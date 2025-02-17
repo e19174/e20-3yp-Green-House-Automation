@@ -4,10 +4,11 @@ import { Ionicons } from '@expo/vector-icons';
 
 interface HeaderProps {
   selectedZone: string;
+  viewZone: boolean;
   setSelectedZone: (zone: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone }) => {
+const Header: React.FC<HeaderProps> = ({ viewZone, selectedZone, setSelectedZone }) => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const zones: string[] = ['ZONE 1', 'ZONE 2'];
@@ -19,12 +20,14 @@ const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone }) => {
           <Ionicons name="notifications" size={26} color="white" />
         </TouchableOpacity>
 
+        {viewZone && 
         <View style={styles.zoneSelector}>
           <Text style={styles.zoneText}>{selectedZone}</Text>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <Text style={styles.dropdownArrow}>▼</Text>
           </TouchableOpacity>
         </View>
+        }
 
         <TouchableOpacity>
           <Ionicons name="settings" size={26} color="white" />

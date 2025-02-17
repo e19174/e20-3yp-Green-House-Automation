@@ -19,7 +19,7 @@ const Zone: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Header selectedZone={selectedZone} setSelectedZone={setSelectedZone} />
+      <Header selectedZone={selectedZone} setSelectedZone={setSelectedZone} viewZone={true} />
 
       <View style={styles.content}>
         <GrowComponents isEnabled={isEnabled} toggleStatus={toggleStatus} />
