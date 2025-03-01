@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react'
-import { View, Text, TextInput, StyleSheet, Button, Pressable } from 'react-native'
+import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native'
 
 const Login:React.FC = () => {
     const [email, setEmail] = useState<string>('');
