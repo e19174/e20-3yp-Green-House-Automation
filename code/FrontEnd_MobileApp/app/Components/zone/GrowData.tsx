@@ -2,11 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import { CircularProgressBase  } from 'react-native-circular-progress-indicator';
+
 
 interface GrowDataItem {
   name: string;
   value: string;
+  unit: string;
   icon: keyof typeof Ionicons.glyphMap;
+  percentage: number;
 }
 
 const GrowData: React.FC = () => {
@@ -16,17 +20,17 @@ const GrowData: React.FC = () => {
 
   useEffect(() => {
     setInterval(() => {
-      axios.get('http://localhost:8080/api/v1/sensors/currentData') // Adjust if hosted externally
+      axios.get('http://localhost:8080/api/v1/sensors/currentData') 
       .then(response => {
         const sensorData = response.data
         console.log(sensorData);
         const formattedData: GrowDataItem[] = [
-          { name: 'Temp', value: `${sensorData.temperature}°C`, icon: 'thermometer' },
-          { name: 'Humidity', value: `${sensorData.humidity}%`, icon: 'water' },
-          { name: 'Soil Moisture', value: `${sensorData.soilMoisture}%`, icon: 'leaf' },
-          { name: 'N Level', value: `${sensorData.nitrogenLevel} ppm`, icon: 'flask' },
-          { name: 'P Level', value: `${sensorData.phosphorusLevel} ppm`, icon: 'flask' },
-          { name: 'K Level', value: `${sensorData.potassiumLevel} ppm`, icon: 'flask' },
+          { name: 'Temp', value: `${sensorData.temperature}`, unit: '°C', icon: 'thermometer', percentage: (sensorData.temperature || 0) / 50 },
+          { name: 'Humidity', value: `${sensorData.humidity}`, unit: '%', icon: 'water', percentage: (sensorData.humidity || 0) / 100 },
+          { name: 'Soil Moisture', value: `${sensorData.soilMoisture}`, unit: '%', icon: 'leaf', percentage: (sensorData.soilMoisture || 0) / 3000 },
+          { name: 'N Level', value: `${sensorData.nitrogenLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData.nitrogenLevel || 0) / 0.00125 },
+          { name: 'P Level', value: `${sensorData.phosphorusLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData.phosphorusLevel || 0) / 0.00125 },
+          { name: 'K Level', value: `${sensorData.potassiumLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData.potassiumLevel || 0) / 0.00125 },
         ];
         setGrowDataItems(formattedData);
         setLoading(false);
@@ -59,10 +63,23 @@ const GrowData: React.FC = () => {
         {firstRow.map((item, index) => (
           <View key={index} style={styles.growDataItem}>
             <Text style={styles.growDataTitle}>{item.name}</Text>
-            <View style={styles.largeCircle}>
-              <Ionicons name={item.icon} size={28} color="#16F08B" />
-              <Text style={styles.circleValue}>{item.value}</Text>
-            </View>
+            <CircularProgressBase
+              value={(item.percentage || 0) * 100} // Convert to 0-100%
+              radius={40}
+              duration={1000}
+              
+              activeStrokeColor="#16F08B"
+              inActiveStrokeColor="#01694D"
+              inActiveStrokeOpacity={0.5}
+              activeStrokeWidth={5}
+              inActiveStrokeWidth={5}
+            >
+              <View style={styles.iconOverlay}>
+                <Text style={styles.circleValue}>{item.value}</Text>
+                <Text style={styles.unitText}>{item.unit}</Text>
+                <Ionicons name={item.icon} size={20} color="#16F08B" style={styles.iconInside} />
+              </View>
+            </CircularProgressBase>
           </View>
         ))}
       </View>
@@ -71,10 +88,23 @@ const GrowData: React.FC = () => {
         {secondRow.map((item, index) => (
           <View key={index} style={styles.growDataItem}>
             <Text style={styles.growDataTitle}>{item.name}</Text>
-            <View style={styles.largeCircle}>
-              <Ionicons name={item.icon} size={28} color="#16F08B" />
-              <Text style={styles.circleValue}>{item.value}</Text>
-            </View>
+            <CircularProgressBase
+              value={(item.percentage || 0) * 100} // Convert to 0-100%
+              radius={40}
+              duration={1000}
+              
+              activeStrokeColor="#16F08B"
+              inActiveStrokeColor="#01694D"
+              inActiveStrokeOpacity={0.5}
+              activeStrokeWidth={5}
+              inActiveStrokeWidth={5}
+            >
+              <View style={styles.iconOverlay}>
+                <Text style={styles.circleValue}>{item.value}</Text>
+                <Text style={styles.unitText}>{item.unit}</Text>
+                <Ionicons name={item.icon} size={20} color="#16F08B" style={styles.iconInside} />
+              </View>
+            </CircularProgressBase>
           </View>
         ))}
       </View>
@@ -115,19 +145,22 @@ const styles = StyleSheet.create({
     color: '#16F08B',
     marginBottom: 5,
   },
-  largeCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#04261C',
+   
+  iconOverlay: {
+    position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 5,
   },
   circleValue: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#16F08B',
+    color: 'white',
+  },
+  unitText: {
+    fontSize: 12,
+    color: 'white',
+  },
+  iconInside: {
     marginTop: 5,
   },
 });
