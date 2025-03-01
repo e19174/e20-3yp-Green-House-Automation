@@ -8,6 +8,8 @@ import com.Green_Tech.Green_Tech.Entity.Role;
 import com.Green_Tech.Green_Tech.Entity.User;
 import com.Green_Tech.Green_Tech.Repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,8 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
 
     public User createNewUser(AuthDTO authDTO) throws UserAlreadyFoundException {
@@ -60,6 +64,17 @@ public class UserService {
     }
 
     public String loginUser(AuthDTO authDTO) throws UserNotFoundException {
+        try{
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            authDTO.getEmail(),
+                            authDTO.getPassword()
+                    )
+            );
+        }catch (Exception ex){
+            throw new UserNotFoundException("User not found with " + authDTO.getEmail() + " this email!!!");
+        }
+
         // validate user exists
         User user = userRepo.findByEmail(authDTO.getEmail()).orElseThrow(()
                 -> new UserNotFoundException("User not found"));
