@@ -11,10 +11,10 @@ const GrowComponents: React.FC<GrowComponentsProps> = ({ isEnabled, toggleStatus
   const sendControlSignal = async (index: number, status: boolean) => {
     try {
       const response = await fetch("http://localhost:8080/api/v1/sensors/controlsignal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          device: index, // Send device index (0 - Fan, 1 - Nutrients, 2 - Water, 3 - Light)
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            device: index, // Send device index (0 - Fan, 1 - Nutrients, 2 - Water, 3 - Light)
           turnOn: status, // true or false
         }),
       });
