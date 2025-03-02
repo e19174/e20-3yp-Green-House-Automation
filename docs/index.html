@@ -152,13 +152,23 @@
         </div>
       </div>
 
+    <!-- System video -->
+    <div class="relative isolate overflow-hidden py-24 sm:py-16" id="SolutionArchitecture">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <h2 class="text-4xl font-semibold tracking-tight sm:text-6xl text-center">Implementation</h2>
+        <div class="mt-10 gap-8 sm:mt-16 flex justify-center">
+          <video src="./video/demo.mp4" autoplay muted class="max-w-4xl mx-auto w-full" controls></video>
+        </div>
+      </div>
+    </div>
+
 
     <!-- system Design -->
     <div class="relative isolate overflow-hidden py-24 sm:py-16" id="SolutionArchitecture">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <h2 class="text-4xl font-semibold tracking-tight sm:text-6xl text-center">Solution Architecture</h2>
         <div class="mt-10 gap-8 sm:mt-16 flex justify-center">
-          <img src="./images/high-level.png" alt="" class="">
+          <img src="./images/high-level-new.png" alt="" class="">
         </div>
         <div class="mt-10 gap-8 sm:mt-16 flex justify-center">
           <img src="./images/data-flow.png" alt="">
@@ -187,11 +197,11 @@
                 </li>
                 <li class="flex items-center gap-x-2">
                   <span class="text-[rgb(1,105,77)] text-2xl font-semibold">3.</span>
-                  <span class="text-lg/7 text-gray-600">Temperature and Humidity Sensor</span>
+                  <span class="text-lg/7 text-gray-600">Temperature and Humidity Sensor (DHT22)</span>
                 </li>
                 <li class="flex items-center gap-x-2">
                   <span class="text-[rgb(1,105,77)] text-2xl font-semibold">4.</span>
-                  <span class="text-lg/7 text-gray-600">Water Pump</span>
+                  <span class="text-lg/7 text-gray-600">Solenoid Valve</span>
                 </li>
                 <li class="flex items-center gap-x-2">
                   <span class="text-[rgb(1,105,77)] text-2xl font-semibold">5.</span>
@@ -230,7 +240,7 @@
                 </li>
                 <li class="flex items-center gap-x-2">
                   <span class="text-[rgb(1,105,77)] text-2xl font-semibold">3.</span>
-                  <span class="text-lg/7 text-gray-600">MQTT</span>
+                  <span class="text-lg/7 text-gray-600">MySQL</span>
                 </li>
                 <li class="flex items-center gap-x-2">
                   <span class="text-[rgb(1,105,77)] text-2xl font-semibold">4.</span>
@@ -259,15 +269,15 @@
           <tbody>
             <tr class="border-b border-gray-200">
               <td class="text-lg/7 text-gray-600 p-2">ESP32</td>
-              <td class="text-lg/7 text-gray-600 p-2">3</td>
+              <td class="text-lg/7 text-gray-600 p-2">2</td>
               <td class="text-lg/7 text-gray-600 p-2">Rs. 1490</td>
-              <td class="text-lg/7 text-gray-600 p-2">Rs. 4470</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 2980</td>
             </tr>
             <tr class="border-b border-gray-200">
               <td class="text-lg/7 text-gray-600 p-2">DHT22</td>
-              <td class="text-lg/7 text-gray-600 p-2">3</td>
+              <td class="text-lg/7 text-gray-600 p-2">2</td>
               <td class="text-lg/7 text-gray-600 p-2">Rs. 590</td>
-              <td class="text-lg/7 text-gray-600 p-2">Rs. 1770</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 1190</td>
             </tr>
             <tr class="border-b border-gray-200">
               <td class="text-lg/7 text-gray-600 p-2">NPK sensor</td>
@@ -283,21 +293,21 @@
             </tr>
             <tr class="border-b border-gray-200">
               <td class="text-lg/7 text-gray-600 p-2">Fan</td>
-              <td class="text-lg/7 text-gray-600 p-2">2</td>
+              <td class="text-lg/7 text-gray-600 p-2">1</td>
               <td class="text-lg/7 text-gray-600 p-2">Rs. 1550</td>
-              <td class="text-lg/7 text-gray-600 p-2">Rs. 3100</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 1550</td>
             </tr>
             <tr class="border-b border-gray-200">
-              <td class="text-lg/7 text-gray-600 p-2">Water Pump</td>
-              <td class="text-lg/7 text-gray-600 p-2">4</td>
-              <td class="text-lg/7 text-gray-600 p-2">Rs. 1450</td>
-              <td class="text-lg/7 text-gray-600 p-2">Rs. 4350</td>
+              <td class="text-lg/7 text-gray-600 p-2">Solenoid valve</td>
+              <td class="text-lg/7 text-gray-600 p-2">5</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 1190</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 5950</td>
             </tr>
             <tr class="border-b border-gray-200">
               <td class="text-lg/7 text-gray-600 p-2">Jumber wires</td>
-              <td class="text-lg/7 text-gray-600 p-2">1</td>
-              <td class="text-lg/7 text-gray-600 p-2">Rs. 500</td>
-              <td class="text-lg/7 text-gray-600 p-2">Rs. 500</td>
+              <td class="text-lg/7 text-gray-600 p-2">2</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 190</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 380</td>
             </tr>
             <tr class="border-b border-gray-200">
               <td class="text-lg/7 text-gray-600 p-2">PCB board</td>
@@ -307,15 +317,45 @@
             </tr>
             <tr class="border-b border-gray-200">
               <td class="text-lg/7 text-gray-600 p-2">Relay</td>
+              <td class="text-lg/7 text-gray-600 p-2">6</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 220</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 1320</td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="text-lg/7 text-gray-600 p-2">RS485</td>
+              <td class="text-lg/7 text-gray-600 p-2">1</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 195</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 195</td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="text-lg/7 text-gray-600 p-2">Solder wire</td>
+              <td class="text-lg/7 text-gray-600 p-2">2</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 240</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 480</td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="text-lg/7 text-gray-600 p-2">Bread board</td>
+              <td class="text-lg/7 text-gray-600 p-2">1</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 290</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 290</td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="text-lg/7 text-gray-600 p-2">Wood sticks</td>
+              <td class="text-lg/7 text-gray-600 p-2">22</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 114</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 2516</td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="text-lg/7 text-gray-600 p-2">Polythene sheets</td>
               <td class="text-lg/7 text-gray-600 p-2">5</td>
-              <td class="text-lg/7 text-gray-600 p-2">Rs. 300</td>
-              <td class="text-lg/7 text-gray-600 p-2">Rs. 1500</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 1000</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 5000</td>
             </tr>
             <tr class="border-b border-gray-200 bg-gray-100">
               <td class="text-lg/7 text-gray-600 p-2">TOTAL</td>
               <td></td>
               <td></td>
-              <td class="text-lg/7 text-gray-600 p-2">Rs. 28370</td>
+              <td class="text-lg/7 text-gray-600 p-2">Rs. 34291</td>
             </tr>
          
           </tbody>
