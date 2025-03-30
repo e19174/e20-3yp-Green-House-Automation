@@ -25,10 +25,10 @@ public class MQTTService {
 
     private MqttClientConnection connection;
 
-    @PostConstruct
-    public void startMqttClient() {
-        new Thread(this::connectAndSubscribe).start();
-    }
+//    @PostConstruct
+//    public void startMqttClient() {
+//        new Thread(this::connectAndSubscribe).start();
+//    }
 
     private void connectAndSubscribe() {
         try {

@@ -7,22 +7,65 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  Button,
 } from "react-native";
 import Footer from "../common/Footer";
 import Header from "../common/Header";
+import axios from 'axios';
+import * as ImagePicker from "react-native-image-picker";
 
 interface USER {
   name: string,
   email: string,
   phoneNumber: number,
-  imageData: Uint8Array;
+  imageData: string;
   imageType: string,
   imageName: string,
 }
 
 const Profile: React.FC = () => {
-    const [user, setUser] = useState<USER>();
-  const params = useLocalSearchParams(); // Fix: Get params without destructuring
+  const [user, setUser] = useState<USER>({
+    name: '',
+    email: '',
+    phoneNumber: 0,
+    imageData: '',
+    imageType: '',
+    imageName: '',
+  });
+  const params = useLocalSearchParams();
+  const [imageUri, setImageUri] = useState<any>();
+  const [image, setImage] = useState<FileToUpload>();
+
+  const handlePickImage = () => {
+    ImagePicker.launchImageLibrary(
+      { mediaType: "photo", quality: 1 },
+      (response) => {
+        if (response.didCancel) {
+          console.log("User cancelled image picker");
+        } else if (response.errorCode) {
+          console.log("ImagePicker Error:", response.errorMessage);
+        } else {
+          if (response.assets && response.assets.length > 0) {
+            const file = response.assets[0]; // Extract file info
+            setImageUri(file.uri);
+            setImage({
+              uri: file.uri || "",
+              name: file.fileName || "upload.jpg",
+              type: file.type || "image/jpeg",
+            })
+            // setImageUri(file.uri);
+            // const fileToUpload: FileToUpload = {
+            //   uri: file.uri || "",
+            //   name: file.fileName || "profile.jpg",
+            //   type: file.type || "image/jpeg",
+            // };
+            // handleUpdate(fileToUpload);
+          }
+        }
+      }
+    );
+  };
+
 
   useEffect(() => {
     if (params.user) {
@@ -35,12 +78,47 @@ const Profile: React.FC = () => {
     }
   }, [params.user]); // Fix: Add `params.user` as a dependency
     
-    const handleInput = (text: string, field: keyof USER) => {
-  setUser((prevUser) => ({
-    ...prevUser!,
-    [field]: text,  // Correct way to dynamically update state
-  }));
-};
+  const handleInput = (text: string|number, field: keyof USER) => {
+    setUser((prevUser) => ({
+      ...prevUser!,
+      [field]: text,  // Correct way to dynamically update state
+    }));
+  };
+
+  interface FileToUpload {
+    uri: string;
+    name: string;
+    type: string;
+  }
+
+  const handleUpdate = async () => {
+    const formData = new FormData();
+    if (image) {
+      formData.append("file", {
+        uri: image.uri,
+        name: image.name,
+        type: image.type,
+      } as any);
+    }
+    formData.append("name", user.name);
+    formData.append("phoneNumber", user.phoneNumber.toString());
+    try {
+      const response = await axios.post("http://localhost:8080/api/v1/auth/user/update", formData, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      setUser(response.data);
+      console.log(user);
+      console.log(formData.get("file"));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // useEffect(()=>{
+  //   setImageUrl(`data:${user?.imageType};base64,${(user?.imageData)}`);
+  // },[user])
 
   // State for user input
   return (
@@ -48,19 +126,18 @@ const Profile: React.FC = () => {
       <Header viewZone={false} selectedZone={""} setSelectedZone={() => {}} />
 
       <View style={styles.profileContainer}>
-        <View style={styles.headings}> Edit Profile </View>
+        <Text style={styles.headings}> Edit Profile </Text>
           <View style={styles.profileWork}>
             <View style={styles.inner}>
               <Image
-                source={{
-                  uri: "https://randomuser.me/api/portraits/men/75.jpg",
-                }}
+                source={user?.imageData ? { uri: imageUri } : require("../../../assets/profile_picture.jpg")}
                 style={styles.profileImage}
               />
+              <Button title='add' onPress={handlePickImage}/>
             </View>
           </View>
         
-        <TouchableOpacity style={styles.editProfileButton} >
+        <TouchableOpacity style={styles.editProfileButton} onPress={() => handleUpdate()}>
           <Text style={styles.editProfileText}>Update</Text>
         </TouchableOpacity>
       </View>
@@ -70,7 +147,7 @@ const Profile: React.FC = () => {
             <Text style={styles.separator}>:</Text>
              <TextInput 
                 style={styles.value} 
-                value={user?.name} 
+                value={user?.name || ''} 
                 onChangeText={(text) => handleInput(text, "name")} // ✅ Pass text and field name
                 placeholderTextColor="white"
              />
@@ -82,7 +159,7 @@ const Profile: React.FC = () => {
             <Text style={styles.separator}>:</Text>
                <TextInput 
                 style={styles.value} 
-                value={user?.email} 
+                value={user?.email || ''} 
                 onChangeText={(text) => handleInput(text, "email")} // ✅ Pass text and field name
                 placeholderTextColor="white"
              />
@@ -91,15 +168,13 @@ const Profile: React.FC = () => {
         <View style={styles.detailsRow}>
           <Text style={styles.label}>Contact-No</Text>
             <Text style={styles.separator}>:</Text>
-              <TextInput 
+              <TextInput
                 style={styles.value} 
-                 value={user?.phoneNumber} 
-                 onChangeText={(text) => handleInput(text, "phoneNumber")} // ✅ Pass text and field name
+                 value={user?.phoneNumber?.toString() || ''} 
+                 onChangeText={(text) => handleInput(Number(text), "phoneNumber")} // ✅ Pass text and field name
                  placeholderTextColor="white"
                 />
-            </View>
-
-
+        </View>
       <Footer />
     </View>
   );

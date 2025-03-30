@@ -64,16 +64,16 @@ public class UserService {
     }
 
     public String loginUser(AuthDTO authDTO) throws UserNotFoundException {
-        try{
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            authDTO.getEmail(),
-                            authDTO.getPassword()
-                    )
-            );
-        }catch (Exception ex){
-            throw new UserNotFoundException("User not found with " + authDTO.getEmail() + " this email!!!");
-        }
+//        try{
+//            authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(
+//                            authDTO.getEmail(),
+//                            authDTO.getPassword()
+//                    )
+//            );
+//        }catch (Exception ex){
+//            throw new UserNotFoundException("User not found with " + authDTO.getEmail() + " this email!!!");
+//        }
 
         // validate user exists
         User user = userRepo.findByEmail(authDTO.getEmail()).orElseThrow(()
@@ -92,7 +92,7 @@ public class UserService {
         User user = extractUserFromJwt(auth);
 
         user.setName(userDTO.getName());
-        user.setEmail(userDTO.getEmail());
+//        user.setEmail(userDTO.getEmail());
         user.setPhoneNumber(userDTO.getPhoneNumber());
         if (file != null && !file.isEmpty()) {
             user.setImageName(file.getOriginalFilename());
@@ -100,7 +100,7 @@ public class UserService {
             user.setImageType(file.getContentType());
         }
         userRepo.save(user);
-        return "upadted sucessfully";
+        return "updated successfully";
     }
 
     public void updateProfilePicture(Long userId, MultipartFile file) throws IOException {
@@ -131,7 +131,8 @@ public class UserService {
     }
 
     public User extractUserFromJwt(String auth) throws UserNotFoundException{
-        String token = auth.substring('7');
+        String token = auth.substring(7);
+        System.out.println(token);
         String email = jwtService.extractUserEmail(token);
         return userRepo.findByEmail(email).orElseThrow(()->
             new UserNotFoundException("There is no user with "+ email)
