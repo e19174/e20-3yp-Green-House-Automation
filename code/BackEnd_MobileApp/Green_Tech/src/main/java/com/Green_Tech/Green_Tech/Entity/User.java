@@ -1,9 +1,6 @@
 package com.Green_Tech.Green_Tech.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,9 +23,17 @@ public class User implements UserDetails {
     private String name;
     private String email;
     private String password;
+    private Long phoneNumber;
     private Role role;
     private Date createdAt;
     private Date updatedAt;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] imageData;
+    private String imageType;
+    private String imageName;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

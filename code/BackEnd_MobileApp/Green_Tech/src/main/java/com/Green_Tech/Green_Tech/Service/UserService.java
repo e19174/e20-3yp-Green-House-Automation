@@ -4,14 +4,22 @@ import com.Green_Tech.Green_Tech.Config.JwtService;
 import com.Green_Tech.Green_Tech.CustomException.UserAlreadyFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
 import com.Green_Tech.Green_Tech.DTO.AuthDTO;
+import com.Green_Tech.Green_Tech.DTO.UserDTO;
+import com.Green_Tech.Green_Tech.DTO.UserResponseDTO;
 import com.Green_Tech.Green_Tech.Entity.Role;
 import com.Green_Tech.Green_Tech.Entity.User;
 import com.Green_Tech.Green_Tech.Repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -22,6 +30,10 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private ExtractUserService extractUserService;
 
 
     public User createNewUser(AuthDTO authDTO) throws UserAlreadyFoundException {
@@ -40,12 +52,6 @@ public class UserService {
             throw new IllegalArgumentException("Invalid email format");
         }
 
-//        // validate password complexity
-//        if (authDTO.getPassword().length() < 8 ||!authDTO.getPassword().matches(".*[a-z].*[a-z].*")) {
-//            throw new IllegalArgumentException("Password must contain at least 8 characters and contain at least two lowercase letters");
-//        }
-
-        // encode password and create user
         String password = passwordEncoder.encode(authDTO.getPassword());
         User user = User.builder()
                 .name(authDTO.getEmail().split("@")[0])
@@ -60,6 +66,17 @@ public class UserService {
     }
 
     public String loginUser(AuthDTO authDTO) throws UserNotFoundException {
+        try{
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            authDTO.getEmail(),
+                            authDTO.getPassword()
+                    )
+            );
+        }catch (Exception ex){
+            throw new UserNotFoundException("User not found with " + authDTO.getEmail() + " this email!!!");
+        }
+
         // validate user exists
         User user = userRepo.findByEmail(authDTO.getEmail()).orElseThrow(()
                 -> new UserNotFoundException("User not found"));
@@ -70,5 +87,59 @@ public class UserService {
         }
 
         return jwtService.generateToken(user, user.getRole());
+    }
+
+    public String updateUser(String auth, UserDTO userDTO, MultipartFile file) throws UserNotFoundException, IOException {
+
+        User user = extractUserService.extractUserFromJwt(auth);
+
+        user.setName(userDTO.getName());
+        user.setEmail(userDTO.getEmail());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        if (file != null && !file.isEmpty()) {
+            user.setImageName(file.getOriginalFilename());
+            user.setImageData(file.getBytes());
+            user.setImageType(file.getContentType());
+        }
+        userRepo.save(user);
+        return "upadted sucessfully";
+    }
+
+    public void updateProfilePicture(Long userId, MultipartFile file) throws IOException {
+        Optional<User> userOptional = userRepo.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setImageData(file.getBytes());
+            userRepo.save(user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    public UserResponseDTO getUser(String auth) throws UserNotFoundException {
+        User user = extractUserService.extractUserFromJwt(auth);
+        String base64Image = null;
+        if (user.getImageData() != null) {
+            base64Image = Base64.getEncoder().encodeToString(user.getImageData());
+        }
+        return UserResponseDTO.builder()
+                .name(user.getName())
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .imageType(user.getImageType())
+                .imageName(user.getImageName())
+                .imageData(base64Image)
+                .build();
+    }
+
+
+
+    public void saveUserWithImage(User user, MultipartFile file) throws IOException {
+        if (file != null && !file.isEmpty()) {
+            user.setImageData(file.getBytes());
+            user.setImageType(file.getContentType());
+            user.setImageName(file.getOriginalFilename());
+        }
+        userRepo.save(user);
     }
 }
