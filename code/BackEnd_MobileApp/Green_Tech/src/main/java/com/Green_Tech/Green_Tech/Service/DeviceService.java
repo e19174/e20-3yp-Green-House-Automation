@@ -64,11 +64,16 @@ public class DeviceService {
         });
     }
 
-    // Delete a device by ID
-    public boolean deleteDevice(Long id) {
-        return deviceRepository.findById(id).map(device -> {
-            deviceRepository.delete(device);
+    public boolean deleteDeviceByMacAndUser(String mac, String auth) throws UserNotFoundException {
+        User user = extractUserService.extractUserFromJwt(auth);
+
+        Optional<Device> deviceOptional = deviceRepository.findByMacAndUser(mac, user);
+        if (deviceOptional.isPresent()) {
+            deviceRepository.delete(deviceOptional.get());
             return true;
-        }).orElse(false);
+        } else {
+            return false;
+        }
     }
+
 }

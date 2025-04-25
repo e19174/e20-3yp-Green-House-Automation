@@ -24,7 +24,7 @@ public class DeviceController {
         return deviceService.getAllDevices();
     }
 
-    @GetMapping("/by-user")
+    @GetMapping("/getByUser")
     public ResponseEntity<List<Device>> getDevicesByUser(@RequestHeader("Authorization") String auth) throws UserNotFoundException {
         List<Device> devices = deviceService.getDevicesByUser(auth);
         if (devices.isEmpty()) {
@@ -34,7 +34,7 @@ public class DeviceController {
     }
 
 
-    @PostMapping("/addDevice")
+    @PostMapping("/add")
     public ResponseEntity<Device> createDevice(@RequestBody Map<String, String> data,
                                                @RequestHeader("Authorization") String auth) throws UserNotFoundException {
         return ResponseEntity.ok(deviceService.createDevice(data, auth));
@@ -47,9 +47,15 @@ public class DeviceController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDevice(@PathVariable Long id) {
-        boolean deleted = deviceService.deleteDevice(id);
+    @DeleteMapping("/delete")
+    public ResponseEntity<Device> deleteDevice(@RequestBody Map<String, String> data,
+                                               @RequestHeader("Authorization") String auth) throws UserNotFoundException {
+        String mac = data.get("mac");
+        if (mac == null || mac.isEmpty()) {
+            return ResponseEntity.badRequest().build();  // 400 if mac not provided
+        }
+
+        boolean deleted = deviceService.deleteDeviceByMacAndUser(mac, auth);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 }
