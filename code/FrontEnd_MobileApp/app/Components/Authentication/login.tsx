@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react'
@@ -17,7 +18,7 @@ const Login:React.FC = () => {
         try {
             const response = await axios.post("http://localhost:8080/api/v1/auth/user/login", {email, password});
             console.log(response.data);
-            localStorage.setItem("token", response.data);
+            await AsyncStorage.setItem("token", response.data);
             router.push("/Components/Home/Home");
         } catch (error: any) {
             console.log(error.response.data.message);

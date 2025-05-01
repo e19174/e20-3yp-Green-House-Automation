@@ -44,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone
         }
 
         <TouchableOpacity onPress={() => setSidebarVisible(true)}>
-          <Ionicons name="settings" size={26} color="white" />
+          <Ionicons name="menu" size={26} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -85,7 +85,7 @@ const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => router.push('Components/Profile')}>
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => router.push('Components/Profile/Profile')}>
               <Ionicons name="person" size={24} color="white" />
               <Text style={styles.sidebarText}>Profile</Text>
             </TouchableOpacity>
@@ -177,10 +177,10 @@ const styles = StyleSheet.create({
     width: '70%',
     backgroundColor: '#014D38',
     padding: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+    // shadowColor: '#000',
+    // shadowOffset: { width: 2, height: 0 },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 10,
     elevation: 10,
     height: '100%',
   },

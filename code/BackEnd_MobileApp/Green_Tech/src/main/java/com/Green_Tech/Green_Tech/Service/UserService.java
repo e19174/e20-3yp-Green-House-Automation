@@ -118,6 +118,7 @@ public class UserService {
 
     public UserResponseDTO getUser(String auth) throws UserNotFoundException {
         User user = extractUserService.extractUserFromJwt(auth);
+
         String base64Image = null;
         if (user.getImageData() != null) {
             base64Image = Base64.getEncoder().encodeToString(user.getImageData());
@@ -131,8 +132,6 @@ public class UserService {
                 .imageData(base64Image)
                 .build();
     }
-
-
 
     public void saveUserWithImage(User user, MultipartFile file) throws IOException {
         if (file != null && !file.isEmpty()) {

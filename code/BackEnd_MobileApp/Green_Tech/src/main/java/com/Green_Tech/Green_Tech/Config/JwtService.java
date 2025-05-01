@@ -9,7 +9,9 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +20,17 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "MjJEQkMyQTkzNkZEMkJGMkY0RjM3NDYyQjZBQkMzMjJOMzJOMzJOM0oy" +
-            "TkozSjIzSlNOMzIzRU5EMjM4MzI0TkRKMlM4U1c";
+    private static final String SECRET_KEY = generateKey();
+
+    private Key getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public static String generateKey() {
+        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        return Base64.getEncoder().encodeToString(key.getEncoded());
+    }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         try{
@@ -34,11 +45,6 @@ public class JwtService {
         }catch (Exception e){
             throw new IllegalStateException("Invalid jwt token", e);
         }
-    }
-
-    private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateToken(UserDetails userDetails, Role role) {

@@ -46,16 +46,10 @@ public class UserController {
         return ResponseEntity.ok(userService.getUser(auth));
     }
 
-    @PostMapping("/upload-image")
-    public ResponseEntity<String> uploadUserImage(
-            @RequestHeader("Authorization") String auth,
-            @RequestParam("file") MultipartFile file,
-            @RequestBody UserDTO userDto) throws UserNotFoundException, IOException {
-
-            if (file.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File is empty. Please upload a valid image.");
-            }
-
+    @PostMapping("/update")
+    public ResponseEntity<String> uploadUserImage(@RequestHeader("Authorization") String auth,
+                                                  @RequestParam(value = "file", required = false) MultipartFile file,
+                                                  @ModelAttribute UserDTO userDto) throws UserNotFoundException, IOException {
         return ResponseEntity.ok(userService.updateUser(auth, userDto, file));
     }
 

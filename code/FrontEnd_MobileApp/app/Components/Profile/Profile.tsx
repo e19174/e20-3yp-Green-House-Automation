@@ -10,13 +10,13 @@ import {
 import Footer from "../common/Footer";
 import Header from "../common/Header";
 import axios from "axios";
-import { setParams } from "expo-router/build/global-state/routing";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface USER {
   name: String,
   email: String,
   phoneNumber: number,
-  imageData: Uint8Array;
+  imageData: string;
   imageType: String,
   imageName: String,
 }
@@ -26,19 +26,22 @@ const Profile: React.FC = () => {
   const[user, setUser] = useState<USER>()
   
   const fetchUserData = async () => {
+    const token = await AsyncStorage.getItem("token");
     try {
       const response = axios.get("http://localhost:8080/api/v1/auth/user/getUser", {
         headers: {
-          Authorization: "bearer " + localStorage.getItem("token")
+          Authorization: `Bearer ${token}`
         }
       });
       setUser((await response).data);
+      console.log((await response).data);
     } catch (error) {
       console.log(error)
     }
   }
 
   useEffect(() => {
+    console.log("token: ",localStorage.getItem("token"));
     fetchUserData();
   },[])
   
@@ -49,7 +52,7 @@ const Profile: React.FC = () => {
       <Header viewZone={false} selectedZone={""} setSelectedZone={() => {}} />
 
       <View style={styles.profileContainer}>
-        <View style={styles.headings}> Profile </View>
+        <Text style={styles.headings}> Profile </Text>
           <View style={styles.profileWork}>
             <View style={styles.inner}>
               <Image
@@ -59,9 +62,9 @@ const Profile: React.FC = () => {
             </View>
           </View>
         
-        <TouchableOpacity style={styles.editProfileButton} onPress={() => router.push({ pathname: 'Components/Profile/EditProfile', params: {user: JSON.stringify(user)} })}>
-          <Text style={styles.editProfileText}>Edit Profile</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.editProfileButton} onPress={() => router.push({ pathname: 'Components/Profile/EditProfile', params: {user: JSON.stringify(user)} })}>
+            <Text style={styles.editProfileText}>Edit Profile</Text>
+          </TouchableOpacity>
       </View>
 
       <View style={styles.detailsContainer}>
