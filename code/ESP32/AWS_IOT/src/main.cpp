@@ -16,9 +16,10 @@
 #define WATER_PIN 17
 #define LIGHT_PIN 2
 
-float h;
-float t;
-DHT dht(DHTPIN, DHTTYPE);
+//     pinMode(FAN_PIN, OUTPUT);
+//     pinMode(NUTRIENTS_PIN, OUTPUT);
+//     pinMode(WATER_PIN, OUTPUT);
+//     pinMode(LIGHT_PIN, OUTPUT);
 
 struct Command {
   const char* name;
@@ -33,49 +34,50 @@ void setup(){
   
     Serial.begin(115200);
 
-    pinMode(FAN_PIN, OUTPUT);
-    pinMode(NUTRIENTS_PIN, OUTPUT);
-    pinMode(WATER_PIN, OUTPUT);
-    pinMode(LIGHT_PIN, OUTPUT);
+// }
 
-    connectAWS();
-    dht.begin();
+// void loop(){
 
-}
+//   client.loop();
 
-void loop(){
+//   h = dht.readHumidity();
+//   t = dht.readTemperature();
 
-  client.loop();
+//   if (isnan(h) || isnan(t)) // Check if any reads failed and exit early (to try again).
+//   {
+//     Serial.println(F("Failed to read from DHT sensor!"));
+//     return;
+//     }
 
-  h = dht.readHumidity();
-  t = dht.readTemperature();
+//     int moisture = analogRead(MOISTURE_SENSOR_PIN);
 
-  if (isnan(h) || isnan(t)) // Check if any reads failed and exit early (to try again).
-  {
-    Serial.println(F("Failed to read from DHT sensor!"));
-    return;
-    }
+//     Serial.print(F("Humidity: "));
+//     Serial.print(h);
+//     Serial.print(F("%  Temperature: "));
+//     Serial.print(t);
+//     Serial.println(F("°C "));
 
-    int moisture = analogRead(MOISTURE_SENSOR_PIN);
+//     Serial.print(F("Moisture: "));
+//     Serial.print(moisture);
+//     Serial.println(F("%"));
 
-    Serial.print(F("Humidity: "));
-    Serial.print(h);
-    Serial.print(F("%  Temperature: "));
-    Serial.print(t);
-    Serial.println(F("°C "));
+//     if (moisture < 1000)
+//     {
+//       Serial.println("Watering the plant");
+//     }
+//     else
+//     {
+//       Serial.println("Plant is watered");
+//     }
 
-    Serial.print(F("Moisture: "));
-    Serial.print(moisture);
-    Serial.println(F("%"));
+//     // control command for equipments
+//     processCommand(command);
 
-    if (moisture < 1000)
-    {
-      Serial.println("Watering the plant");
-    }
-    else
-    {
-      Serial.println("Plant is watered");
-    }
+//     publishMessage(h, t, moisture);
+//     client.loop();
+//     delay(2000);
+// }
+
 
     // control command for equipments
     processCommand(command);

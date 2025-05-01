@@ -32,6 +32,8 @@ public class UserService {
     private JwtService jwtService;
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private ExtractUserService extractUserService;
 
 
     public User createNewUser(AuthDTO authDTO) throws UserAlreadyFoundException {
@@ -64,16 +66,16 @@ public class UserService {
     }
 
     public String loginUser(AuthDTO authDTO) throws UserNotFoundException {
-//        try{
-//            authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(
-//                            authDTO.getEmail(),
-//                            authDTO.getPassword()
-//                    )
-//            );
-//        }catch (Exception ex){
-//            throw new UserNotFoundException("User not found with " + authDTO.getEmail() + " this email!!!");
-//        }
+        try{
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            authDTO.getEmail(),
+                            authDTO.getPassword()
+                    )
+            );
+        }catch (Exception ex){
+            throw new UserNotFoundException("User not found with " + authDTO.getEmail() + " this email!!!");
+        }
 
         // validate user exists
         User user = userRepo.findByEmail(authDTO.getEmail()).orElseThrow(()
@@ -89,10 +91,10 @@ public class UserService {
 
     public String updateUser(String auth, UserDTO userDTO, MultipartFile file) throws UserNotFoundException, IOException {
 
-        User user = extractUserFromJwt(auth);
+        User user = extractUserService.extractUserFromJwt(auth);
 
         user.setName(userDTO.getName());
-//        user.setEmail(userDTO.getEmail());
+        user.setEmail(userDTO.getEmail());
         user.setPhoneNumber(userDTO.getPhoneNumber());
         if (file != null && !file.isEmpty()) {
             user.setImageName(file.getOriginalFilename());
@@ -100,7 +102,7 @@ public class UserService {
             user.setImageType(file.getContentType());
         }
         userRepo.save(user);
-        return "updated successfully";
+        return "upadted sucessfully";
     }
 
     public void updateProfilePicture(Long userId, MultipartFile file) throws IOException {
@@ -115,7 +117,8 @@ public class UserService {
     }
 
     public UserResponseDTO getUser(String auth) throws UserNotFoundException {
-        User user = extractUserFromJwt(auth);
+        User user = extractUserService.extractUserFromJwt(auth);
+
         String base64Image = null;
         if (user.getImageData() != null) {
             base64Image = Base64.getEncoder().encodeToString(user.getImageData());
@@ -128,15 +131,6 @@ public class UserService {
                 .imageName(user.getImageName())
                 .imageData(base64Image)
                 .build();
-    }
-
-    public User extractUserFromJwt(String auth) throws UserNotFoundException{
-        String token = auth.substring(7);
-        System.out.println(token);
-        String email = jwtService.extractUserEmail(token);
-        return userRepo.findByEmail(email).orElseThrow(()->
-            new UserNotFoundException("There is no user with "+ email)
-        );
     }
 
     public void saveUserWithImage(User user, MultipartFile file) throws IOException {

@@ -15,7 +15,6 @@ public class JWTService {
     @Autowired
     private JWTRepo jwtRepo;
 
-
     public String generateToken(User user) {
         String token = UUID.randomUUID().toString();
         JWT jwt = JWT.builder()

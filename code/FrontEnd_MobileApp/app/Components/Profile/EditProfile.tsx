@@ -7,18 +7,15 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
-  Button,
 } from "react-native";
 import Footer from "../common/Footer";
 import Header from "../common/Header";
-import axios from 'axios';
-import * as ImagePicker from "react-native-image-picker";
 
 interface USER {
   name: string,
   email: string,
   phoneNumber: number,
-  imageData: string;
+  imageData: Uint8Array;
   imageType: string,
   imageName: string,
 }
@@ -159,7 +156,7 @@ const Profile: React.FC = () => {
             <Text style={styles.separator}>:</Text>
                <TextInput 
                 style={styles.value} 
-                value={user?.email || ''} 
+                value={user?.email} 
                 onChangeText={(text) => handleInput(text, "email")} // ✅ Pass text and field name
                 placeholderTextColor="white"
              />
