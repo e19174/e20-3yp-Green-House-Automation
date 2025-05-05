@@ -56,7 +56,7 @@ const Profile: React.FC = () => {
           <View style={styles.profileWork}>
             <View style={styles.inner}>
               <Image
-                source={user?.imageData ? { uri: imageUri } : require("../../../assets/profile_picture.jpg")}
+                source={user?.imageData ? { uri: imageUri } : require("../../../assets/profile_picture.webp")}
                 style={styles.profileImage}
                 />
             </View>
@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     borderWidth: 3,
     borderColor: "#fff",
+    backgroundColor: "#fff",
   },
   editProfileButton: {
     marginTop: 15,

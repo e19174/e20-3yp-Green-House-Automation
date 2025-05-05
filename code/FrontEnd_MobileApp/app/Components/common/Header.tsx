@@ -3,11 +3,22 @@ import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet, Image } from
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 interface HeaderProps {
   selectedZone: string;
   viewZone: boolean;
   setSelectedZone: (zone: string) => void;
+}
+
+interface USER {
+  name: String,
+  email: String,
+  phoneNumber: number,
+  imageData: string;
+  imageType: String,
+  imageName: String,
 }
 
 const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone }) => {
@@ -16,14 +27,32 @@ const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone
 
   const zones: string[] = ['ZONE 1', 'ZONE 2'];
 
+  const[user, setUser] = useState<USER>()
+  
+  const fetchUserData = async () => {
+    const token = await AsyncStorage.getItem("token");
+    try {
+      const response = axios.get("http://localhost:8080/api/v1/auth/user/getUser", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setUser((await response).data);
+      console.log((await response).data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
-    if(!localStorage.getItem("token")){
+    if(!AsyncStorage.getItem("token")){
       router.push('Components/Authentication/login');
     }
+    fetchUserData();
   },[])
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    AsyncStorage.removeItem("token");
     router.push('Components/Authentication/login');
   }
 
@@ -79,7 +108,7 @@ const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone
             </TouchableOpacity>
 
             <Image
-              source={require("../../../assets/profile_picture.jpg")}
+              source={user?.imageData? `data:${user.imageType};base64,${user.imageData}`: require("../../../assets/profile_picture.webp")}
               style={styles.profilePicture}
             />
 
@@ -95,10 +124,16 @@ const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone
               <Text style={styles.sidebarText}>Settings</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => router.push('Components/Manual/Manual')}>
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => router.push('Components/Device/DisplayList')}>
               <Ionicons name="radio-sharp" size={24} color="white" />
               <Text style={styles.sidebarText}>Instruments</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => router.push('Components/Manual/Manual')}>
+              <Ionicons name="radio-sharp" size={24} color="white" />
+              <Text style={styles.sidebarText}>Manual</Text>
+            </TouchableOpacity>
+
 
             <View style={styles.divider} />
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

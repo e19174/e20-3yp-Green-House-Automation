@@ -89,20 +89,18 @@ public class UserService {
         return jwtService.generateToken(user, user.getRole());
     }
 
-    public String updateUser(String auth, UserDTO userDTO, MultipartFile file) throws UserNotFoundException, IOException {
+    public User updateUser(String auth, UserDTO userDTO, MultipartFile file) throws UserNotFoundException, IOException {
 
         User user = extractUserService.extractUserFromJwt(auth);
 
         user.setName(userDTO.getName());
-        user.setEmail(userDTO.getEmail());
         user.setPhoneNumber(userDTO.getPhoneNumber());
         if (file != null && !file.isEmpty()) {
             user.setImageName(file.getOriginalFilename());
             user.setImageData(file.getBytes());
             user.setImageType(file.getContentType());
         }
-        userRepo.save(user);
-        return "upadted sucessfully";
+        return userRepo.save(user);
     }
 
     public void updateProfilePicture(Long userId, MultipartFile file) throws IOException {
@@ -129,7 +127,7 @@ public class UserService {
                 .email(user.getEmail())
                 .imageType(user.getImageType())
                 .imageName(user.getImageName())
-                .imageData(base64Image)
+                .imageData(user.getImageData())
                 .build();
     }
 

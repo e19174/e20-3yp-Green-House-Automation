@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 
 @CrossOrigin
@@ -46,8 +47,8 @@ public class UserController {
         return ResponseEntity.ok(userService.getUser(auth));
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<String> uploadUserImage(@RequestHeader("Authorization") String auth,
+    @PutMapping("/update")
+    public ResponseEntity<User> uploadUserImage(@RequestHeader("Authorization") String auth,
                                                   @RequestParam(value = "file", required = false) MultipartFile file,
                                                   @ModelAttribute UserDTO userDto) throws UserNotFoundException, IOException {
         return ResponseEntity.ok(userService.updateUser(auth, userDto, file));
