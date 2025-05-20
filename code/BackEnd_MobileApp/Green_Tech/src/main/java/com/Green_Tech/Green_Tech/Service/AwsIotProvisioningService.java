@@ -4,7 +4,9 @@ import com.Green_Tech.Green_Tech.Entity.AwsIotCredentials;
 import com.Green_Tech.Green_Tech.Entity.Device;
 import com.Green_Tech.Green_Tech.Repository.AwsIotCredentialsRepo;
 import com.Green_Tech.Green_Tech.Repository.DeviceRepo;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -21,12 +23,20 @@ public class AwsIotProvisioningService {
     @Autowired
     private AwsIotCredentialsRepo awsIotCredentialsRepo;
 
-    private final IotClient iotClient;
+    @Value("${aws.accessKeyId}")
+    private String accessKeyId;
+    @Value("${aws.secretKey}")
+    private String secretAccessKey;
+    @Value("${aws.endpointUrl}")
+    private String endpoint;
 
-    public AwsIotProvisioningService() {
+    private IotClient iotClient;
+
+    @PostConstruct
+    public void init() {
         AwsBasicCredentials awsCreds = AwsBasicCredentials.create(
-                "AKIAZ7SAK4VTHQRFATO2",
-                "+7AEKW1y5xDZ7X5aNRsdNqXwwzJMdwkCMGhevvoz"
+                accessKeyId,
+                secretAccessKey
         );
 
         this.iotClient = IotClient.builder()
@@ -71,7 +81,7 @@ public class AwsIotProvisioningService {
                 .privateKey(certResp.keyPair().privateKey())
                 .publicKey(certResp.keyPair().publicKey())
                 .createdAt(new Date())
-                .endpoint("a1j1bemwj6e7rr-ats.iot.ap-south-1.amazonaws.com")
+                .endpoint(endpoint)
                 .active(false)
                 .build();
 
