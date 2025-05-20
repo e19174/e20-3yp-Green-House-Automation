@@ -9,41 +9,20 @@ import {
 } from "react-native";
 import Footer from "../common/Footer";
 import Header from "../common/Header";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "../../Contexts/UserContext";
 
 interface USER {
-  name: String,
-  email: String,
-  phoneNumber: number,
+  name: string;
+  email: string;
+  phoneNumber: number;
   imageData: string;
-  imageType: String,
-  imageName: String,
+  imageType: string;
+  imageName: string;
 }
 
 // Main Profile Component
 const Profile: React.FC = () => {
-  const[user, setUser] = useState<USER>()
-  
-  const fetchUserData = async () => {
-    const token = await AsyncStorage.getItem("token");
-    try {
-      const response = axios.get("http://localhost:8080/api/v1/auth/user/getUser", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      setUser((await response).data);
-      console.log((await response).data);
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  useEffect(() => {
-    console.log("token: ",localStorage.getItem("token"));
-    fetchUserData();
-  },[])
+  const {user, setUser} = useAuth();
   
   const imageUri = `data:${user?.imageType};base64,${(user?.imageData)}`;
 

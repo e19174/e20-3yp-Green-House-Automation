@@ -7,19 +7,17 @@
 #define DHTPIN 4
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 
+// Create an instance of the DHT sensor
+DHT dht(DHTPIN, DHTTYPE);
+
 // Capsitive moisture sensor
-#define MOISTURE_SENSOR_PIN 34
+#define MOISTURE_SENSOR_PIN 33
 
 // Define Control Pins
 #define FAN_PIN 15
 #define NUTRIENTS_PIN 16
 #define WATER_PIN 17
 #define LIGHT_PIN 2
-
-//     pinMode(FAN_PIN, OUTPUT);
-//     pinMode(NUTRIENTS_PIN, OUTPUT);
-//     pinMode(WATER_PIN, OUTPUT);
-//     pinMode(LIGHT_PIN, OUTPUT);
 
 struct Command {
   const char* name;
@@ -31,53 +29,48 @@ struct Command {
 void processCommand(const char* command);
 
 void setup(){
-  
+    
+    dht.begin(); // Initialize the DHT sensor
     Serial.begin(115200);
+    pinMode(FAN_PIN, OUTPUT);
+    pinMode(NUTRIENTS_PIN, OUTPUT);
+    pinMode(WATER_PIN, OUTPUT);
+    pinMode(LIGHT_PIN, OUTPUT);
+}
 
-// }
+void loop(){
 
-// void loop(){
+  client.loop();
 
-//   client.loop();
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
 
-//   h = dht.readHumidity();
-//   t = dht.readTemperature();
+  if (isnan(h) || isnan(t)) // Check if any reads failed and exit early (to try again).
+  {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+    }
 
-//   if (isnan(h) || isnan(t)) // Check if any reads failed and exit early (to try again).
-//   {
-//     Serial.println(F("Failed to read from DHT sensor!"));
-//     return;
-//     }
+    int moisture = analogRead(MOISTURE_SENSOR_PIN);
 
-//     int moisture = analogRead(MOISTURE_SENSOR_PIN);
+    Serial.print(F("Humidity: "));
+    Serial.print(h);
+    Serial.print(F("%  Temperature: "));
+    Serial.print(t);
+    Serial.println(F("°C "));
 
-//     Serial.print(F("Humidity: "));
-//     Serial.print(h);
-//     Serial.print(F("%  Temperature: "));
-//     Serial.print(t);
-//     Serial.println(F("°C "));
+    Serial.print(F("Moisture: "));
+    Serial.print(moisture);
+    Serial.println(F("%"));
 
-//     Serial.print(F("Moisture: "));
-//     Serial.print(moisture);
-//     Serial.println(F("%"));
-
-//     if (moisture < 1000)
-//     {
-//       Serial.println("Watering the plant");
-//     }
-//     else
-//     {
-//       Serial.println("Plant is watered");
-//     }
-
-//     // control command for equipments
-//     processCommand(command);
-
-//     publishMessage(h, t, moisture);
-//     client.loop();
-//     delay(2000);
-// }
-
+    if (moisture < 1000)
+    {
+      Serial.println("Watering the plant");
+    }
+    else
+    {
+      Serial.println("Plant is watered");
+    }
 
     // control command for equipments
     processCommand(command);
@@ -109,105 +102,105 @@ void processCommand(const char* command) {
 
 
 
-#include "Arduino.h"
+// #include "Arduino.h"
 
-#define RE 5
-#define DE 5
+// #define RE 5
+// #define DE 5
 
-const byte nitro[] = {0x01, 0x03, 0x00, 0x1E, 0x00, 0x01, 0xE4, 0x0C};
-const byte phos[] = {0x01, 0x03, 0x00, 0x1F, 0x00, 0x01, 0xB5, 0xCC};
-const byte pota[] = {0x01, 0x03, 0x00, 0x20, 0x00, 0x01, 0x85, 0xC0};
+// const byte nitro[] = {0x01, 0x03, 0x00, 0x1E, 0x00, 0x01, 0xE4, 0x0C};
+// const byte phos[] = {0x01, 0x03, 0x00, 0x1F, 0x00, 0x01, 0xB5, 0xCC};
+// const byte pota[] = {0x01, 0x03, 0x00, 0x20, 0x00, 0x01, 0x85, 0xC0};
 
-byte values[7];
-HardwareSerial mod(2);  // Use UART2: TX = 17, RX = 16
+// byte values[7];
+// HardwareSerial mod(2);  // Use UART2: TX = 17, RX = 16
 
-uint16_t nitrogen();
-uint16_t phosphorous();
-uint16_t potassium();
-uint16_t readSensor(const byte *command);
+// uint16_t nitrogen();
+// uint16_t phosphorous();
+// uint16_t potassium();
+// uint16_t readSensor(const byte *command);
 
-void setup() {
-    Serial.begin(115200);
-    mod.begin(4800, SERIAL_8N1, 16, 17);  // RX = GPIO 16, TX = GPIO 17
+// void setup() {
+//     Serial.begin(115200);
+//     mod.begin(4800, SERIAL_8N1, 16, 17);  // RX = GPIO 16, TX = GPIO 17
 
-    pinMode(RE, OUTPUT);
-    pinMode(DE, OUTPUT);
-    digitalWrite(DE, LOW);
-    digitalWrite(RE, LOW);
-}
+//     pinMode(RE, OUTPUT);
+//     pinMode(DE, OUTPUT);
+//     digitalWrite(DE, LOW);
+//     digitalWrite(RE, LOW);
+// }
 
-void loop() {
-    uint16_t val1, val2, val3;
+// void loop() {
+//     uint16_t val1, val2, val3;
     
-    val1 = nitrogen();
-    delay(250);
-    val2 = phosphorous();
-    delay(250);
-    val3 = potassium();
-    delay(250);
+//     val1 = nitrogen();
+//     delay(250);
+//     val2 = phosphorous();
+//     delay(250);
+//     val3 = potassium();
+//     delay(250);
     
-    Serial.print("Nitrogen: ");
-    Serial.print(val1);
-    Serial.println(" mg/kg");
+//     Serial.print("Nitrogen: ");
+//     Serial.print(val1);
+//     Serial.println(" mg/kg");
 
-    Serial.print("Phosphorous: ");
-    Serial.print(val2);
-    Serial.println(" mg/kg");
+//     Serial.print("Phosphorous: ");
+//     Serial.print(val2);
+//     Serial.println(" mg/kg");
 
-    Serial.print("Potassium: ");
-    Serial.print(val3);
-    Serial.println(" mg/kg");
+//     Serial.print("Potassium: ");
+//     Serial.print(val3);
+//     Serial.println(" mg/kg");
     
-    Serial.println("----------------------------");
-    delay(2000);
-}
+//     Serial.println("----------------------------");
+//     delay(2000);
+// }
 
-uint16_t nitrogen() {
-    return readSensor(nitro);
-}
+// uint16_t nitrogen() {
+//     return readSensor(nitro);
+// }
 
-uint16_t phosphorous() {
-    return readSensor(phos);
-}
+// uint16_t phosphorous() {
+//     return readSensor(phos);
+// }
 
-uint16_t potassium() {
-    return readSensor(pota);
-}
+// uint16_t potassium() {
+//     return readSensor(pota);
+// }
 
-uint16_t readSensor(const byte *command) {
-    digitalWrite(DE, HIGH);
-    digitalWrite(RE, HIGH);
-    delay(10);
+// uint16_t readSensor(const byte *command) {
+//     digitalWrite(DE, HIGH);
+//     digitalWrite(RE, HIGH);
+//     delay(10);
     
-    mod.write(command, 8);
-    mod.flush();
-    delay(10);
+//     mod.write(command, 8);
+//     mod.flush();
+//     delay(10);
 
-    digitalWrite(DE, LOW);
-    digitalWrite(RE, LOW);
+//     digitalWrite(DE, LOW);
+//     digitalWrite(RE, LOW);
 
-    unsigned long startTime = millis();
-    while (mod.available() < 7) {  // Wait for full response (7 bytes)
-        if (millis() - startTime > 500) {
-            Serial.println("Sensor Timeout!");
-            return 0;
-        }
-    }
+//     unsigned long startTime = millis();
+//     while (mod.available() < 7) {  // Wait for full response (7 bytes)
+//         if (millis() - startTime > 500) {
+//             Serial.println("Sensor Timeout!");
+//             return 0;
+//         }
+//     }
 
-    for (byte i = 0; i < 7; i++) {
-        values[i] = mod.read();
-        Serial.print(values[i], HEX);
-        Serial.print(" ");
-    }
-    Serial.println();
+//     for (byte i = 0; i < 7; i++) {
+//         values[i] = mod.read();
+//         Serial.print(values[i], HEX);
+//         Serial.print(" ");
+//     }
+//     Serial.println();
 
-    if (values[0] != 0x01 || values[1] != 0x03) {  // Check valid response
-        Serial.println("Invalid Response!");
-        return 0;
-    }
+//     if (values[0] != 0x01 || values[1] != 0x03) {  // Check valid response
+//         Serial.println("Invalid Response!");
+//         return 0;
+//     }
 
-    return (values[3] << 8) | values[4];  // Convert to 16-bit value
-}
+//     return (values[3] << 8) | values[4];  // Convert to 16-bit value
+// }
 
 
 // #include "Arduino.h"

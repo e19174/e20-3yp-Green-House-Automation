@@ -1,13 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import { Link, router } from 'expo-router';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native'
+import { useAuth } from '../../Contexts/UserContext';
+import { Axios } from '../AxiosRequestBuilder';
 
 const Login:React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-
+    const {user, setUser} = useAuth();
     
     const handleRegister = async () => {
         if (password == '' || email == "") {
@@ -16,10 +17,11 @@ const Login:React.FC = () => {
         }
         
         try {
-            const response = await axios.post("http://localhost:8080/api/v1/auth/user/login", {email, password});
-            console.log(response.data);
-            await AsyncStorage.setItem("token", response.data);
+            const response = await Axios.post("/auth/user/login", {email, password});
+            await AsyncStorage.setItem("token", response.data.token);
             router.push("/Components/Home/Home");
+            setUser(response.data.user);
+            console.log(response.data.token);
         } catch (error: any) {
             console.log(error.response.data.message);
         }

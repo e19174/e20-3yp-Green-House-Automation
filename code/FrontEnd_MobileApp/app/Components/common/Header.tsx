@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import { useAuth } from '../../Contexts/UserContext';
 
 interface HeaderProps {
   selectedZone: string;
@@ -13,12 +12,12 @@ interface HeaderProps {
 }
 
 interface USER {
-  name: String,
-  email: String,
-  phoneNumber: number,
+  name: string;
+  email: string;
+  phoneNumber: number;
   imageData: string;
-  imageType: String,
-  imageName: String,
+  imageType: string;
+  imageName: string;
 }
 
 const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone }) => {
@@ -27,32 +26,18 @@ const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone
 
   const zones: string[] = ['ZONE 1', 'ZONE 2'];
 
-  const[user, setUser] = useState<USER>()
-  
-  const fetchUserData = async () => {
-    const token = await AsyncStorage.getItem("token");
-    try {
-      const response = axios.get("http://localhost:8080/api/v1/auth/user/getUser", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      setUser((await response).data);
-      console.log((await response).data);
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const{user, setUser} = useAuth();
 
   useEffect(() => {
     if(!AsyncStorage.getItem("token")){
       router.push('Components/Authentication/login');
     }
-    fetchUserData();
   },[])
 
   const handleLogout = () => {
     AsyncStorage.removeItem("token");
+    setUser({} as USER);
+    setSidebarVisible(false);
     router.push('Components/Authentication/login');
   }
 
@@ -100,7 +85,6 @@ const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone
       </Modal>
 
       <Modal visible={sidebarVisible} transparent animationType="slide" onRequestClose={() => setSidebarVisible(false)}>
-        <SafeAreaView >
         <View style={styles.sidebarContainer}>
           <View style={styles.sidebarContent}>
             <TouchableOpacity style={styles.closeButton} onPress={() => setSidebarVisible(false)}>
@@ -114,23 +98,35 @@ const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => router.push('Components/Profile/Profile')}>
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => {
+                  router.push('Components/Profile/Profile');
+                  setSidebarVisible(false);
+                  }}>
               <Ionicons name="person" size={24} color="white" />
               <Text style={styles.sidebarText}>Profile</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => router.push('Components/Settings')}>
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => {
+                  router.push('Components/Settings');
+                  setSidebarVisible(false);
+                  }}>
               <Ionicons name="settings" size={24} color="white" />
               <Text style={styles.sidebarText}>Settings</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => router.push('Components/Device/DisplayList')}>
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => {
+                  router.push('Components/Device/DisplayList');
+                  setSidebarVisible(false);
+                  }}>
               <Ionicons name="radio-sharp" size={24} color="white" />
               <Text style={styles.sidebarText}>Instruments</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => router.push('Components/Manual/Manual')}>
-              <Ionicons name="radio-sharp" size={24} color="white" />
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => {
+                  router.push('Components/Manual/Manual');
+                  setSidebarVisible(false);
+                  }}>
+              <Ionicons name="square-sharp" size={24} color="white" />
               <Text style={styles.sidebarText}>Manual</Text>
             </TouchableOpacity>
 
@@ -142,7 +138,6 @@ const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone
             <Text style={styles.versionText}>App Version 10.2.1</Text>
           </View>
         </View>
-        </SafeAreaView>
       </Modal>
     </>
   );
@@ -261,7 +256,7 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     fontSize: 24,
-    padding: 'auto',
+    padding: 4,
     color: 'white',
     fontWeight: '500',
     textAlign: 'center',
@@ -269,7 +264,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   logoutButton:{
-    paddingTop:'auto',
     marginTop: '80%',
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 8,

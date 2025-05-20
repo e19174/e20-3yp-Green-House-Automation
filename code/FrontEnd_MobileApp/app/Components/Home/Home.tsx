@@ -16,7 +16,7 @@ const { width, height } = Dimensions.get("window");
 
 const Home = () => {
 
-  const zones = ["ZONE 1", "ZONE 2", "ZONE 3", "ZONE 4", "ZONE 5", "ZONE 6"];
+  const zones = ["ZONE 1", "ZONE 2", "ZONE 3", "ZONE 4", "ZONE 5", "ZONE 6", "ZONE 7", "ZONE 8", "ZONE 9", "ZONE 10"];
 
   return (
     <>
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     width: width * 0.9,
     height: height * 0.25,
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: 20,
     marginBottom: 15,
   },
   optionsContainer: {

@@ -11,9 +11,10 @@ import {
 } from "react-native";
 import Footer from "../common/Footer";
 import Header from "../common/Header";
-import axios from "axios";
 import { launchImageLibrary } from "react-native-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "../../Contexts/UserContext";
+import { Axios } from "../AxiosRequestBuilder";
 
 interface USER {
   name: string;
@@ -25,15 +26,8 @@ interface USER {
 }
 
 const Profile: React.FC = () => {
-  const [user, setUser] = useState<USER>({
-    name: "",
-    email: "",
-    phoneNumber: 0,
-    imageData: "",
-    imageType: "",
-    imageName: "",
-  });
-  const params = useLocalSearchParams();
+  const {user, setUser} = useAuth();
+  // const params = useLocalSearchParams();
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [image, setImage] = useState<FileToUpload>();
 
@@ -58,25 +52,19 @@ const Profile: React.FC = () => {
   };
 
   useEffect(() => {
-    if (params.user) {
-      try {
-        const userData: USER = JSON.parse(params.user as string);
-        setUser(userData);
-        const imageUri = `data:${userData.imageType};base64,${userData.imageData}`;
-        setImageUri(imageUri);
-      } catch (error) {
-        console.error("Failed to parse user data:", error);
+    if (user) {
+      const imageUri = `data:${user.imageType};base64,${user.imageData}`;
+      setImageUri(imageUri);
       }
-    }
-  }, [params.user]);
+    }, [user]);
 
   const handleInput = (text: string | number, field: keyof USER) => {
-    setUser((prevUser) => ({
+    setUser((prevUser: USER) => ({
       ...prevUser,
       [field]: text,
     }));
   };
-
+  
   interface FileToUpload {
     uri: string;
     name: string;
@@ -93,26 +81,21 @@ const Profile: React.FC = () => {
         formData.append("file", blob, image.name);
       }
     }
-    formData.append("name", user.name);
-    formData.append("phoneNumber", user.phoneNumber.toString());
-
+    if (user) {
+      formData.append("name", user.name);
+      formData.append("phoneNumber", user.phoneNumber.toString());
+    }
+    
     const token = await AsyncStorage.getItem("token");
     try {
-      const response = await axios.put(
-        "http://localhost:8080/api/v1/auth/user/update",
-        formData,
-        {
-          headers: {
-            Authorization: "Bearer " + token,
-          },
-        }
-      );
+      const response = await Axios.put("/auth/user/update", formData);
       setUser(response.data);
       router.push("Components/Profile/Profile");
     } catch (error) {
       console.log(error);
     }
   };
+  
 
   return (
     <View style={styles.container}>

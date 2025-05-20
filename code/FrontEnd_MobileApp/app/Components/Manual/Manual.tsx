@@ -32,7 +32,7 @@ const imageData = [
   {
     id: 3,
     name: "Capasitive moisture sensor",
-    image: require("../../../assets/capasitive_moisture_sensor.jpg"),
+    image: require("../../../assets/capasitive_moisture_sensor.webp"),
     description:
       "The VH400 is a soil moisture sensor designed to measure the water content in the soil. It provides real-time data about soil moisture levels and is widely used in agriculture and gardening applications to ensure optimal watering and irrigation systems.",
   },
@@ -146,8 +146,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   heading:{
-    color:"#F6FCDF",
-    fontSize: 36,
+    color:"#fff",
+    fontSize: 30,
     textAlign: "center",
     marginTop: "20%",
     fontWeight: "bold",
@@ -163,7 +163,6 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: "#f1f5f9",
     overflow: "hidden",
-
   },
   image: {
     width: "100%",
@@ -171,10 +170,10 @@ const styles = StyleSheet.create({
     objectFit: "cover"
   },
   description: {
-    fontSize: 20,
+    fontSize: 19,
     width: "85%",
     textAlign: "justify",
-    color: "#F6FCDF",
+    color: "#fff",
     marginBottom: 20,
   },
   navigationContainer: {
@@ -186,8 +185,8 @@ const styles = StyleSheet.create({
     marginBottom: "20%",
   },
   arrowButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
     borderRadius: 8,
     elevation: 5,
     borderWidth: 0.6,

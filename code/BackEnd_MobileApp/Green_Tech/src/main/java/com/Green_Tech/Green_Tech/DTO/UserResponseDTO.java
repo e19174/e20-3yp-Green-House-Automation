@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 public class UserResponseDTO {
     String name;
     String email;
-    String password;
     Long phoneNumber;
     byte[] imageData;
     String imageType;

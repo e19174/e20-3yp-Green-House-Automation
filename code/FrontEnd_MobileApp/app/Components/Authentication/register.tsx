@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet, TextInput, Pressable, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Link, router } from 'expo-router'
-import axios from 'axios'
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import * as AuthSession from "expo-auth-session";
+import { Axios } from '../AxiosRequestBuilder';
 
 const Register:React.FC = () => {
     const [email, setEmail] = useState<string>('')
@@ -23,7 +23,7 @@ const Register:React.FC = () => {
         }
 
         try {
-            const response = await axios.post("http://localhost:8080/api/v1/auth/user/register", {email, password, confirmPassword});
+            const response = await Axios.post("/auth/user/register", {email, password, confirmPassword});
             console.log(response.data);
             router.push("/Components/Authentication/login");
         } catch (error) {

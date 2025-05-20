@@ -17,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @CrossOrigin
@@ -38,7 +40,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody AuthDTO authDTO) throws UserNotFoundException {
+    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody AuthDTO authDTO) throws UserNotFoundException {
         return ResponseEntity.ok(userService.loginUser(authDTO));
     }
 

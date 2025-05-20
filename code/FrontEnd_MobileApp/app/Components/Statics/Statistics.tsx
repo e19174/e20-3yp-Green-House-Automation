@@ -360,7 +360,7 @@ const StatisticsDisplay: React.FC = () => {
             },
           ],
         }}
-        width={400} 
+        width={380} 
         height={300}
         chartConfig={chartConfig()}
         style={styles.chart}
@@ -386,16 +386,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#012A1C", 
     alignItems: "center",
-    width: "100%",
   },
   editProfile: {
     flexGrow: 2,
     alignItems: "center",
     width: "100%",
-    padding: 20,
+    marginHorizontal : "auto",
+    marginTop: 30,
   },
   title: {
-    marginTop: "13%",
+    marginTop: "15%",
     marginBottom: 20,
     fontSize: 28,
     color: "#FFFFFF",
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     marginTop:20,
     marginBottom: 20,
     marginVertical: 20,
-    marginHorizontal: 50,
+    // marginHorizontal: 50,
     borderRadius: 8,
     width: "80%",
     height: "auto",
@@ -439,11 +439,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: "80%",
     marginVertical: 10,
-    textAlign: "center",
-    // shadowColor: "#004",
-    // shadowOffset: { width: 0, height: 4 },
-    // shadowOpacity: 0.2,
-    // shadowRadius: 5,
     elevation: 5,
   }
 });

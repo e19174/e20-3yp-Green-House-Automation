@@ -17,9 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -65,7 +63,7 @@ public class UserService {
         return userRepo.save(user);
     }
 
-    public String loginUser(AuthDTO authDTO) throws UserNotFoundException {
+    public Map<String, Object> loginUser(AuthDTO authDTO) throws UserNotFoundException {
         try{
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -86,7 +84,23 @@ public class UserService {
             throw new IllegalArgumentException("Invalid password");
         }
 
-        return jwtService.generateToken(user, user.getRole());
+        Map<String, Object> userData = new HashMap<>();
+
+        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+                .name(user.getName())
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .imageType(user.getImageType())
+                .imageName(user.getImageName())
+                .imageData(user.getImageData())
+                .build();
+
+        String token = jwtService.generateToken(user, user.getRole());
+
+        userData.put("user", userResponseDTO);
+        userData.put("token", token);
+
+        return userData;
     }
 
     public User updateUser(String auth, UserDTO userDTO, MultipartFile file) throws UserNotFoundException, IOException {
