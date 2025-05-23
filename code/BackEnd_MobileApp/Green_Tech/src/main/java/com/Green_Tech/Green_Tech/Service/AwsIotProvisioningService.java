@@ -82,7 +82,6 @@ public class AwsIotProvisioningService {
                 .publicKey(certResp.keyPair().publicKey())
                 .createdAt(new Date())
                 .endpoint(endpoint)
-                .active(false)
                 .build();
 
         return awsIotCredentialsRepo.save(awsIotCredentials);

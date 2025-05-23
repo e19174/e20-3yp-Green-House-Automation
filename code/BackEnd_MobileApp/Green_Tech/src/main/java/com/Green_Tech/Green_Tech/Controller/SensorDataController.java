@@ -29,8 +29,8 @@ public class SensorDataController {
 
     @PostMapping(value = "/controlsignal")
     public String sendControlSignal(@RequestBody Map<String, Object> payload) {
-        int deviceIndex = (int) payload.get("device");
-        boolean turnOn = (boolean) payload.get("turnOn");
+        int deviceIndex = (int) payload.get("index");
+        boolean turnOn = (boolean) payload.get("status");
 
         String deviceName;
         switch (deviceIndex) {

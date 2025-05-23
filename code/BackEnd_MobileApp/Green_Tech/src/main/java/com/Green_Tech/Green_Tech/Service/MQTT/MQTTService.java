@@ -81,15 +81,14 @@ public class MQTTService {
     private final ConcurrentHashMap<String, byte[]> deviceDataBuffer = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, MqttClientConnection> deviceConnections = new ConcurrentHashMap<>();
 
-    @PostConstruct
-    public void init() {
-        new Thread(this::connectAllDevices).start();
-    }
+//    @PostConstruct
+//    public void init() {
+//        new Thread(this::connectAllDevices).start();
+//    }
 
     public void connectAllDevices() {
         try {
-            List<AwsIotCredentials> credentials = awsIotCredentialsRepo.findAll();
-//            if (credentials == null) return;
+            List<AwsIotCredentials> credentials = awsIotCredentialsRepo.findAllByActiveDevices(true);
             for (AwsIotCredentials aws : credentials) {
                 connectAndSubscribe(aws);
             }

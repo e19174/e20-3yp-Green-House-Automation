@@ -17,4 +17,5 @@ public interface DeviceRepo extends JpaRepository<Device, Long> {
     Device findByMac(String mac);
     boolean existsByMac(String mac);
     List<Device> findAllByUserId(Long id);
+    List<Device> findByUserAndActive(User user, boolean status);
 }

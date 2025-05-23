@@ -26,18 +26,26 @@ public class DeviceController {
 
 
     @GetMapping("/getAll")
-    public List<Device> getAllDevices() {
-        return deviceService.getAllDevices();
+    public List<Device> getAllDevices(@RequestHeader("Authorization") String auth) {
+        return deviceService.getAllDevices(auth);
     }
 
     @GetMapping("/by-user")
     public ResponseEntity<List<Device>> getDevicesByUser(@RequestHeader("Authorization") String auth)
                                                         throws UserNotFoundException {
-        List<Device> devices = deviceService.getDevicesByUser(auth);
-        if (devices.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(devices);
+        return ResponseEntity.ok(deviceService.getDevicesByUser(auth));
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<List<Device>> getActiveDevicesByUser(@RequestHeader("Authorization") String auth)
+                                                        throws UserNotFoundException {
+        return ResponseEntity.ok(deviceService.getActiveDevicesByUser(auth));
+    }
+
+    @GetMapping("/activeByZones")
+    public ResponseEntity<Map<String, List<Device>>> getActiveDevicesByZone(@RequestHeader("Authorization") String auth)
+                                                        throws UserNotFoundException {
+        return ResponseEntity.ok(deviceService.getActiveDevicesByZone(auth));
     }
 
     @PostMapping("/addDevice")
@@ -45,8 +53,13 @@ public class DeviceController {
         return ResponseEntity.ok(deviceService.createDevice(data));
     }
 
+    @PutMapping("activate/{id}")
+    public ResponseEntity<Device> activateDevice(@PathVariable("id") Long id) throws DeviceNotFoundException {
+        return ResponseEntity.ok(deviceService.activateDevice(id));
+    }
+
     @PutMapping("update/{id}")
-    public ResponseEntity<Device> updateDevice(@PathVariable("id") Long id, @RequestBody Device updatedDevice)
+    public ResponseEntity<Device> updateDevice(@PathVariable("id") Long id, @RequestBody Map<String, String> updatedDevice)
             throws DeviceNotFoundException {
         return ResponseEntity.ok(deviceService.updateDevice(id, updatedDevice));
     }

@@ -11,11 +11,7 @@ import com.Green_Tech.Green_Tech.Repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class DeviceService {
@@ -31,17 +27,20 @@ public class DeviceService {
 
 
     // Get all devices
-    public List<Device> getAllDevices() {
+    public List<Device> getAllDevices(String auth) {
         return deviceRepository.findAll();
     }
-
 
     // Get a device by ID
     public List<Device> getDevicesByUser(String auth) throws UserNotFoundException {
         User user = extractUserService.extractUserFromJwt(auth);
-        return deviceRepository.findByUser(user);
+        return deviceRepository.findByUserAndActive(user, false);
     }
 
+    public List<Device> getActiveDevicesByUser(String auth) throws UserNotFoundException {
+        User user = extractUserService.extractUserFromJwt(auth);
+        return deviceRepository.findByUserAndActive(user, true);
+    }
 
     // Create a new device
     public AwsIotCredentials createDevice(Map<String, String> data) throws UserNotFoundException, DeviceAlreadyFoundException {
@@ -61,22 +60,22 @@ public class DeviceService {
                 .name("undefined")
                 .location("undefined")
                 .user(user)
+                .active(false)
                 .build();
 
         deviceRepository.save(device);
 
-        AwsIotCredentials credentials = awsIotProvisioningService.createThing(data.get("mac"));
-        return credentials;
+        return awsIotProvisioningService.createThing(data.get("mac"));
     }
 
     // Update an existing device
-    public Device updateDevice(Long id, Device updatedDevice) throws DeviceNotFoundException {
+    public Device updateDevice(Long id, Map<String, String> updatedDevice) throws DeviceNotFoundException {
         Device device = deviceRepository.findById(id).orElseThrow(
                 () -> new DeviceNotFoundException("Device not found!!"));
 
-        device.setZoneName(updatedDevice.getZoneName());
-        device.setName(updatedDevice.getName());
-        device.setLocation(updatedDevice.getLocation());
+        device.setZoneName(updatedDevice.get("zoneName"));
+        device.setName(updatedDevice.get("name"));
+        device.setLocation(updatedDevice.get("location"));
         return deviceRepository.save(device);
     }
 
@@ -86,5 +85,32 @@ public class DeviceService {
             deviceRepository.delete(device);
             return true;
         }).orElse(false);
+    }
+
+    public Device activateDevice(Long id) throws DeviceNotFoundException {
+        Device device = deviceRepository.findById(id).orElseThrow(
+                () -> new DeviceNotFoundException("Device not found!!"));
+
+        device.setActive(true);
+        return deviceRepository.save(device);
+    }
+
+    public Map<String, List<Device>> getActiveDevicesByZone(String auth) throws UserNotFoundException {
+        User user = extractUserService.extractUserFromJwt(auth);
+        List<Device> devices = deviceRepository.findByUserAndActive(user, true);
+
+        Map<String, List<Device>> zoneDevices = new HashMap<>();
+
+        for( Device device: devices){
+            if (!zoneDevices.containsKey(device.getZoneName())){
+                List<Device> deviceList = new ArrayList<>();
+                deviceList.add(device);
+                zoneDevices.put(device.getZoneName(), deviceList);
+                continue;
+            }
+            zoneDevices.get(device.getZoneName()).add(device);
+        }
+
+        return zoneDevices;
     }
 }

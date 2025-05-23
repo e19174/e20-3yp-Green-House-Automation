@@ -35,5 +35,4 @@ public class AwsIotCredentials {
     private String endpoint;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createdAt;
-    private boolean active;
 }

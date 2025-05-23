@@ -25,6 +25,7 @@ public class SensorDataService {
     public SensorData getAllSensorData() {
         return sensorDataRepository.findFirstByOrderByIdDesc();
     }
+
     public HashMap convertByteArrayToHashMap(byte[] jsonData) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {

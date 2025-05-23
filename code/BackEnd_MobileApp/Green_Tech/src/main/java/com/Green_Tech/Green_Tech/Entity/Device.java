@@ -25,4 +25,5 @@ public class Device {
     @ManyToOne
     @JoinColumn(name = "user_id")  // creates a foreign key column 'user_id' in Device table
     private User user;
+    private boolean active;
 }
