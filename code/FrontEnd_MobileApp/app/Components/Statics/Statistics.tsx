@@ -6,10 +6,12 @@ import {
   Text,
   TouchableOpacity,
   View,
+  RefreshControl,
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
+import { themeAuth } from "../../Contexts/ThemeContext";
 
 // Define DataType interface
 type DataType = {
@@ -34,8 +36,18 @@ const dataTypes = [
 ];
 
 const StatisticsDisplay: React.FC = () => {
+  const {theme} = themeAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [stats, setStats] = useState({ avg: 0, min: 0, max: 0, trend: 0 });
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    // Simulate fetching new data
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1500);
+  };
 
   // Mock Data
   const [datas, setDatas] = useState<DataType[]>([
@@ -317,29 +329,34 @@ const StatisticsDisplay: React.FC = () => {
 
 
   return (
-    <View style={styles.container}>
-    <Header viewZone={false} selectedZone={""} setSelectedZone={() => {}} />
+    <ScrollView contentContainerStyle={[styles.container, {backgroundColor: theme.colors.background}]}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
 
-    <ScrollView contentContainerStyle={styles.editProfile}>
-      <Text style={styles.title}>Live Data Statistics</Text>
+    <Header/>
+
+    <View style={styles.editProfile}>
+      <Text style={[styles.title, {color: theme.colors.text}]}>Live Data Statistics</Text>
 
       {/* Switch Data Type Buttons */}
       <View style={styles.switchContainer}>
-        <TouchableOpacity onPress={handlePrev} style={styles.arrowButton}>
-          <Ionicons name="arrow-back" size={24} color="white" />
+        <TouchableOpacity onPress={handlePrev} style={[styles.arrowButton, {backgroundColor: theme.colors.primary}]}>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
 
-        <Text style={styles.currentDataTypeText}>
+        <Text style={[styles.currentDataTypeText, {color: theme.colors.text}]}>
           {dataTypes[currentIndex].name}
         </Text>
 
-        <TouchableOpacity onPress={handleNext} style={styles.arrowButton}>
-          <Ionicons name="arrow-forward" size={24} color="white" />
+        <TouchableOpacity onPress={handleNext} style={[styles.arrowButton, {backgroundColor: theme.colors.primary}]}>
+          <Ionicons name="arrow-forward" size={24} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
 
       {/* Statistical Summary */}
-      <View style={styles.summary}>
+      <View style={[styles.summary, {backgroundColor: theme.colors.cardBackground}]}>
         <Text style={styles.label}>📊 Average: {stats.avg.toFixed(2)}</Text>
         <Text style={styles.label}>🔺 Max: {stats.max}</Text>
         <Text style={styles.label}>🔻 Min: {stats.min}</Text>
@@ -365,9 +382,9 @@ const StatisticsDisplay: React.FC = () => {
         chartConfig={chartConfig()}
         style={styles.chart}
         />
-    </ScrollView>
+    </View>
     <Footer/>
-  </View>
+  </ScrollView>
   );
 };
 
@@ -407,7 +424,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     // marginHorizontal: 50,
     borderRadius: 8,
-    width: "80%",
+    // width: "80%",
     height: "auto",
   },
   label: {
@@ -415,6 +432,7 @@ const styles = StyleSheet.create({
     color: "#D1D5DB",
     fontWeight: "600",
     marginVertical: 5,
+    textAlign: "center"
   },
   switchContainer: {
     flexDirection: "row",

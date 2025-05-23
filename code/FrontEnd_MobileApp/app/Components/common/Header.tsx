@@ -1,15 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../Contexts/UserContext';
-
-interface HeaderProps {
-  selectedZone: string;
-  viewZone: boolean;
-  setSelectedZone: (zone: string) => void;
-}
+import { themeAuth } from '../../Contexts/ThemeContext';
+import { get, remove } from '../../Storage/secureStorage';
 
 interface USER {
   name: string;
@@ -20,22 +15,26 @@ interface USER {
   imageName: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone }) => {
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
+const Header: React.FC = () => {
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
-
-  const zones: string[] = ['ZONE 1', 'ZONE 2'];
+  const { theme, toggleTheme } = themeAuth();
 
   const{user, setUser} = useAuth();
+  const imageUri = `data:${user?.imageType};base64,${(user?.imageData)}`;
+
 
   useEffect(() => {
-    if(!AsyncStorage.getItem("token")){
-      router.push('Components/Authentication/login');
-    }
+    const checkToken = async () => {
+      const token = await get("token");
+      if (!token) {
+        router.push('Components/Authentication/login');
+      }
+    };
+    checkToken();
   },[])
 
   const handleLogout = () => {
-    AsyncStorage.removeItem("token");
+    remove("token");
     setUser({} as USER);
     setSidebarVisible(false);
     router.push('Components/Authentication/login');
@@ -43,99 +42,73 @@ const Header: React.FC<HeaderProps> = ({ selectedZone, setSelectedZone, viewZone
 
   return (
     <>
-      <View style={styles.header}>
+      <View style={[styles.header, {backgroundColor: theme.colors.primary}]}>
         <TouchableOpacity>
-          <Ionicons name="notifications" size={26} color="white" />
+          <Ionicons name="notifications" size={26} color={theme.colors.text} />
         </TouchableOpacity>
 
-        {viewZone &&
-          <View style={styles.zoneSelector}>
-            <Text style={styles.zoneText}>{selectedZone}</Text>
-            <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Text style={styles.dropdownArrow}>▼</Text>
-            </TouchableOpacity>
-          </View>
-        }
-
         <TouchableOpacity onPress={() => setSidebarVisible(true)}>
-          <Ionicons name="menu" size={26} color="white" />
+          <Ionicons name="menu" size={26} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
 
-      <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <FlatList
-              data={zones}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.modalItem}
-                  onPress={() => {
-                    setSelectedZone(item);
-                    setModalVisible(false);
-                  }}
-                >
-                  <Text style={styles.modalText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        </View>
-      </Modal>
-
       <Modal visible={sidebarVisible} transparent animationType="slide" onRequestClose={() => setSidebarVisible(false)}>
         <View style={styles.sidebarContainer}>
-          <View style={styles.sidebarContent}>
+          <View style={[styles.sidebarContent, {backgroundColor: theme.colors.background}]}>
             <TouchableOpacity style={styles.closeButton} onPress={() => setSidebarVisible(false)}>
-              <Ionicons name="close" size={28} color="white" />
+              <Ionicons name="close" size={28} color={theme.colors.text} />
             </TouchableOpacity>
 
             <Image
-              source={user?.imageData? `data:${user.imageType};base64,${user.imageData}`: require("../../../assets/profile_picture.webp")}
-              style={styles.profilePicture}
+              source={user?.imageData ? { uri : imageUri} : require("../../../assets/profile_picture.webp")}
+              style={[styles.profilePicture, {borderColor: theme.colors.text}]}
             />
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => {
+            <TouchableOpacity style={[styles.sidebarItem, {backgroundColor: theme.colors.primary}]} onPress={toggleTheme}>
+              <Ionicons name="toggle" size={24} color={theme.colors.text} />
+              <Text style={styles.sidebarText}>{theme.dark == true? "Light mode": "Dark mode"}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.sidebarItem, {backgroundColor: theme.colors.primary}]} onPress={() => {
                   router.push('Components/Profile/Profile');
                   setSidebarVisible(false);
                   }}>
-              <Ionicons name="person" size={24} color="white" />
+              <Ionicons name="person" size={24} color={theme.colors.text} />
               <Text style={styles.sidebarText}>Profile</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => {
+            <TouchableOpacity style={[styles.sidebarItem, {backgroundColor: theme.colors.primary}]} onPress={() => {
                   router.push('Components/Settings');
                   setSidebarVisible(false);
                   }}>
-              <Ionicons name="settings" size={24} color="white" />
+              <Ionicons name="settings" size={24} color={theme.colors.text} />
               <Text style={styles.sidebarText}>Settings</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => {
+            <TouchableOpacity style={[styles.sidebarItem, {backgroundColor: theme.colors.primary}]} onPress={() => {
                   router.push('Components/Device/DisplayList');
                   setSidebarVisible(false);
                   }}>
-              <Ionicons name="radio-sharp" size={24} color="white" />
-              <Text style={styles.sidebarText}>Instruments</Text>
+              <Ionicons name="radio-sharp" size={24} color={theme.colors.text}/>
+              <Text style={styles.sidebarText}>Devices</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => {
+            <TouchableOpacity style={[styles.sidebarItem, {backgroundColor: theme.colors.primary}]} onPress={() => {
                   router.push('Components/Manual/Manual');
                   setSidebarVisible(false);
                   }}>
-              <Ionicons name="square-sharp" size={24} color="white" />
+              <Ionicons name="square-sharp" size={24} color={theme.colors.text}/>
               <Text style={styles.sidebarText}>Manual</Text>
             </TouchableOpacity>
 
 
             <View style={styles.divider} />
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={[styles.versionText, {color: theme.colors.text}]}>App Version 10.2.1</Text>
+            <TouchableOpacity style={[styles.logoutButton, {backgroundColor: theme.colors.primary}]} onPress={handleLogout}>
               <Text style={styles.logoutText}>Log Out</Text>
             </TouchableOpacity>
-            <Text style={styles.versionText}>App Version 10.2.1</Text>
           </View>
         </View>
       </Modal>
@@ -149,7 +122,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#01694D',
-    paddingVertical: 18,
+    height: 60,
     paddingHorizontal: 20,
     width: '100%',
     position: 'absolute',
@@ -158,66 +131,23 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 10,
   },
-  zoneSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-  },
-  zoneText: {
-    fontSize: 17,
-    color: 'white',
-    fontWeight: 'bold',
-    marginRight: 8,
-  },
-  dropdownArrow: {
-    fontSize: 25,
-    color: '#16F08B',
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#01694D',
-    width: '50%',
-    padding: 10,
-    borderRadius: 10,
-  },
-  modalItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  modalText: {
-    fontSize: 15,
-    color: "#F6FCDF",
-    textAlign: 'center',
-  },
   sidebarContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
     alignItems: 'flex-end',
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
   sidebarContent: {
     width: '70%',
-    backgroundColor: '#014D38',
     padding: 25,
-    // shadowColor: '#000',
-    // shadowOffset: { width: 2, height: 0 },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 10,
     elevation: 10,
-    height: '100%',
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    right: 0,
   },
   closeButton: {
     padding: 10,
     alignSelf: 'flex-end',
-    marginBottom: 20,
   },
   profilePicture: {
     width: 120,
@@ -226,12 +156,12 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: 'white',
     alignSelf: 'center',
-    marginVertical: 20,
+    marginVertical: 10,
   },
   sidebarItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 15,
+    paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
     marginVertical: 5,
@@ -251,7 +181,6 @@ const styles = StyleSheet.create({
   versionText: {
     color: 'rgba(255, 255, 255, 0.6)',
     textAlign: 'center',
-    marginTop: 'auto',
     paddingTop: 20,
   },
   logoutText: {
@@ -264,7 +193,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   logoutButton:{
-    marginTop: '80%',
+    marginTop: "auto",
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 8,
     padding: 10,

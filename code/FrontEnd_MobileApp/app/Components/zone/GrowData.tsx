@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CircularProgressBase  } from 'react-native-circular-progress-indicator';
 import { Axios } from '../AxiosRequestBuilder';
+import { themeAuth } from '../../Contexts/ThemeContext';
 
 
 interface GrowDataItem {
@@ -14,6 +15,7 @@ interface GrowDataItem {
 }
 
 const GrowData: React.FC = () => {
+  const { theme } = themeAuth();
   const [growDataItems, setGrowDataItems] = useState<GrowDataItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +64,7 @@ const GrowData: React.FC = () => {
   const secondRow = growDataItems.slice(3, 6);
 
   return (
-    <View style={styles.growDataSection}>
+    <View style={[styles.growDataSection, { backgroundColor: theme.colors.primary }]}>
       <Text style={styles.growDataMainTitle}>GROW DATA</Text>
 
       <View style={styles.rowContainer}>

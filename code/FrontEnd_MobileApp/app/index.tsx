@@ -1,22 +1,27 @@
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
-import {StyleSheet, Text, View, Image } from "react-native";
+import {StyleSheet, Text, View, Image, Alert } from "react-native";
+import { get, remove } from "./Storage/secureStorage";
 
 const Page:React.FC = () => {
-  const [data, setData] = useState<any>('');
-  const [isLogin, setIsLogin] = useState<boolean>(false);
 
-  useEffect(()=>{
-    setTimeout(() => {
-      if(!isLogin){
-        router.push("/Components/Authentication/login");
-      }
-    }, 2000);
-  },[])
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = await get("token");
+      setTimeout(() => {
+        if (!token) {
+          router.push("/Components/Authentication/login");
+        } else {
+          router.push("/Components/Home/Home");
+        }
+      }, 2000);
+    };
+    checkToken();
+  }, [])
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/logopng.png')} style={styles.logo}></Image>
+      <Image source={require('../assets/logopng_dark.png')} style={styles.logo}></Image>
       <Text style={styles.title}>Green Tech</Text>
     </View>
   );

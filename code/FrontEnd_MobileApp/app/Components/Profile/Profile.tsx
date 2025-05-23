@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import { router } from 'expo-router';
 import {
   View,
@@ -6,10 +5,14 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  RefreshControl,
+  ScrollView,
 } from "react-native";
 import Footer from "../common/Footer";
 import Header from "../common/Header";
 import { useAuth } from "../../Contexts/UserContext";
+import { useState } from 'react';
+import { themeAuth } from '../../Contexts/ThemeContext';
 
 interface USER {
   name: string;
@@ -22,31 +25,45 @@ interface USER {
 
 // Main Profile Component
 const Profile: React.FC = () => {
+  const {theme} = themeAuth();
   const {user, setUser} = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
+  
+    const onRefresh = () => {
+      setRefreshing(true);
+  
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 1500);
+    };
   
   const imageUri = `data:${user?.imageType};base64,${(user?.imageData)}`;
 
   return (
-    <View style={styles.container}>
-      <Header viewZone={false} selectedZone={""} setSelectedZone={() => {}} />
+    <ScrollView contentContainerStyle={[styles.container, {backgroundColor: theme.colors.background}]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <Header/>
 
       <View style={styles.profileContainer}>
-        <Text style={styles.headings}> Profile </Text>
+        <Text style={[styles.headings, {color: theme.colors.text}]}> Profile </Text>
           <View style={styles.profileWork}>
-            <View style={styles.inner}>
+            <View style={[styles.inner, {backgroundColor: theme.colors.primary}]}>
               <Image
                 source={user?.imageData ? { uri: imageUri } : require("../../../assets/profile_picture.webp")}
-                style={styles.profileImage}
+              style={[styles.profileImage, {borderColor: theme.colors.text}]}
                 />
             </View>
           </View>
         
-          <TouchableOpacity style={styles.editProfileButton} onPress={() => router.push({ pathname: 'Components/Profile/EditProfile', params: {user: JSON.stringify(user)} })}>
-            <Text style={styles.editProfileText}>Edit Profile</Text>
+          <TouchableOpacity style={[styles.editProfileButton, {backgroundColor: theme.colors.primary}]} onPress={() => router.push('Components/Profile/EditProfile')}>
+            <Text style={[styles.editProfileText, {color: theme.colors.text}]}>Edit Profile</Text>
           </TouchableOpacity>
       </View>
 
-      <View style={styles.detailsContainer}>
+      <View style={[styles.detailsContainer, {backgroundColor: theme.colors.primary}]}>
         <View style={styles.detailsContent}>
           <View style={styles.detailsRow}>
             <Text style={styles.label}>Name</Text>
@@ -69,7 +86,7 @@ const Profile: React.FC = () => {
       </View>
 
       <Footer />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -90,7 +107,6 @@ const styles = StyleSheet.create({
   profileContainer: {
     marginTop: 30,
     alignItems: "center",
-    backgroundColor: "#012A1C", 
     width: "100%",
     paddingTop: 50,
     paddingBottom: 50,

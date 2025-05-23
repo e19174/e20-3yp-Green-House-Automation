@@ -1,15 +1,23 @@
-import { View, Text, StyleSheet, TextInput, Pressable, Button } from 'react-native'
+import { View, Text, StyleSheet, TextInput, Pressable, Button, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Link, router } from 'expo-router'
-import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
-import * as AuthSession from "expo-auth-session";
+// import * as WebBrowser from "expo-web-browser";
+// import * as Google from "expo-auth-session/providers/google";
+// import * as AuthSession from "expo-auth-session";
 import { Axios } from '../AxiosRequestBuilder';
+import { themeAuth } from '../../Contexts/ThemeContext';
+// import {
+//     GoogleSignin,
+//     isSuccessResponse,
+//     isErrorWithCode,
+//     statusCodes
+// } from "@react-native-google-signin/google-signin"
 
 const Register:React.FC = () => {
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [confirmPassword, setConfirmPassword] = useState<string>('')
+    const {theme} = themeAuth();
 
     const handleRegister = async () => {
         if (password == '' || confirmPassword == "" || email == "") {
@@ -32,39 +40,65 @@ const Register:React.FC = () => {
         
     }
 
-    const [userInfo, setUserInfo] = useState<AuthSession.TokenResponse>();
+    // const handleGoogleSignin = async () => {
+    //     try{
+    //         await GoogleSignin.hasPlayServices();
+    //         const response = await GoogleSignin.signIn();
+    //         if(isSuccessResponse(response)){
+    //             const {idToken, user } = response.data;
+    //             const {name , email, photo} = user;
+    //             Alert.alert(`Success, ${name}`)
+    //         }else{
+    //             Alert.alert("Google Signin was cancelled!")
+    //         }
+    //     }catch(error){
+    //         if(isErrorWithCode(error)){
+    //             switch(error.code){
+    //                 case statusCodes.IN_PROGRESS:
+    //                     Alert.alert("Google Signin is in progress");
+    //                     break;
+    //                 default:
+    //                     Alert.alert(error.code);
+    //             }
+    //         }else{
+    //             Alert.alert("Error has occured");
+    //         }
+    //     }
+    // }
 
-    // const redirectUri = AuthSession.makeRedirectUri({
-    //     native: "Routing://oauthredirect",
-    //   });
-    const redirectUri = "https://auth.expo.io/@vithustennysan/Routing";
+//     const [userInfo, setUserInfo] = useState<AuthSession.TokenResponse>();
+
+//     // const redirectUri = AuthSession.makeRedirectUri({
+//     //     native: "Routing://oauthredirect",
+//     //   });
+//     const redirectUri = "https://auth.expo.io/@vithustennysan/Routing";
 
 
-    // Function to handle Google Sign-In
-    const [request, response, promptAsync] = Google.useAuthRequest({
-        clientId: "994434333-4kpuihtinousoimldvrl537hcb008n1o.apps.googleusercontent.com",
-        redirectUri: redirectUri, // Use Expo proxy redirect
-        scopes: ["openid", "profile", "email"],
-      });
+//     // Function to handle Google Sign-In
+//     const [request, response, promptAsync] = Google.useAuthRequest({
+//         clientId: "994434333-4kpuihtinousoimldvrl537hcb008n1o.apps.googleusercontent.com",
+//         redirectUri: redirectUri, // Use Expo proxy redirect
+//         scopes: ["openid", "profile", "email"],
+//       });
   
-   // Handle the authentication response
-    useEffect(() => {
-        if (response?.type === "success") {
-            const { authentication } = response;
-            if (authentication) {
-                setUserInfo(authentication);
-            }
-        }
-    }, [response]);
+//    // Handle the authentication response
+//     useEffect(() => {
+//         if (response?.type === "success") {
+//             const { authentication } = response;
+//             if (authentication) {
+//                 setUserInfo(authentication);
+//             }
+//         }
+//     }, [response]);
     
     return (
-        <View style={styles.container}>
-            <View style={styles.formContainer}>
-                <Text style={styles.title}>Register</Text>
+        <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
+            <View style={[styles.formContainer, {backgroundColor: theme.colors.primary}]}>
+                <Text style={[styles.title, {color: theme.colors.text}]}>Register</Text>
                 <View style={styles.form}>
-                    <TextInput style={styles.inputs} placeholder='Email' placeholderTextColor="rgb(173, 173, 173)" value={email} onChangeText={(value) => setEmail(value)}/>
-                    <TextInput style={styles.inputs} placeholder='Password' placeholderTextColor="rgb(173, 173, 173)" value={password} onChangeText={(value) => setPassword(value)}/>
-                    <TextInput style={styles.inputs} placeholder='ConfirmPassword' placeholderTextColor="rgb(173, 173, 173)" value={confirmPassword} onChangeText={(value) => setConfirmPassword(value)}/>
+                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Email' placeholderTextColor="rgb(173, 173, 173)" value={email} onChangeText={(value) => setEmail(value)}/>
+                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Password' placeholderTextColor="rgb(173, 173, 173)" value={password} onChangeText={(value) => setPassword(value)}/>
+                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='ConfirmPassword' placeholderTextColor="rgb(173, 173, 173)" value={confirmPassword} onChangeText={(value) => setConfirmPassword(value)}/>
                     <Pressable onPress={handleRegister} style={styles.register}>
                         <Text style={styles.text}>REGISTER</Text>
                     </Pressable>
@@ -73,13 +107,13 @@ const Register:React.FC = () => {
                 <Link href={"/Components/Authentication/login"} style={styles.login}>LOGIN</Link>
 
                 <View>
-                    {userInfo ? (
+                    {/* {userInfo ? (
                         <Text>Welcome! Access Token: {userInfo.accessToken}</Text>
-                    ) : (
+                    ) : ( */}
                         <Pressable style={styles.googleLogin}>
-                            <Text disabled={!request} onPress={() => promptAsync()} style={styles.googleLoginText}>Sign in with Google</Text>
+                            <Text onPress={() => handleGoogleSignin()} style={styles.googleLoginText}>Sign in with Google</Text>
                         </Pressable>
-                    )}
+                    
                 </View>
             </View>
         </View>

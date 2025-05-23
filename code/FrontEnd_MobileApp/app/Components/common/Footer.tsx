@@ -2,18 +2,20 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { themeAuth } from '../../Contexts/ThemeContext';
 
 const Footer: React.FC = () => {
+  const {theme} = themeAuth();
   return (
-    <View style={styles.footer}>
+    <View style={[styles.footer, {backgroundColor: theme.colors.primary}]}>
       <TouchableOpacity onPress={() => router.push("Components/Home/Home")}>
-        <Ionicons name="home" size={28} color="white" />
+        <Ionicons name="home" size={28} color={theme.colors.text} />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push("Components/Statics/Statistics")}>
-        <Ionicons name="bar-chart" size={28} color="white" />
+        <Ionicons name="bar-chart" size={28} color={theme.colors.text} />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push("Components/Manual/Manual")}>
-        <MaterialCommunityIcons name="account-cog" size={28} color="white" />
+        <MaterialCommunityIcons name="account-cog" size={28} color={theme.colors.text} />
       </TouchableOpacity>
     </View>
   );

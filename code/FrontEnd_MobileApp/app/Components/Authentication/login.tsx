@@ -1,14 +1,16 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Link, router } from 'expo-router';
 import React, { useContext, useState } from 'react'
 import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native'
 import { useAuth } from '../../Contexts/UserContext';
 import { Axios } from '../AxiosRequestBuilder';
+import { themeAuth } from '../../Contexts/ThemeContext';
+import { save } from '../../Storage/secureStorage';
 
 const Login:React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const {user, setUser} = useAuth();
+    const {theme} = themeAuth();
     
     const handleRegister = async () => {
         if (password == '' || email == "") {
@@ -18,22 +20,21 @@ const Login:React.FC = () => {
         
         try {
             const response = await Axios.post("/auth/user/login", {email, password});
-            await AsyncStorage.setItem("token", response.data.token);
+            await save("token", response.data.token);
             router.push("/Components/Home/Home");
             setUser(response.data.user);
-            console.log(response.data.token);
         } catch (error: any) {
-            console.log(error.response.data.message);
+            console.log(error);
         }
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.formContainer}>
-                <Text style={styles.title}>Login</Text>
+        <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
+            <View style={[styles.formContainer, {backgroundColor: theme.colors.primary}]}>
+                <Text style={[styles.title, {color: theme.colors.text}]}>Login</Text>
                 <View style={styles.form}>
-                    <TextInput style={styles.inputs} placeholder='Email' placeholderTextColor="rgb(173, 173, 173)" value={email} onChangeText={(value) => setEmail(value)}/>
-                    <TextInput style={styles.inputs} placeholder='Password' placeholderTextColor="rgb(173, 173, 173)" value={password} onChangeText={(value) => setPassword(value)}/>
+                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Email' placeholderTextColor="rgb(173, 173, 173)" value={email} onChangeText={(value) => setEmail(value)}/>
+                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Password' placeholderTextColor="rgb(173, 173, 173)" value={password} onChangeText={(value) => setPassword(value)}/>
                     <Pressable onPress={handleRegister} style={styles.login}>
                         <Text style={styles.text}>LOGIN</Text>
                     </Pressable>
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginBottom: 14,
         padding: 10,
-        color: "#F6FCDF",
+        // color: "#F6FCDF",
         fontSize: 16,
         width: "100%",
     },

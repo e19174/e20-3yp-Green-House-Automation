@@ -11,8 +11,7 @@ import {
 } from "react-native";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
-
-const { width } = Dimensions.get("window");
+import { themeAuth } from "../../Contexts/ThemeContext";
 
 const imageData = [
   {
@@ -46,6 +45,7 @@ const imageData = [
 ];
 
 const Manual = () => {
+  const {theme} = themeAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scaleAnim = new Animated.Value(1);
 
@@ -79,17 +79,17 @@ const Manual = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Header viewZone={false} selectedZone={''} setSelectedZone={(zone: string) => {}}/>
+    <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
+      <Header/>
       
-      <Text style={styles.heading}>{imageData[currentIndex].name}</Text>
+      <Text style={[styles.heading, {color: theme.colors.text}]}>{imageData[currentIndex].name}</Text>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Image Display */}
-        <View style={styles.imageContainer}>
+        <View style={[styles.imageContainer, {borderColor: theme.colors.text}]}>
           <Image source={imageData[currentIndex].image} style={styles.image} />
         </View>
 
-        <Text style={styles.description}>
+        <Text style={[styles.description, {color: theme.colors.text}]}>
           {imageData[currentIndex].description}
         </Text>
 
@@ -101,15 +101,16 @@ const Manual = () => {
             style={[
               styles.arrowButton,
               currentIndex === 0 ? styles.disabledButton : styles.activeButton,
+                {backgroundColor: theme.colors.cardBackground}
             ]}
             disabled={currentIndex === 0}
           >
-            <Animated.Text style={styles.arrowText}>{"<"}</Animated.Text>
+            <Animated.Text style={[styles.arrowText, {color: theme.colors.text}]}>{"<"}</Animated.Text>
           </TouchableOpacity>
 
           {/* Page Number */}
           <View style={styles.pageNumberContainer}>
-            <Text style={styles.pageText}>
+            <Text style={[styles.pageText, {color: theme.colors.text}]}>
               {currentIndex + 1} / {imageData.length}
             </Text>
           </View>
@@ -122,10 +123,11 @@ const Manual = () => {
               currentIndex === imageData.length - 1
                 ? styles.disabledButton
                 : styles.activeButton,
+                {backgroundColor: theme.colors.cardBackground}
             ]}
             disabled={currentIndex === imageData.length - 1}
           >
-            <Animated.Text style={styles.arrowText}>{">"}</Animated.Text>
+            <Animated.Text style={[styles.arrowText, {color: theme.colors.text}]}>{">"}</Animated.Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -196,7 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgb(1,105,77)",
   },
   disabledButton: {
-    backgroundColor: "rgba(1, 105, 77, 0.34)",
+    backgroundColor: "rgba(1, 105, 77)",
   },
   pageNumberContainer: {
     paddingVertical: 8,
@@ -211,7 +213,6 @@ const styles = StyleSheet.create({
   },
   arrowText: {
     fontSize: 30,
-    color: "white",
     fontWeight: "bold",
   },
 });

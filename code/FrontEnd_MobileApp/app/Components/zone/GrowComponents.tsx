@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Axios } from '../AxiosRequestBuilder';
+import { themeAuth } from '../../Contexts/ThemeContext';
 
 interface GrowComponentsProps {
   isEnabled: boolean[];
@@ -9,6 +10,8 @@ interface GrowComponentsProps {
 }
 
 const GrowComponents: React.FC<GrowComponentsProps> = ({ isEnabled, toggleStatus }) => {
+  const { theme } = themeAuth();
+
   const sendControlSignal = async (index: number, status: boolean) => {
     try {
       const response = await Axios.post("/sensors/controlsignal", {index, status});
@@ -20,7 +23,7 @@ const GrowComponents: React.FC<GrowComponentsProps> = ({ isEnabled, toggleStatus
   };
 
   return (
-    <View style={styles.section}>
+    <View style={[styles.section, { backgroundColor: theme.colors.primary }]}>
       <Text style={styles.title}>GROW COMPONENTS</Text>
       <View style={styles.growContainer}>
         {[

@@ -6,15 +6,17 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
 import { Axios } from "../AxiosRequestBuilder";
+import { themeAuth } from "../../Contexts/ThemeContext";
 
 type Device = {
-  id: string;
+  id: number;
   mac: string;
   name: string;
   zoneName: string;
@@ -33,9 +35,10 @@ interface User {
 }
 
 const DisplayDetail: React.FC = () => {
+  const {theme} = themeAuth();
   const params = useLocalSearchParams();
   const [device, setDevice] = useState<Device>({
-    id: "",
+    id: 0,
     mac: "",
     name: "",
     zoneName: "",
@@ -51,16 +54,35 @@ const DisplayDetail: React.FC = () => {
     },
   });
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1500);
+  }
 
   const handleSave = async () => {
     try {
-      const response = await Axios.put(`/device/update/${device.id}`, device);
+      const response = await Axios.put(`/device/update/${device.id}`, {
+        name: device.name.trim(),
+        zoneName: device.zoneName.trim(),
+        location: device.location.trim(),
+      });
       setDevice(response.data);
-      console.log("Device updated successfully:", response.data);
     } catch (error) {
       console.error("Error updating device:", error);
     }
     setIsEditing(false);
+  };
+
+  const handleAddDevice = async () => {
+    try {
+      const response = await Axios.put(`/device/activate/${device.id}`);
+      console.log("Device added successfully:", response.data);
+    } catch (error) {
+      console.error("Error adding device:", error);
+    }
   };
 
   useEffect(() => {
@@ -72,7 +94,7 @@ const DisplayDetail: React.FC = () => {
         console.error("Error parsing device data:", error);
       }
     }
-  }, [params.device]);
+  }, [params.device, refreshing]);
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -80,25 +102,29 @@ const DisplayDetail: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Header viewZone={false} selectedZone={""} setSelectedZone={() => {}} />
-      <ScrollView style={styles.scrollContainer}>
+    <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
+      <Header/>
+      <ScrollView contentContainerStyle={styles.scrollContainer}
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={onRefresh} />
+        }
+      >
         <View style={styles.header}>
-          <TouchableOpacity>
-            <Text style={styles.saveButton}>Add</Text>
+          <TouchableOpacity onPress={handleAddDevice}>
+            <Text style={[styles.saveButton, {color: theme.colors.text}]}>Add</Text>
           </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>Device Details</Text>
+          <Text style={[styles.headerTitle, {color: theme.colors.text}]}>Device Details</Text>
           {isEditing ? (
             <TouchableOpacity onPress={handleSave}>
-              <Text style={styles.saveButton}>Save</Text>
+              <Text style={[styles.saveButton, {color: theme.colors.text}]}>Save</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity onPress={() => setIsEditing(true)}>
               <Ionicons
                 name="create-outline"
                 size={24}
-                color="white"
+                color={theme.colors.text}
                 fontSize="bold"
               />
             </TouchableOpacity>
@@ -180,15 +206,6 @@ const DisplayDetail: React.FC = () => {
             <Text style={styles.fieldValue}>{device.user.name}</Text>
           </View>
         </View>
-
-        {/* {device.mac.includes("efid65b12") && (
-          <View style={styles.verseContainer}>
-            <Text style={styles.verseText}>
-              He who keeps you will not slumber
-            </Text>
-            <Text style={styles.verseReference}>Psalms 121:3</Text>
-          </View>
-        )} */}
       </ScrollView>
       <Footer />
     </View>
@@ -201,6 +218,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgb(4,38,28)",
   },
   scrollContainer: {
+    marginBottom: 60,
     paddingHorizontal: 20,
     marginTop: 30,
   },
@@ -259,24 +277,7 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 16,
     backgroundColor: "#fff",
-  },
-  verseContainer: {
-    backgroundColor: "#e8f4f8",
-    borderRadius: 10,
-    padding: 15,
-    marginTop: 10,
-  },
-  verseText: {
-    fontSize: 16,
-    fontStyle: "italic",
-    marginBottom: 5,
-    color: "#333",
-  },
-  verseReference: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "right",
-  },
+  }
 });
 
 export default DisplayDetail;

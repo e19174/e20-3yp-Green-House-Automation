@@ -7,14 +7,18 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
-  Button,
+  Alert,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
 import Footer from "../common/Footer";
 import Header from "../common/Header";
-import { launchImageLibrary } from "react-native-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../../Contexts/UserContext";
 import { Axios } from "../AxiosRequestBuilder";
+import { Ionicons } from '@expo/vector-icons';
+import { themeAuth } from "../../Contexts/ThemeContext";
+import * as ImagePicker from 'expo-image-picker';
+import { get } from "../../Storage/secureStorage";
 
 interface USER {
   name: string;
@@ -27,27 +31,53 @@ interface USER {
 
 const Profile: React.FC = () => {
   const {user, setUser} = useAuth();
-  // const params = useLocalSearchParams();
+  const {theme} = themeAuth();  
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [image, setImage] = useState<FileToUpload>();
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1500);
+  };
 
   const handlePickImage = async () => {
-    try {
-      const result = await launchImageLibrary({
-        mediaType: "photo",
-        quality: 1,
+    // Ask for media library permissions
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      Alert.alert('Permission Required', 'Permission to access media library is required!');
+      return;
+    }
+
+    // Launch image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+      allowsEditing: true,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      const pickedImage = result.assets[0];
+      setImageUri(pickedImage.uri);
+      setImage({
+        uri: pickedImage.uri,
+        name: pickedImage.fileName || 'photo.jpg',
+        type: pickedImage.type || 'image/jpeg',
       });
-      if (result.didCancel) {
-        console.log("User cancelled image picker");
-      } else if (result.errorCode) {
-        console.log("ImagePicker Error:", result.errorMessage);
-      } else if (result.assets && result.assets.length > 0) {
-        const file = result.assets[0];
-        setImageUri(file.uri || null);
-        setImage(file as FileToUpload);
-      }
-    } catch (error) {
-      console.error("Image picking failed:", error);
+
+      // You can create a "file-like" object to upload
+      const fileToUpload = {
+        uri: pickedImage.uri,
+        name: pickedImage.fileName || 'photo.jpg',
+        type: pickedImage.type || 'image/jpeg',
+      };
+
+      console.log('Selected image file:', fileToUpload);
+
+      // You can now upload it using fetch or Axios
     }
   };
 
@@ -56,7 +86,7 @@ const Profile: React.FC = () => {
       const imageUri = `data:${user.imageType};base64,${user.imageData}`;
       setImageUri(imageUri);
       }
-    }, [user]);
+    }, [user, refreshing]);
 
   const handleInput = (text: string | number, field: keyof USER) => {
     setUser((prevUser: USER) => ({
@@ -74,58 +104,63 @@ const Profile: React.FC = () => {
   const handleUpdate = async () => {
     console.log(image);
     const formData = new FormData();
-    if (image) {
-      if (image.uri) {
-        const response = await fetch(image.uri);
-        const blob = await response.blob();
-        formData.append("file", blob, image.name);
-      }
+    
+    if (image?.uri) {
+      const response = await fetch(image.uri);
+      const blob = await response.blob();
+      formData.append("file", blob, image.name);
     }
     if (user) {
       formData.append("name", user.name);
       formData.append("phoneNumber", user.phoneNumber.toString());
     }
     
-    const token = await AsyncStorage.getItem("token");
+    
+    const token = get("token");
     try {
-      const response = await Axios.put("/auth/user/update", formData);
+      const response = await Axios.put("/auth/user/update", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
       setUser(response.data);
       router.push("Components/Profile/Profile");
     } catch (error) {
+      Alert.alert(String(error));
       console.log(error);
     }
   };
   
 
   return (
-    <View style={styles.container}>
-      <Header viewZone={false} selectedZone={""} setSelectedZone={() => {}} />
+    <ScrollView contentContainerStyle={[styles.container, {backgroundColor: theme.colors.background}]}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+    >
+    
+      <Header/>
 
       <View style={styles.profileContainer}>
-        <Text style={styles.headings}> Edit Profile </Text>
+        <Text style={[styles.headings, {color: theme.colors.text}]}> Edit Profile </Text>
         <View style={styles.profileWork}>
-          <View style={styles.inner}>
+          <View style={[styles.inner, {backgroundColor: theme.colors.primary}]}>
             <Image
               source={
                 user?.imageData
-                  ? { uri: imageUri }
-                  : require("../../../assets/profile_picture.webp")
+                ? { uri: imageUri }
+                : require("../../../assets/profile_picture.webp")
               }
-              style={styles.profileImage}
-            />
-            <Button title="add" onPress={handlePickImage} />
+              style={[styles.profileImage, {borderColor: theme.colors.text}]}
+              />
           </View>
+          <Ionicons name="camera" size={26} color={theme.colors.text} onPress={handlePickImage}/>
         </View>
 
-        <TouchableOpacity
-          style={styles.editProfileButton}
-          onPress={() => handleUpdate()}
-        >
-          <Text style={styles.editProfileText}>Update</Text>
-        </TouchableOpacity>
       </View>
 
-      <View style={styles.detailsContainer}>
+      <View style={[styles.detailsContainer, {backgroundColor: theme.colors.primary}]}>
         <View style={styles.detailsContent}>
           <View style={styles.detailsRow}>
             <Text style={styles.label}>Name</Text>
@@ -135,7 +170,7 @@ const Profile: React.FC = () => {
               value={user?.name || ""}
               onChangeText={(text) => handleInput(text, "name")}
               placeholderTextColor="white"
-            />
+              />
           </View>
 
           <View style={styles.detailsRow}>
@@ -152,12 +187,19 @@ const Profile: React.FC = () => {
               value={user?.phoneNumber?.toString() || ""}
               onChangeText={(text) => handleInput(text.replace(/[^0-9]/g, ""), "phoneNumber")}
               placeholderTextColor="white"
-            />
+              />
           </View>
         </View>
+
+        <TouchableOpacity
+          style={styles.editProfileButton}
+          onPress={() => handleUpdate()}
+          >
+          <Text style={styles.editProfileText}>Update</Text>
+        </TouchableOpacity>
       </View>
       <Footer />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -178,7 +220,6 @@ const styles = StyleSheet.create({
   profileContainer: {
     marginTop: 30,
     alignItems: "center",
-    backgroundColor: "#012A1C",
     width: "100%",
     paddingTop: 50,
     paddingBottom: 50,
@@ -216,6 +257,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#012A1C",
+    textAlign: "center",
   },
   detailsContainer: {
     width: "90%",

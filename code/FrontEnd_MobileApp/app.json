@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Green-Tech",
-    "slug": "Routing",
+    "slug": "Green-Tech",
     "version": "1.0.0",
     "scheme": "Routing",
     "orientation": "portrait",
@@ -14,20 +14,46 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.green-tech.green-tech",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.green_tech.green_tech"
     },
     "web": {
-      "favicon": "./assets/logopng.png"
+      "favicon": "./assets/logopng.png",
+      "platforms": [
+        "ios",
+        "android",
+        "web"
+      ],
+      "extra": {
+        "eas": {
+          "projectId": "f388a575-46cf-44a9-8bbd-20e3dbf21cb1"
+        }
+      }
     },
-    "platforms": ["ios", "android", "web"],
+    "owner": "green-tech",
     "extra": {
-      "redirectUri": "https://auth.expo.io/@vithustennysan/Routing"
-    }
+      "eas": {
+        "projectId": "f388a575-46cf-44a9-8bbd-20e3dbf21cb1"
+      }
+    },
+    "plugins": [
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.394427764996-o8g4j0kgol614gg914cdo1f1jrqi77uk"
+        }
+      ],
+      "expo-secure-store"
+    ]
   }
 }
