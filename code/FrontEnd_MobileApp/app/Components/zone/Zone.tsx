@@ -30,7 +30,7 @@ const Zone: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [devices, setDevices] = useState<Device[]>([]);
   const params = useLocalSearchParams();
-  const [selectedDevice, setSelectedDevice] = useState<Device | undefined>();
+  const [selectedDevice, setSelectedDevice] = useState<Device | undefined>(JSON.parse(params.zone as string)[0]);
   const [isEnabled, setIsEnabled] = useState<boolean[]>([false, false, false, false]);
   const { theme } = themeAuth();
   const [refreshing, setRefreshing] = useState(false);
@@ -42,17 +42,15 @@ const Zone: React.FC = () => {
   }
 
   useEffect(() => {
-      if (params.device) {
+      if (params.zone) {
         try {
           const deviceObject = JSON.parse(params.zone as string);
-          console.log("Parsed device data:", deviceObject);
-          Alert.alert(deviceObject);
           setDevices(deviceObject);
         } catch (error) {
           console.error("Error parsing device data:", error);
         }
       }
-    }, [params.device, refreshing]);
+    }, [params.zone, refreshing]);
 
   const toggleStatus = (index: number) => {
     setIsEnabled((prevState) => {
@@ -63,23 +61,24 @@ const Zone: React.FC = () => {
   };
 
   return (
+    <>
+    <Header/>
+
     <ScrollView contentContainerStyle={[styles.container, {backgroundColor: theme.colors.background}]}
       refreshControl={
         <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         />
       }>
-      <Header/>
-
+      
       <View style={styles.zoneSelector}>
-        <Text style={[styles.zoneText, {color: theme.colors.text}]}>{selectedDevice?.name}</Text>
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <Text style={styles.dropdownArrow}>▼</Text>
-        </TouchableOpacity>
+          <Text style={[styles.zoneText, {color: theme.colors.text}]}>{selectedDevice?.name}</Text>
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <Text style={[styles.dropdownArrow, {color: theme.colors.text}]}>▼</Text>
+          </TouchableOpacity>
       </View>
 
-      
       <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -88,43 +87,49 @@ const Zone: React.FC = () => {
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={styles.modalItem}
-                  onPress={() => {
-                    setSelectedDevice(item);
-                    setModalVisible(false);
-                  }}
+                style={styles.modalItem}
+                onPress={() => {
+                  setSelectedDevice(item);
+                  setModalVisible(false);
+                }}
                 >
                   <Text style={styles.modalText}>{item.name}</Text>
                 </TouchableOpacity>
               )}
-            />
+              />
           </View>
         </View>
       </Modal>
 
       <View style={styles.content}>
+        
+
         <GrowComponents isEnabled={isEnabled} toggleStatus={toggleStatus} />
-        <GrowData />
+        <GrowData deviceId={selectedDevice?.id} />
       </View>
 
-      <Footer />
     </ScrollView>
+
+    <Footer />
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#04261C', 
+    backgroundColor: '#04261C',
+    alignItems: 'center', 
+    paddingTop: 70, 
   },
   content: {
-    marginTop: '29%',  
   },
-    zoneSelector: {
+  zoneSelector: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 5,
     paddingHorizontal: 15,
+    marginBottom: 20,
   },
   zoneText: {
     fontSize: 17,

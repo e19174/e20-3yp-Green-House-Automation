@@ -14,7 +14,11 @@ interface GrowDataItem {
   percentage: number;
 }
 
-const GrowData: React.FC = () => {
+interface GrowDataProps {
+  deviceId: number | undefined;
+}
+
+const GrowData: React.FC<GrowDataProps> = ({deviceId}) => {
   const { theme } = themeAuth();
   const [growDataItems, setGrowDataItems] = useState<GrowDataItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +27,7 @@ const GrowData: React.FC = () => {
   useEffect(() => {
     const fetchSensorData = async () => {
       try {
-        const response = await Axios.get('/sensors/currentData');
+        const response = await Axios.get(`/sensors/currentData/${deviceId}`);
         const sensorData = response.data
         console.log(sensorData);
         const formattedData: GrowDataItem[] = [
