@@ -33,7 +33,10 @@ A demo video is available to illustrate the working system:
 
 ## 🧠 Solution Architecture
 
-### High-Level Architecture  
+### Circuit Design
+![Circuit Design](./DemonstrationDesign/circuit_image.png)
+
+### High-Level Architecture   
 ![High Level Architecture](./docs/images/high-level-new.png)
 
 ### Control Flow  
@@ -111,8 +114,8 @@ This system automates and modernizes greenhouse management by integrating IoT, c
 ## 📂 Repository Structure
 
 ```plaintext
-├── code/Backend-End/            # Spring Boot backend
-├── code/Front-EndMobileApp/     # React Native frontend
+├── code/BackendEnd_MobileApp/            # Spring Boot backend
+├── code/FrontEnd_MobileApp/     # React Native frontend
 ├── code/ESP32/                  # ESP32 firmware
 ├── demonstrationDesign/         # Demo designs
 └── README.md
