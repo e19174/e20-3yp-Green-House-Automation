@@ -13,12 +13,12 @@ import {
 } from "react-native";
 import Footer from "../common/Footer";
 import Header from "../common/Header";
-import { useAuth } from "../../Contexts/UserContext";
-import { Axios } from "../AxiosRequestBuilder";
+import { useAuth } from "../../../Contexts/UserContext";
+import { Axios } from "../../AxiosRequestBuilder";
 import { Ionicons } from '@expo/vector-icons';
-import { themeAuth } from "../../Contexts/ThemeContext";
+import { themeAuth } from "../../../Contexts/ThemeContext";
 import * as ImagePicker from 'expo-image-picker';
-import { get } from "../../Storage/secureStorage";
+import { get } from "../../../Storage/secureStorage";
 
 interface USER {
   name: string;

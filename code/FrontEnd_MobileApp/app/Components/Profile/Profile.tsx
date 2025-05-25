@@ -10,9 +10,9 @@ import {
 } from "react-native";
 import Footer from "../common/Footer";
 import Header from "../common/Header";
-import { useAuth } from "../../Contexts/UserContext";
+import { useAuth } from "../../../Contexts/UserContext";
 import { useState } from 'react';
-import { themeAuth } from '../../Contexts/ThemeContext';
+import { themeAuth } from '../../../Contexts/ThemeContext';
 
 interface USER {
   name: string;

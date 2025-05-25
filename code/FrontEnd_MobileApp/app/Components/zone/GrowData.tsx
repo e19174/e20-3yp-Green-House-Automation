@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CircularProgressBase  } from 'react-native-circular-progress-indicator';
-import { Axios } from '../AxiosRequestBuilder';
-import { themeAuth } from '../../Contexts/ThemeContext';
+import { Axios } from '../../AxiosRequestBuilder';
+import { themeAuth } from '../../../Contexts/ThemeContext';
+import { useFocusEffect } from 'expo-router';
 
 
 interface GrowDataItem {
@@ -24,37 +25,40 @@ const GrowData: React.FC<GrowDataProps> = ({deviceId}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+useFocusEffect(
+  React.useCallback(() => {
+    let isActive = true;
     const fetchSensorData = async () => {
       try {
         const response = await Axios.get(`/sensors/currentData/${deviceId}`);
         const sensorData = response.data
         console.log(sensorData);
         const formattedData: GrowDataItem[] = [
-        { name: 'Temp', value: `${sensorData.temperature}`, unit: '°C', icon: 'thermometer', percentage: (sensorData.temperature || 0) / 50 },
-        { name: 'Humidity', value: `${sensorData.humidity}`, unit: '%', icon: 'water', percentage: (sensorData.humidity || 0) / 100 },
-        { name: 'Soil Moisture', value: `${sensorData.soilMoisture}`, unit: '%', icon: 'leaf', percentage: (sensorData.soilMoisture || 0) / 3000 },
-        { name: 'N Level', value: `${sensorData.nitrogenLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData.nitrogenLevel || 0) / 0.00125 },
-        { name: 'P Level', value: `${sensorData.phosphorusLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData.phosphorusLevel || 0) / 0.00125 },
-        { name: 'K Level', value: `${sensorData.potassiumLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData.potassiumLevel || 0) / 0.00125 },
+          { name: 'Temp', value: `${sensorData.temperature}`, unit: '°C', icon: 'thermometer', percentage: (sensorData.temperature || 0) / 50 },
+          { name: 'Humidity', value: `${sensorData.humidity}`, unit: '%', icon: 'water', percentage: (sensorData.humidity || 0) / 100 },
+          { name: 'Soil Moisture', value: `${sensorData.soilMoisture}`, unit: '%', icon: 'leaf', percentage: (sensorData.soilMoisture || 0) / 3000 },
+          { name: 'N Level', value: `${sensorData.nitrogenLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData.nitrogenLevel || 0) / 0.00125 },
+          { name: 'P Level', value: `${sensorData.phosphorusLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData.phosphorusLevel || 0) / 0.00125 },
+          { name: 'K Level', value: `${sensorData.potassiumLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData.potassiumLevel || 0) / 0.00125 },
         ];
         setGrowDataItems(formattedData);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching sensor data:', error);
         setError('Failed to load data');
-        setLoading(false);
       }
     }
     const intervalId = setInterval(() => {
+      if (!isActive) return;
       fetchSensorData();
     }, 1000);
-
+    
     return () => {
       clearInterval(intervalId);
+      isActive = false;
     }
-    
-  }, []);
+  }, [])
+);
 
   if (loading) {
     return <ActivityIndicator size="large" color="#16F08B" />;

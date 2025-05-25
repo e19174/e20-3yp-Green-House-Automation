@@ -1,7 +1,7 @@
 // import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useEffect  } from 'react';
 import RootLayout from './app/Components/_layout';
-import { ThemeProvider } from './app/Contexts/ThemeContext';
+import { ThemeProvider } from './Contexts/ThemeContext';
 
 export default function App() {
   // useEffect(() => {

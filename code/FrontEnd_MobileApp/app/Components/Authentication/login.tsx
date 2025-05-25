@@ -1,31 +1,56 @@
-import { Link, router } from 'expo-router';
-import React, { useContext, useState } from 'react'
-import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native'
-import { useAuth } from '../../Contexts/UserContext';
-import { Axios } from '../AxiosRequestBuilder';
-import { themeAuth } from '../../Contexts/ThemeContext';
-import { save } from '../../Storage/secureStorage';
+import { Link, router, useFocusEffect } from 'expo-router';
+import React, { useState } from 'react'
+import { View, Text, TextInput, StyleSheet, Pressable, ActivityIndicator } from 'react-native'
+import { useAuth } from '../../../Contexts/UserContext';
+import { Axios } from '../../AxiosRequestBuilder';
+import { themeAuth } from '../../../Contexts/ThemeContext';
+import { get, save } from '../../../Storage/secureStorage';
 
 const Login:React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const {user, setUser} = useAuth();
     const {theme} = themeAuth();
+    const [checkingToken, setCheckingToken] = useState(true);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            let isActive = true;
+            const checkToken = async () => {
+                const token = await get("token");
+                if (token && isActive) {
+                    router.replace("/Components/Home/Home");
+                } else {
+                    setCheckingToken(false);
+                }
+            };
+            checkToken();
+            return () => { isActive = false; };
+        }, [])
+    );
     
     const handleRegister = async () => {
         if (password == '' || email == "") {
-            alert("Fill the feilds");
+            alert("Fill the fields");
             return;
         }
         
         try {
             const response = await Axios.post("/auth/user/login", {email, password});
             await save("token", response.data.token);
-            router.push("/Components/Home/Home");
+            router.replace("/Components/Home/Home");
             setUser(response.data.user);
         } catch (error: any) {
             console.log(error);
         }
+    }
+
+    if (checkingToken) {
+        return (
+            <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
+                <ActivityIndicator size="large" color={theme.dark ? "#fff" : "#01694D"} />
+            </View>
+        );
     }
 
     return (

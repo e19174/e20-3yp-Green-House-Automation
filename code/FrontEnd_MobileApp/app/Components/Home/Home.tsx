@@ -13,8 +13,8 @@ import {
 import Footer from "../common/Footer";
 import Header from "../common/Header";
 import { router } from "expo-router";
-import { Axios } from "../AxiosRequestBuilder";
-import { themeAuth } from "../../Contexts/ThemeContext";
+import { Axios } from "../../AxiosRequestBuilder";
+import { themeAuth } from "../../../Contexts/ThemeContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -39,7 +39,6 @@ interface User {
 
 const Home = () => {
   
-  // const [devices, setDevices] = useState<Device[]>([]);
   const [zones, setZones] = useState<any>({});
   const [refreshing, setRefreshing] = useState(false);
   const { theme } = themeAuth();
@@ -48,7 +47,6 @@ const Home = () => {
   const onRefresh = () => {
     setRefreshing(true);
 
-    // Simulate fetching new data
     setTimeout(() => {
       setRefreshing(false);
     }, 1500);
@@ -71,20 +69,6 @@ const Home = () => {
     router.push({ pathname: '/Components/zone/Zone', params: { zone: JSON.stringify(item) } })
   };
   
-
-  // const renderItem = ({ item }: { item: Device }) => (
-  //     <TouchableOpacity onPress={() => directToDetail(item)}>
-  //       <View style={[styles.card, {backgroundColor: theme.colors.cardBackground}]}>
-  //         <Text style={styles.deviceName}>{item.name}</Text>
-  //         <Text style={styles.deviceDetails}>Zone: {item.zoneName}</Text>
-  //         <Text style={styles.deviceDetails}>Location: {item.location}</Text>
-  //         <View style={styles.timeContainer}>
-  //           <Text style={styles.time}>Added At: {new Date(item.addedAt).toLocaleString()}</Text>
-  //         </View>
-  //       </View>
-  //     </TouchableOpacity>
-  //   );
-
   return (
     <>
       <ScrollView contentContainerStyle={[styles.container, {backgroundColor: theme.colors.background}]}
@@ -95,25 +79,9 @@ const Home = () => {
 
         <Header/>
         
-        <Text style={[styles.heading, {color: theme.colors.text}]}>Green Tech</Text>
+        <Text style={[styles.heading, {color: theme.colors.text}]}>Home</Text>
 
         <Image source={require("../../../assets/greenHouse.jpg")} style={styles.image} />
-
-        {/* <View style={styles.optionsContainer}>
-          {devices.length !== 0 ? <FlatList
-            data={devices}
-            keyExtractor={item => item.id.toString()}
-            renderItem={renderItem}
-            contentContainerStyle={{ paddingBottom: 60 }}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-            />
-            :
-            <Text style={{ color: 'white', textAlign: 'center', marginTop: 20 }}>No devices found</Text>
-          }
-
-        </View> */}
 
         <View style={styles.optionsContainer}>
           {Object.keys(zones).map((zoneName, index) => (

@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useAuth } from '../../Contexts/UserContext';
-import { themeAuth } from '../../Contexts/ThemeContext';
-import { get, remove } from '../../Storage/secureStorage';
+import { useAuth } from '../../../Contexts/UserContext';
+import { themeAuth } from '../../../Contexts/ThemeContext';
+import { get, remove } from '../../../Storage/secureStorage';
 
 interface USER {
   name: string;
@@ -47,6 +47,10 @@ const Header: React.FC = () => {
           <Ionicons name="notifications" size={26} color={theme.colors.text} />
         </TouchableOpacity>
 
+        <TouchableOpacity onPress={() => router.push('Components/Home/Home')}>
+          <Text style={{color: theme.colors.text, fontSize: 20, fontWeight: 'bold'}}>Green Tech</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={() => setSidebarVisible(true)}>
           <Ionicons name="menu" size={26} color={theme.colors.text} />
         </TouchableOpacity>
@@ -64,13 +68,15 @@ const Header: React.FC = () => {
               style={[styles.profilePicture, {borderColor: theme.colors.text}]}
             />
 
-            <View style={styles.divider} />
+            <View style={[styles.divider, {backgroundColor: theme.dark? 'rgba(255, 255, 255, 0.2)' : '#aaa'}]} />
 
             <TouchableOpacity style={[styles.sidebarItem, {backgroundColor: theme.colors.primary}]} onPress={toggleTheme}>
               <Ionicons name="toggle" size={24} color={theme.colors.text} />
               <Text style={styles.sidebarText}>{theme.dark == true? "Light mode": "Dark mode"}</Text>
             </TouchableOpacity>
 
+            <View style={[styles.divider, {backgroundColor: theme.dark? 'rgba(255, 255, 255, 0.2)' : '#aaa'}]} />
+            
             <TouchableOpacity style={[styles.sidebarItem, {backgroundColor: theme.colors.primary}]} onPress={() => {
                   router.push('Components/Profile/Profile');
                   setSidebarVisible(false);
@@ -88,14 +94,6 @@ const Header: React.FC = () => {
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.sidebarItem, {backgroundColor: theme.colors.primary}]} onPress={() => {
-                  router.push('Components/Device/DisplayList');
-                  setSidebarVisible(false);
-                  }}>
-              <Ionicons name="radio-sharp" size={24} color={theme.colors.text}/>
-              <Text style={styles.sidebarText}>Devices</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.sidebarItem, {backgroundColor: theme.colors.primary}]} onPress={() => {
                   router.push('Components/Manual/Manual');
                   setSidebarVisible(false);
                   }}>
@@ -104,7 +102,7 @@ const Header: React.FC = () => {
             </TouchableOpacity>
 
 
-            <View style={styles.divider} />
+            <View style={[styles.divider, {backgroundColor: theme.dark? 'rgba(255, 255, 255, 0.2)' : '#aaa'}]} />
             <Text style={[styles.versionText, {color: theme.colors.text}]}>App Version 10.2.1</Text>
             <TouchableOpacity style={[styles.logoutButton, {backgroundColor: theme.colors.primary}]} onPress={handleLogout}>
               <Text style={styles.logoutText}>Log Out</Text>

@@ -4,7 +4,7 @@ import Header from '../common/Header';
 import Footer from '../common/Footer';  
 import GrowComponents from './GrowComponents';
 import GrowData from './GrowData';
-import { themeAuth } from '../../Contexts/ThemeContext';
+import { themeAuth } from '../../../Contexts/ThemeContext';
 import { useLocalSearchParams } from 'expo-router';
 
 type Device = {
@@ -72,7 +72,7 @@ const Zone: React.FC = () => {
         />
       }>
       
-      <View style={styles.zoneSelector}>
+      <View style={[styles.zoneSelector, {backgroundColor: theme.colors.primary}]}>
           <Text style={[styles.zoneText, {color: theme.colors.text}]}>{selectedDevice?.name}</Text>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <Text style={[styles.dropdownArrow, {color: theme.colors.text}]}>▼</Text>
@@ -127,19 +127,25 @@ const styles = StyleSheet.create({
   zoneSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
+    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 10,
     marginBottom: 20,
+    minWidth: 180,
   },
   zoneText: {
     fontSize: 17,
-    color: 'white',
+    color: '#01694D',
     fontWeight: 'bold',
-    marginRight: 8,
+    marginRight: 12,
+    flexShrink: 1,
+    textAlign: 'center',
+    flex: 1,
   },
   dropdownArrow: {
-    fontSize: 25,
-    color: '#16F08B',
+    fontSize: 22,
+    color: '#01694D',
     fontWeight: 'bold',
   },
   modalContainer: {

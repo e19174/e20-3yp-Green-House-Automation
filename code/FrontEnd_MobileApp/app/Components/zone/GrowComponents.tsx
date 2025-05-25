@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Axios } from '../AxiosRequestBuilder';
-import { themeAuth } from '../../Contexts/ThemeContext';
+import { Axios } from '../../AxiosRequestBuilder';
+import { themeAuth } from '../../../Contexts/ThemeContext';
 
 interface GrowComponentsProps {
   isEnabled: boolean[];

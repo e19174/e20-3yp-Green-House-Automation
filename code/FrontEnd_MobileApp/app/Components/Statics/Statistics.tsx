@@ -11,7 +11,7 @@ import {
 import { LineChart } from "react-native-chart-kit";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
-import { themeAuth } from "../../Contexts/ThemeContext";
+import { themeAuth } from "../../../Contexts/ThemeContext";
 
 // Define DataType interface
 type DataType = {

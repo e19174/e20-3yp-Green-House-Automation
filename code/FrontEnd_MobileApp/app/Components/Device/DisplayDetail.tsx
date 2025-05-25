@@ -12,8 +12,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
-import { Axios } from "../AxiosRequestBuilder";
-import { themeAuth } from "../../Contexts/ThemeContext";
+import { Axios } from "../../AxiosRequestBuilder";
+import { themeAuth } from "../../../Contexts/ThemeContext";
 
 type Device = {
   id: number;

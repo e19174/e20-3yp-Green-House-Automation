@@ -1,6 +1,6 @@
 // ThemeContext.js
 import React, { createContext, ReactNode, useContext, useState } from 'react';
-import { LightTheme, DarkTheme } from '../Themes/themes';
+import { LightTheme, DarkTheme } from './Themes/themes';
 
 interface Theme{
     dark: boolean,
@@ -14,7 +14,7 @@ interface Theme{
 
 interface ThemeContextType {
   theme: Theme;
-    toggleTheme: (theme : Theme) => void;
+  toggleTheme: (theme : Theme) => void;
 }
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
