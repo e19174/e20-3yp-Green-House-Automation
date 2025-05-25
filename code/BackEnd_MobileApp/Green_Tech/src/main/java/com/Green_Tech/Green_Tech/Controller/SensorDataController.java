@@ -21,9 +21,9 @@ public class SensorDataController {
     private MQTTService mqttService;
 
 
-    @GetMapping(value = "/currentData")
-    public SensorData getAllSensorData() {
-        return sensorDataService.getAllSensorData();
+    @GetMapping(value = "/currentData/{id}")
+    public SensorData getSensorData(@PathVariable("id") Long id) {
+        return sensorDataService.getSensorData(id);
     }
 
 

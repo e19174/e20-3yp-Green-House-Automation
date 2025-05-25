@@ -32,18 +32,18 @@ public class AwsIotProvisioningService {
 
     private IotClient iotClient;
 
-    @PostConstruct
-    public void init() {
-        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(
-                accessKeyId,
-                secretAccessKey
-        );
-
-        this.iotClient = IotClient.builder()
-                .region(Region.AP_SOUTH_1)
-                .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
-                .build();
-    }
+//    @PostConstruct
+//    public void init() {
+//        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(
+//                accessKeyId,
+//                secretAccessKey
+//        );
+//
+//        this.iotClient = IotClient.builder()
+//                .region(Region.AP_SOUTH_1)
+//                .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
+//                .build();
+//    }
 
     public AwsIotCredentials createThing(String mac) {
         Device device = deviceRepo.findByMac(mac);

@@ -104,7 +104,7 @@ public class DeviceService {
         for( Device device: devices){
             if (!zoneDevices.containsKey(device.getZoneName())){
                 List<Device> deviceList = new ArrayList<>();
-                deviceList.add(device);
+                deviceList.add(getDeviceDetails(device));
                 zoneDevices.put(device.getZoneName(), deviceList);
                 continue;
             }
@@ -112,5 +112,12 @@ public class DeviceService {
         }
 
         return zoneDevices;
+    }
+
+    private Device getDeviceDetails(Device device) {
+        device.getUser().setImageData(null);
+        device.getUser().setImageName(null);
+        device.getUser().setImageType(null);
+        return device;
     }
 }

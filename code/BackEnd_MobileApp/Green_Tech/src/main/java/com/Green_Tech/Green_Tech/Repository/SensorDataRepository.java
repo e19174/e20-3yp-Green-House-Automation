@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 @EnableJpaRepositories
 public interface SensorDataRepository extends JpaRepository<SensorData, Long> {
     SensorData findFirstByOrderByIdDesc();
+    SensorData findFirstByIdOrderByIdDesc(Long id);
 }

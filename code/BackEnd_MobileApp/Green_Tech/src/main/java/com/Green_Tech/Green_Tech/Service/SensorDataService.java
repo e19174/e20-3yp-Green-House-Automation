@@ -22,8 +22,8 @@ public class SensorDataService {
     @Autowired
     private DeviceRepo deviceRepo;
 
-    public SensorData getAllSensorData() {
-        return sensorDataRepository.findFirstByOrderByIdDesc();
+    public SensorData getSensorData(Long id) {
+        return sensorDataRepository.findFirstByIdOrderByIdDesc(id);
     }
 
     public HashMap convertByteArrayToHashMap(byte[] jsonData) {
