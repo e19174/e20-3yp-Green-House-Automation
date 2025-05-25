@@ -27,17 +27,17 @@ This project aims to develop an **IoT-based Smart Greenhouse Automation System**
 ## 🛠️ Implementation
 
 A demo video is available to illustrate the working system:  
-📹 [Demo Video](./video/demo.mp4)
+📹 [Demo Video](./docs/video/demo.mp4)
 
 ---
 
 ## 🧠 Solution Architecture
 
 ### High-Level Architecture  
-![High Level Architecture](./images/high-level-new.png)
+![High Level Architecture](./docs/images/high-level-new.png)
 
 ### Control Flow  
-![Control Flow](./images/data-flow-new.png)
+![Control Flow](./docs/images/data-flow-new.png)
 
 ---
 
@@ -65,13 +65,24 @@ A demo video is available to illustrate the working system:
 
 ## 💰 Budget
 
-| Item         | Quantity | Unit Price | Total Price |
-|--------------|----------|------------|-------------|
-| ESP32        | 2        | Rs. 1490   | Rs. 2980    |
-| DHT22        | 2        | Rs. 590    | Rs. 1190    |
-| ...          | ...      | ...        | ...         |
-
-*Additional items and full budget breakdown available in the source files.*
+| Component                | Quantity | Unit Price (LKR) | Total Price (LKR) |
+| ------------------------ | -------- | ---------------- | ----------------- |
+| ESP32                    | 2        | 1490             | 2980              |
+| DHT22                    | 2        | 590              | 1180              |
+| Relay Module             | 2        | 590              | 1180              |
+| Soil Moisture Sensor     | 2        | 690              | 1380              |
+| NPK Sensor               | 1        | 19,500           | 19,500            |
+| Mini Submersible Pump    | 2        | 780              | 1560              |
+| Solenoid Valve           | 1        | 1,950            | 1,950             |
+| Fan                      | 1        | 720              | 720               |
+| Wires and Connectors     | -        | -                | 500               |
+| Power Supply             | 2        | 800              | 1600              |
+| Breadboard               | 2        | 400              | 800               |
+| Jumper Wires             | -        | -                | 300               |
+| Tubes for Water/Nutrient | -        | -                | 400               |
+| PVC for Box (Casing)     | -        | -                | 500               |
+| Miscellaneous            | -        | -                | 700               |
+| TOTAL                                                  | 34,250            |
 
 ---
 
