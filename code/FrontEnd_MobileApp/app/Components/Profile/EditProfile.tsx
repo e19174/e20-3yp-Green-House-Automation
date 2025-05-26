@@ -11,8 +11,6 @@ import {
   ScrollView,
   RefreshControl,
 } from "react-native";
-import Footer from "../common/Footer";
-import Header from "../common/Header";
 import { useAuth } from "../../../Contexts/UserContext";
 import { Axios } from "../../AxiosRequestBuilder";
 import { Ionicons } from '@expo/vector-icons';
@@ -140,8 +138,6 @@ const Profile: React.FC = () => {
           }
     >
     
-      <Header/>
-
       <View style={styles.profileContainer}>
         <Text style={[styles.headings, {color: theme.colors.text}]}> Edit Profile </Text>
         <View style={styles.profileWork}>
@@ -198,7 +194,7 @@ const Profile: React.FC = () => {
           <Text style={styles.editProfileText}>Update</Text>
         </TouchableOpacity>
       </View>
-      <Footer />
+
     </ScrollView>
   );
 };
@@ -209,6 +205,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#012A1C",
     alignItems: "center",
+    paddingTop: 10,
   },
   headings: {
     marginTop: 10,
@@ -218,10 +215,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   profileContainer: {
-    marginTop: 30,
     alignItems: "center",
     width: "100%",
-    paddingTop: 50,
     paddingBottom: 50,
   },
   profileWork: {

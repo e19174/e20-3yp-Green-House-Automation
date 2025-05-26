@@ -18,7 +18,7 @@ const Page:React.FC = () => {
         const token = await get("token");
         setTimeout(async () => {
           if (!token && isActive) {
-            router.push("/Components/Authentication/login");
+            router.push("../Authentication/login");
           } else if (isActive) {
             router.push("/Components/Home/Home");
           }

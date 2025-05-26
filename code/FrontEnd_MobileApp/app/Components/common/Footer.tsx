@@ -26,11 +26,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     backgroundColor: '#01694D',
-    paddingVertical: 15,
+    paddingVertical: 10,
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
+    height: 55,
+    elevation: 5,
   },
 });
 

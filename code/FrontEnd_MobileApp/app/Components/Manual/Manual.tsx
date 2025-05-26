@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   Animated,
-  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
@@ -9,8 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Header from "../common/Header";
-import Footer from "../common/Footer";
 import { themeAuth } from "../../../Contexts/ThemeContext";
 
 const imageData = [
@@ -80,7 +77,6 @@ const Manual = () => {
 
   return (
     <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
-      <Header/>
       
       <Text style={[styles.heading, {color: theme.colors.text}]}>{imageData[currentIndex].name}</Text>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -132,7 +128,6 @@ const Manual = () => {
         </View>
       </ScrollView>
 
-      <Footer />
     </View>
   );
 };
@@ -141,6 +136,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "rgb(4,38,28)",
+    paddingTop: 10,
   },
   scrollContent: {
     flexGrow: 1,
@@ -151,7 +147,6 @@ const styles = StyleSheet.create({
     color:"#fff",
     fontSize: 30,
     textAlign: "center",
-    marginTop: "20%",
     fontWeight: "bold",
   },
   imageContainer: {

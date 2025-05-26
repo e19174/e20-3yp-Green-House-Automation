@@ -10,8 +10,6 @@ import {
   RefreshControl,
   ScrollView
 } from "react-native";
-import Footer from "../common/Footer";
-import Header from "../common/Header";
 import { router } from "expo-router";
 import { Axios } from "../../AxiosRequestBuilder";
 import { themeAuth } from "../../../Contexts/ThemeContext";
@@ -70,15 +68,12 @@ const Home = () => {
   };
   
   return (
-    <>
       <ScrollView contentContainerStyle={[styles.container, {backgroundColor: theme.colors.background}]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
 
-        <Header/>
-        
         <Text style={[styles.heading, {color: theme.colors.text}]}>Home</Text>
 
         <Image source={require("../../../assets/greenHouse.jpg")} style={styles.image} />
@@ -95,8 +90,6 @@ const Home = () => {
         </View>
 
       </ScrollView>
-      <Footer />
-    </>
   );
 };
 
@@ -104,12 +97,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    paddingTop: 10,
   },
   heading:{
     color: "white",
     fontSize: 30,
     fontWeight: "bold",
-    marginTop: "20%",
   },
   image: {
     width: width * 0.9,
@@ -121,6 +114,7 @@ const styles = StyleSheet.create({
   optionsContainer: {
     flex: 1,
     width: "90%",
+    paddingBottom: 20,
   },
    card: {
     backgroundColor: '#01694D',

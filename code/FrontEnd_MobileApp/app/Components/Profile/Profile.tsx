@@ -8,8 +8,6 @@ import {
   RefreshControl,
   ScrollView,
 } from "react-native";
-import Footer from "../common/Footer";
-import Header from "../common/Header";
 import { useAuth } from "../../../Contexts/UserContext";
 import { useState } from 'react';
 import { themeAuth } from '../../../Contexts/ThemeContext';
@@ -45,7 +43,6 @@ const Profile: React.FC = () => {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <Header/>
 
       <View style={styles.profileContainer}>
         <Text style={[styles.headings, {color: theme.colors.text}]}> Profile </Text>
@@ -85,7 +82,6 @@ const Profile: React.FC = () => {
         </View>
       </View>
 
-      <Footer />
     </ScrollView>
   );
 };
@@ -96,19 +92,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#012A1C", 
     alignItems: "center",
+    paddingTop: 10,
   },
   headings : {
-    marginTop: 10,
     marginBottom: 10,
     fontSize: 28,
     color: "#FFFFFF",
     fontWeight: "bold",
   },
   profileContainer: {
-    marginTop: 30,
     alignItems: "center",
     width: "100%",
-    paddingTop: 50,
     paddingBottom: 50,
   },
   profileWork: {

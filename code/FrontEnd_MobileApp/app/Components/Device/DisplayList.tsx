@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ScrollView, RefreshControl, Pressable, Alert } from 'react-native';
 import { router } from 'expo-router';
-import Header from '../common/Header';  
-import Footer from '../common/Footer'; 
 import { Axios } from '../../AxiosRequestBuilder';
 import { themeAuth } from '../../../Contexts/ThemeContext';
 
@@ -98,7 +96,6 @@ const DeviceListScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
-      <Header />
 
         <View style={styles.filterContainer}>
           <Pressable onPress={() => setFilter("active")}>
@@ -119,21 +116,19 @@ const DeviceListScreen: React.FC = () => {
           data={filteredDevices}
           keyExtractor={item => item.id.toString()}
           renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 60 }}
+          contentContainerStyle={[styles.scrollContainer, { paddingBottom: 60 }]}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }/>
            
-      <Footer />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { 
-    flexGrow: 1,
-    paddingTop: "25%",
-    backgroundColor: 'rgb(4,38,28)' 
+    flex: 1,
+    backgroundColor: 'rgb(4,38,28)', 
   },
   searchInput: {
     borderWidth: 1,
@@ -147,6 +142,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontSize: 16,
     textAlign: 'center',
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
   card: {
     backgroundColor: '#01694D',

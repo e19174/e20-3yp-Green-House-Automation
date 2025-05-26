@@ -7,11 +7,10 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
-import Header from "../common/Header";
-import Footer from "../common/Footer";
+import { router, useLocalSearchParams } from "expo-router";
 import { Axios } from "../../AxiosRequestBuilder";
 import { themeAuth } from "../../../Contexts/ThemeContext";
 
@@ -79,9 +78,21 @@ const DisplayDetail: React.FC = () => {
   const handleAddDevice = async () => {
     try {
       const response = await Axios.put(`/device/activate/${device.id}`);
-      console.log("Device added successfully:", response.data);
+      Alert.alert("Success", "Device added successfully");
     } catch (error) {
       console.error("Error adding device:", error);
+    }
+  };
+
+  const handleDeleteDevice = async (id: number) => {
+    try {
+      const response = await Axios.delete(`/device/delete/${id}`);
+      if (response.data == true) {
+        Alert.alert("Success", "Device deleted successfully");
+        router.push("Components/Device/DisplayList");
+      }
+    } catch (error) {
+      console.error("Error deleting device:", error);
     }
   };
 
@@ -103,7 +114,6 @@ const DisplayDetail: React.FC = () => {
 
   return (
     <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
-      <Header/>
       <ScrollView contentContainerStyle={styles.scrollContainer}
         refreshControl={
           <RefreshControl refreshing={false} onRefresh={onRefresh} />
@@ -206,8 +216,15 @@ const DisplayDetail: React.FC = () => {
             <Text style={styles.fieldValue}>{device.user.name}</Text>
           </View>
         </View>
+
+        <TouchableOpacity style={styles.deleteBtn} onPress={() => {handleDeleteDevice(device.id)}}>
+          <Ionicons name="trash" size={16} color="#fff" />
+          <Text style={styles.deleteText}>
+            Delete Device
+          </Text>
+        </TouchableOpacity>
+
       </ScrollView>
-      <Footer />
     </View>
   );
 };
@@ -216,18 +233,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "rgb(4,38,28)",
+    paddingTop: 10,
   },
   scrollContainer: {
-    marginBottom: 60,
     paddingHorizontal: 20,
-    marginTop: 30,
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 30,
-    marginTop: "15%",
   },
   headerTitle: {
     fontSize: 28,
@@ -277,7 +294,22 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 16,
     backgroundColor: "#fff",
-  }
+  },
+  deleteBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f44336",
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginTop: -5,
+  },
+  deleteText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 10,
+  },
 });
 
 export default DisplayDetail;

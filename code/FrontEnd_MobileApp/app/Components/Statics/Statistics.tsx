@@ -9,8 +9,6 @@ import {
   RefreshControl,
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import Header from "../common/Header";
-import Footer from "../common/Footer";
 import { themeAuth } from "../../../Contexts/ThemeContext";
 
 // Define DataType interface
@@ -335,8 +333,6 @@ const StatisticsDisplay: React.FC = () => {
           }
         >
 
-    <Header/>
-
     <View style={styles.editProfile}>
       <Text style={[styles.title, {color: theme.colors.text}]}>Live Data Statistics</Text>
 
@@ -383,7 +379,6 @@ const StatisticsDisplay: React.FC = () => {
         style={styles.chart}
         />
     </View>
-    <Footer/>
   </ScrollView>
   );
 };
@@ -403,16 +398,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#012A1C", 
     alignItems: "center",
+    paddingTop: 10,
   },
   editProfile: {
-    flexGrow: 2,
+    flexGrow: 1,
     alignItems: "center",
     width: "100%",
     marginHorizontal : "auto",
-    marginTop: 30,
   },
   title: {
-    marginTop: "15%",
     marginBottom: 20,
     fontSize: 28,
     color: "#FFFFFF",
@@ -422,9 +416,7 @@ const styles = StyleSheet.create({
     marginTop:20,
     marginBottom: 20,
     marginVertical: 20,
-    // marginHorizontal: 50,
     borderRadius: 8,
-    // width: "80%",
     height: "auto",
   },
   label: {

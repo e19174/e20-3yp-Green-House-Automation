@@ -1,10 +1,10 @@
 import { Link, router, useFocusEffect } from 'expo-router';
 import React, { useState } from 'react'
 import { View, Text, TextInput, StyleSheet, Pressable, ActivityIndicator } from 'react-native'
-import { useAuth } from '../../../Contexts/UserContext';
-import { Axios } from '../../AxiosRequestBuilder';
-import { themeAuth } from '../../../Contexts/ThemeContext';
-import { get, save } from '../../../Storage/secureStorage';
+import { useAuth } from '../Contexts/UserContext';
+import { Axios } from '../app/AxiosRequestBuilder';
+import { themeAuth } from '../Contexts/ThemeContext';
+import { get, save } from '../Storage/secureStorage';
 
 const Login:React.FC = () => {
     const [email, setEmail] = useState<string>('');

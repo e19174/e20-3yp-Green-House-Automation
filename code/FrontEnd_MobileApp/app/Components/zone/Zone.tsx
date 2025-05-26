@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl, Alert, Text, FlatList, TouchableOpacity, Modal } from 'react-native';
-import Header from '../common/Header';  
-import Footer from '../common/Footer';  
 import GrowComponents from './GrowComponents';
 import GrowData from './GrowData';
 import { themeAuth } from '../../../Contexts/ThemeContext';
@@ -61,9 +59,6 @@ const Zone: React.FC = () => {
   };
 
   return (
-    <>
-    <Header/>
-
     <ScrollView contentContainerStyle={[styles.container, {backgroundColor: theme.colors.background}]}
       refreshControl={
         <RefreshControl
@@ -109,9 +104,6 @@ const Zone: React.FC = () => {
       </View>
 
     </ScrollView>
-
-    <Footer />
-    </>
   );
 };
 
@@ -119,10 +111,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#04261C',
-    alignItems: 'center', 
-    paddingTop: 70, 
-  },
-  content: {
+    alignItems: 'center',
+    paddingTop: 10, 
   },
   zoneSelector: {
     flexDirection: 'row',
