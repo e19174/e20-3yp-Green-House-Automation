@@ -128,7 +128,8 @@ const DeviceListScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: { 
     flex: 1,
-    backgroundColor: 'rgb(4,38,28)', 
+    backgroundColor: 'rgb(4,38,28)',
+    paddingTop: 10, 
   },
   searchInput: {
     borderWidth: 1,

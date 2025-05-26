@@ -1,7 +1,7 @@
 import { Slot, Stack } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
-import Header from './common/Header';
-import Footer from './common/Footer';
+import Header from '../common/Header';
+import Footer from '../common/Footer';
 
 export default function RootLayout() {
   return (

@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useAuth } from '../../../Contexts/UserContext';
-import { themeAuth } from '../../../Contexts/ThemeContext';
-import { get, remove } from '../../../Storage/secureStorage';
+import { useAuth } from '../../Contexts/UserContext';
+import { themeAuth } from '../../Contexts/ThemeContext';
+import { get, remove } from '../../Storage/secureStorage';
 
 interface USER {
   name: string;
@@ -27,7 +27,7 @@ const Header: React.FC = () => {
     const checkToken = async () => {
       const token = await get("token");
       if (!token) {
-        router.push('Components/Authentication/login');
+        router.push('../../Authentication/login');
       }
     };
     checkToken();
@@ -37,7 +37,7 @@ const Header: React.FC = () => {
     remove("token");
     setUser({} as USER);
     setSidebarVisible(false);
-    router.push('Components/Authentication/login');
+    router.push('../../Authentication/login');
   }
 
   return (
@@ -64,7 +64,7 @@ const Header: React.FC = () => {
             </TouchableOpacity>
 
             <Image
-              source={user?.imageData ? { uri : imageUri} : require("../../../assets/profile_picture.webp")}
+              source={user?.imageData ? { uri : imageUri} : require("../../assets/profile_picture.webp")}
               style={[styles.profilePicture, {borderColor: theme.colors.text}]}
             />
 

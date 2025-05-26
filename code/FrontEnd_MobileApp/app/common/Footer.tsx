@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { themeAuth } from '../../../Contexts/ThemeContext';
+import { themeAuth } from '../../Contexts/ThemeContext';
 
 const Footer: React.FC = () => {
   const {theme} = themeAuth();
