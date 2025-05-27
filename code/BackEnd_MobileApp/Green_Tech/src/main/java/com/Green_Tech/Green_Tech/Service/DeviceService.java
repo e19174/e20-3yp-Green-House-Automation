@@ -105,18 +105,6 @@ public class DeviceService {
         return deviceRepository.save(device);
     }
 
-<<<<<<< HEAD
-    public boolean deleteDeviceByMacAndUser(String mac, String auth) throws UserNotFoundException {
-        User user = extractUserService.extractUserFromJwt(auth);
-
-        Optional<Device> deviceOptional = deviceRepository.findByMacAndUser(mac, user);
-        if (deviceOptional.isPresent()) {
-            deviceRepository.delete(deviceOptional.get());
-            return true;
-        } else {
-            return false;
-        }
-=======
     // Delete a device by ID
     @Transactional
     public boolean deleteDevice(Long id) throws DeviceNotFoundException {
@@ -161,7 +149,6 @@ public class DeviceService {
         device.getUser().setImageName(null);
         device.getUser().setImageType(null);
         return device;
->>>>>>> 04d0d16e21cf45bae50080bb45d951f373b5bc8e
     }
 
 }
