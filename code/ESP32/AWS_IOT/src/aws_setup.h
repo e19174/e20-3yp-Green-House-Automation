@@ -1,11 +1,9 @@
 #include "secrets.h"
+#include "register.h"
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
-#include <ArduinoJson.h>
 
-
-#define AWS_IOT_PUBLISH_TOPIC "ESP32/PUB"
-#define AWS_IOT_SUBSCRIBE_TOPIC "ESP32/SUB"
+extern int deviceId;
 
 const char *command = "NULL";
 
@@ -43,7 +41,8 @@ void connectAWS()
   }
 
   // Subscribe to a topic
-  client.subscribe(AWS_IOT_SUBSCRIBE_TOPIC);
+  String SubscribeTopic = "esp32/" + String(deviceId) + "/command";
+  client.subscribe(SubscribeTopic.c_str());
 
   Serial.println("AWS IoT Connected!");
 }
@@ -51,13 +50,15 @@ void connectAWS()
 void publishMessage(float h, float t, int m)
 {
   JsonDocument doc;
+  doc["mac"] = WiFi.macAddress();
   doc["humidity"] = h;
   doc["temperature"] = t;
   doc["moisture"] = m;
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer); // print to client
 
-  client.publish(AWS_IOT_PUBLISH_TOPIC, jsonBuffer);
+  String topic = "esp32/" + String(deviceId) + "/data";
+  bool result = client.publish(topic.c_str(), jsonBuffer);
 }
 
 void messageHandler(char *topic, byte *payload, unsigned int length)

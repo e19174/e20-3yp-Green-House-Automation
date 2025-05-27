@@ -1,18 +1,70 @@
+#pragma once
 #include <WiFi.h>
 #include <WebServer.h>
 #include <EEPROM.h>
 #include <HTTPClient.h>
+#include <ArduinoJson.h>
+#include <WiFiClient.h>
+#include "SPIFFS.h"
 
-WebServer server(80);
-String ssid = "";
-String password = "";
-String userToken = "";
+extern WebServer server;
+extern String ssid;
+extern String password;
+extern String email;
+extern int deviceId;
+extern bool registered;
+
+extern const char* AWS_CERT_CRT;
+extern const char* AWS_CERT_PRIVATE;
+extern const char* THINGNAME;
+extern const char* AWS_IOT_ENDPOINT;
+
+// Helper strings to maintain memory
+String certString;
+String privateKeyString;
+String thingNameString;
+String endpointString;
+
+void writeFile(fs::FS &fs, const char * path, const char * message) {
+  File file = fs.open(path, FILE_WRITE);
+  if (!file) {
+    Serial.println("Failed to open file for writing: " + String(path));
+    return;
+  }
+  file.print(message);
+  file.close();
+}
+
+void removeFile(fs::FS &fs, const char * path) {
+  if (fs.exists(path)) {
+    if (fs.remove(path)) {
+      Serial.println("File removed: " + String(path));
+    } else {
+      Serial.println("Failed to remove file: " + String(path));
+    }
+  } else {
+    Serial.println("File does not exist: " + String(path));
+  }
+}
+
+String readFileAsString(fs::FS &fs, const char * path) {
+  File file = fs.open(path);
+  if (!file || file.isDirectory()) {
+    Serial.println("Failed to open file for reading: " + String(path));
+    return "";
+  }
+
+  String content = file.readString();
+  file.close();
+  return content;
+}
 
 void saveCredentials() {
   EEPROM.begin(512);
   EEPROM.writeString(0, ssid);
   EEPROM.writeString(100, password);
-  EEPROM.writeString(200, userToken);
+  EEPROM.writeString(200, email);
+  EEPROM.write(290, static_cast<uint8_t>(registered));
   EEPROM.commit();
   EEPROM.end();
 }
@@ -48,6 +100,7 @@ const char* RegisterForm = R"rawliteral(
       }
       input[type="text"],
       input[type="password"],
+      input[type="email"],
       textarea {
         width: 100%;
         padding: 10px;
@@ -84,8 +137,8 @@ const char* RegisterForm = R"rawliteral(
       <label for="password">Password:</label><br>
       <input type="password" id="password" name="password" required><br>
   
-      <label for="token">User Token (JWT):</label><br>
-      <textarea id="token" name="token" rows="4" cols="50" required></textarea><br>
+      <label for="email">User Email: </label><br>
+      <input type="email" id="email" name="email" required><br>
   
       <input type="submit" value="Save and Restart">
     </form>
@@ -112,42 +165,14 @@ const char* rebootPage = R"rawliteral(
         font-size: 18px;
         color: #555;
       }
-      .loader {
-        border: 16px solid #f3f3f3;
-        border-top: 16px solid #3498db;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        animation: spin 2s linear infinite;
-      }
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      .loader-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-      .loader-text {
-        margin-left: 20px;
-        font-size: 24px;
-        color: #555;
-      }
     </style>
   </head>
   <body>
     <h2>Rebooting...</h2>
-    <p>Please wait while the device restarts.</p>
-    <div class="loader-container">
-      <div class="loader"></div>
-      <div class="loader-text">Rebooting...</div>
-    </div>
+    <p>Credentials saved! device will restart soon.</p>
   </body>
   </html>
   )rawliteral";
-
 
 void startAccessPoint() {
   WiFi.softAP("ESP32-Setup", "esp32pass");
@@ -161,8 +186,9 @@ void startAccessPoint() {
   server.on("/save", HTTP_POST, []() {
     ssid = server.arg("ssid");
     password = server.arg("password");
-    userToken = server.arg("token");
-    saveCredentials();  // Save to EEPROM
+    email = server.arg("email");
+    saveCredentials();
+    delay(1000);
     server.send(200, "text/html", rebootPage);
     delay(2000);
     ESP.restart();
@@ -175,49 +201,150 @@ void loadCredentials() {
   EEPROM.begin(512);
   ssid = EEPROM.readString(0);
   password = EEPROM.readString(100);
-  userToken = EEPROM.readString(200);
+  email = EEPROM.readString(200);
+  registered = EEPROM.read(290) != 0;
+  deviceId = EEPROM.read(300);
   EEPROM.end();
+
+  certString = readFileAsString(SPIFFS, "/cert.pem");
+  privateKeyString = readFileAsString(SPIFFS, "/priv.key");
+  thingNameString = readFileAsString(SPIFFS, "/thingName.txt");
+  endpointString = readFileAsString(SPIFFS, "/endpoint.txt");
+  
+  // Point const char* to String c_str() - these remain valid as long as String objects exist
+  AWS_CERT_CRT = certString.length() > 0 ? certString.c_str() : nullptr;
+  AWS_CERT_PRIVATE = privateKeyString.length() > 0 ? privateKeyString.c_str() : nullptr;
+  THINGNAME = thingNameString.length() > 0 ? thingNameString.c_str() : nullptr;
+  AWS_IOT_ENDPOINT = endpointString.length() > 0 ? endpointString.c_str() : nullptr;
 }
 
-void sendRegistrationToBackend() {
+bool sendRegistrationToBackend() {
   HTTPClient http;
   WiFiClient client;
 
-  http.begin(client, "http://192.168.115.83:8080/api/v1/auth/user/test");
+  http.setTimeout(10000);
+  
+  http.begin(client, "http://192.168.129.83:8080/api/v1/device/addDevice");
   http.addHeader("Content-Type", "application/json");
-  http.addHeader("Authorization", "Bearer " + userToken);
 
-  String payload = "{\"mac\":\"" + WiFi.macAddress() + "\"}";
+  JsonDocument doc;
+  doc["mac"] = WiFi.macAddress();
+  doc["email"] = email;
+  String payload;
+  serializeJson(doc, payload);
+
+  Serial.println("Sending registration request...");
+  Serial.println("Payload: " + payload);
+  
   int code = http.POST(payload);
+  Serial.println("HTTP Response Code: " + String(code));
 
   if (code > 0) {
     String response = http.getString();
-    Serial.println("Response: " + response);
+    
     if (code == 200) {
-      Serial.println("Device registered successfully!");
+      JsonDocument respDoc;
+      DeserializationError error = deserializeJson(respDoc, response);
+
+      if (error) {
+        Serial.print("JSON Parse Error: ");
+        Serial.println(error.c_str());
+        http.end();
+        return false;
+      }
+
+      // Debug: Print all keys in the response
+      Serial.println("Response keys available:");
+      for (JsonPair kv : respDoc.as<JsonObject>()) {
+        Serial.println("  " + String(kv.key().c_str()));
+      }
+
+      // Extract credentials safely and store in String objects first
+      certString = respDoc["certificatePem"].as<String>();
+      privateKeyString = respDoc["privateKey"].as<String>();
+      endpointString = respDoc["endpoint"].as<String>();
+      thingNameString = respDoc["thingName"].as<String>();
+      deviceId = respDoc["deviceId"]["id"];
+      
+      // Point const char* to the String objects
+      AWS_CERT_CRT = certString.c_str();
+      AWS_CERT_PRIVATE = privateKeyString.c_str();
+      AWS_IOT_ENDPOINT = endpointString.c_str();
+      THINGNAME = thingNameString.c_str();
+      
+      Serial.println("Device ID: " + String(deviceId));
+      Serial.println("Thing Name: " + String(THINGNAME));
+      Serial.println("Endpoint: " + String(AWS_IOT_ENDPOINT));
+      Serial.println("Certificate length: " + String(certString.length()));
+      Serial.println("Private key length: " + String(privateKeyString.length()));
+
+      // Save to SPIFFS
+      writeFile(SPIFFS, "/cert.pem", AWS_CERT_CRT);
+      writeFile(SPIFFS, "/priv.key", AWS_CERT_PRIVATE);
+      writeFile(SPIFFS, "/thingName.txt", THINGNAME);
+      writeFile(SPIFFS, "/endpoint.txt", AWS_IOT_ENDPOINT);
+
+      Serial.println("Device registered and credentials stored.");
+      
+      // Mark as registered
       EEPROM.begin(512);
-      EEPROM.write(490, 1); // 1 means "registered"
+      EEPROM.write(290, 1);
+      EEPROM.write(300, deviceId);
       EEPROM.commit();
       EEPROM.end();
+      
+      http.end();
+      return true;
     } else {
-      Serial.println("Failed to register device, code: " + String(code));
+      Serial.println("Registration failed with code: " + String(code));
+      Serial.println("Response: " + response);
     }
   } else {
-    Serial.println("Failed to register device");
+    Serial.println("HTTP request failed with error code: " + String(code));
   }
 
   http.end();
+  return false;
+}
+
+bool sendRegistrationWithRetry() {
+  for (int i = 0; i < 5; i++) {
+    Serial.println("Registration attempt #" + String(i+1));
+    
+    // Check WiFi connection before each attempt
+    if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("WiFi disconnected during registration");
+      return false;
+    }
+    
+    if (sendRegistrationToBackend()) {
+      Serial.println("Registration successful on attempt #" + String(i+1));
+      return true;
+    }
+    
+    Serial.println("Registration attempt #" + String(i+1) + " failed");
+
+    if (i < 4) { // Don't delay after the last attempt
+      Serial.println("Waiting 3 seconds before next attempt...");
+      delay(3000);
+    }
+  }
+  Serial.println("All registration attempts failed");
+  return false;
 }
 
 void tryConnectToWiFi() {
   loadCredentials();
 
-  if (ssid == "" || password == "" || userToken == "") {
+  if (ssid == "" || password == "" || email == "") {
     Serial.println("No credentials found. Starting AP mode.");
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_AP);
     startAccessPoint();
     return;
   }
 
+  Serial.println("Connecting to WiFi: " + ssid);
   WiFi.begin(ssid.c_str(), password.c_str());
 
   int retries = 0;
@@ -226,19 +353,44 @@ void tryConnectToWiFi() {
     Serial.print(".");
     retries++;
   }
+  Serial.println();
 
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("Connected to Wi-Fi!");
-    EEPROM.begin(512);
-    int registered = EEPROM.read(490);
-    EEPROM.end();
+    Serial.println("IP address: " + WiFi.localIP().toString());
+    Serial.println("MAC address: " + WiFi.macAddress());
+    
+    // Wait for valid IP
+    int ipWaitCount = 0;
+    while (WiFi.localIP().toString() == "0.0.0.0" && ipWaitCount < 50) {
+      delay(100);
+      ipWaitCount++;
+    }
+    
+    if (WiFi.localIP().toString() == "0.0.0.0") {
+      Serial.println("Failed to get valid IP address");
+      WiFi.disconnect(true);
+      WiFi.mode(WIFI_AP);
+      startAccessPoint();
+      return;
+    }
+    
     if (registered == 1) {
       Serial.println("Device already registered.");
       return;
     }
-    sendRegistrationToBackend();  // use token here
+    
+    Serial.println("Starting device registration...");
+    if (!sendRegistrationWithRetry()) {
+      Serial.println("Device registration failed after all attempts");
+      // Optionally, you could start AP mode here for reconfiguration
+    }
+    delay(3000);
+    ESP.restart();
   } else {
+    Serial.println("Failed to connect to WiFi");
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_AP);
     startAccessPoint();
   }
 }
-
