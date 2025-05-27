@@ -33,9 +33,18 @@ public class DeviceController {
     }
 
     @GetMapping("/getByUser")
+<<<<<<< HEAD
+    public ResponseEntity<List<Device>> getDevicesByUser(@RequestHeader("Authorization") String auth) throws UserNotFoundException {
+        List<Device> devices = deviceService.getDevicesByUser(auth);
+        if (devices.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(devices);
+=======
     public ResponseEntity<List<Device>> getDevicesByUser(@RequestHeader("Authorization") String auth)
                                                         throws UserNotFoundException {
         return ResponseEntity.ok(deviceService.getDevicesByUser(auth));
+>>>>>>> 04d0d16e21cf45bae50080bb45d951f373b5bc8e
     }
 
     @GetMapping("/active")
@@ -50,6 +59,12 @@ public class DeviceController {
         return ResponseEntity.ok(deviceService.getActiveDevicesByZone(auth));
     }
 
+<<<<<<< HEAD
+    @PostMapping("/add")
+    public ResponseEntity<Device> createDevice(@RequestBody Map<String, String> data,
+                                               @RequestHeader("Authorization") String auth) throws UserNotFoundException {
+        return ResponseEntity.ok(deviceService.createDevice(data, auth));
+=======
     @PostMapping("/addDevice")
     public ResponseEntity<Map<String, Object>> createDevice(@RequestBody Map<String, String> data) throws UserNotFoundException, DeviceAlreadyFoundException {
         try {
@@ -89,6 +104,7 @@ public class DeviceController {
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
+>>>>>>> 04d0d16e21cf45bae50080bb45d951f373b5bc8e
     }
 
     @PutMapping("activate/{id}")
@@ -96,6 +112,18 @@ public class DeviceController {
         return ResponseEntity.ok(deviceService.activateDevice(id));
     }
 
+<<<<<<< HEAD
+    @DeleteMapping("/delete")
+    public ResponseEntity<Device> deleteDevice(@RequestBody Map<String, String> data,
+                                               @RequestHeader("Authorization") String auth) throws UserNotFoundException {
+        String mac = data.get("mac");
+        if (mac == null || mac.isEmpty()) {
+            return ResponseEntity.badRequest().build();  // 400 if mac not provided
+        }
+
+        boolean deleted = deviceService.deleteDeviceByMacAndUser(mac, auth);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+=======
     @PutMapping("update/{id}")
     public ResponseEntity<Device> updateDevice(@PathVariable("id") Long id, @RequestBody Map<String, String> updatedDevice)
             throws DeviceNotFoundException {
@@ -111,5 +139,6 @@ public class DeviceController {
     public ResponseEntity<AwsIotCredentials> provisionDevice(@RequestBody Map<String, String> deviceInfo) {
         AwsIotCredentials credentials = awsIotProvisioningService.createThing(deviceInfo.get("mac"));
         return ResponseEntity.ok(credentials);
+>>>>>>> 04d0d16e21cf45bae50080bb45d951f373b5bc8e
     }
 }
