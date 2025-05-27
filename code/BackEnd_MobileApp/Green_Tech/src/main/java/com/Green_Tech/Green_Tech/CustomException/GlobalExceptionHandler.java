@@ -24,9 +24,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> getUserAlreadyFoundException(UserAlreadyFoundException ex){
         Map<String, Object> response = new HashMap<>();
         response.put("message", ex.getMessage());
-        response.put("status", HttpStatus.FOUND.value());
+        response.put("status", HttpStatus.CONFLICT.value());
         response.put("error", "User already found with this email!!!");
-        return new ResponseEntity<>(response, HttpStatus.FOUND);
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(DeviceNotFoundException.class)
@@ -42,8 +42,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> getDeviceAlreadyFoundException(DeviceAlreadyFoundException ex){
         Map<String, Object> response = new HashMap<>();
         response.put("message", ex.getMessage());
-        response.put("status", HttpStatus.FOUND.value());
+        response.put("status", HttpStatus.CONFLICT.value());
         response.put("error", "Device already found!!!");
-        return new ResponseEntity<>(response, HttpStatus.FOUND);
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 }

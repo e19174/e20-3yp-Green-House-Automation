@@ -14,4 +14,6 @@ import java.util.List;
 public interface AwsIotCredentialsRepo extends JpaRepository<AwsIotCredentials, Long> {
     @Query("SELECT a FROM AwsIotCredentials a JOIN a.device d where d.active = :status")
     List<AwsIotCredentials> findAllByActiveDevices(@Param("status") boolean status);
+    void deleteByDeviceId(Long id);
+    AwsIotCredentials findByDeviceId(Long id);
 }

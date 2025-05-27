@@ -32,60 +32,90 @@ public class AwsIotProvisioningService {
 
     private IotClient iotClient;
 
-//    @PostConstruct
-//    public void init() {
-//        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(
-//                accessKeyId,
-//                secretAccessKey
-//        );
-//
-//        this.iotClient = IotClient.builder()
-//                .region(Region.AP_SOUTH_1)
-//                .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
-//                .build();
-//    }
+    @PostConstruct
+    public void init() {
+        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(
+                accessKeyId,
+                secretAccessKey
+        );
+
+        this.iotClient = IotClient.builder()
+                .region(Region.AP_SOUTH_1)
+                .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
+                .build();
+    }
 
     public AwsIotCredentials createThing(String mac) {
         Device device = deviceRepo.findByMac(mac);
         String thingName = "esp32-" + device.getId();
 
-        // 1. Create Thing
-        iotClient.createThing(CreateThingRequest.builder()
-                .thingName(thingName)
-                .build()
-        );
+        try {
+            // Check if thing already exists in AWS
+            try {
+                DescribeThingResponse existingThing = iotClient.describeThing(
+                        DescribeThingRequest.builder()
+                                .thingName(thingName)
+                                .build()
+                );
+                System.out.println("Thing already exists in AWS: " + thingName);
 
-        // 2. Create Certificate
-        CreateKeysAndCertificateResponse certResp = iotClient.createKeysAndCertificate(
-                CreateKeysAndCertificateRequest.builder()
-                        .setAsActive(true)
-                        .build()
-        );
+                // Check if we have credentials in database
+                AwsIotCredentials existingCreds = awsIotCredentialsRepo.findByDeviceId(device.getId());
+                if (existingCreds != null) {
+                    System.out.println("Returning existing credentials from database");
+                    return existingCreds;
+                }
+                // If thing exists in AWS but not in our DB, we have a problem
+                // For now, let's create new credentials (this might create duplicate things)
+                System.out.println("Thing exists in AWS but no credentials in DB. Creating new credentials...");
 
-        // 3. Attach policy
-        iotClient.attachPolicy(AttachPolicyRequest.builder()
-                .policyName("IOT_policy")
-                .target(certResp.certificateArn())
-                .build());
+            } catch (ResourceNotFoundException e) {
+                // Thing doesn't exist in AWS, proceed with creation
+                System.out.println("Thing doesn't exist in AWS, creating new thing: " + thingName);
+            }
 
-        // 4. Attach certificate to thing
-        iotClient.attachThingPrincipal(AttachThingPrincipalRequest.builder()
-                .thingName(thingName)
-                .principal(certResp.certificateArn())
-                .build());
+            // 1. Create Thing
+            iotClient.createThing(CreateThingRequest.builder()
+                    .thingName(thingName)
+                    .build()
+            );
 
-        AwsIotCredentials awsIotCredentials = AwsIotCredentials.builder()
-                .thingName(thingName)
-                .device(device )
-                .certificatePem(certResp.certificatePem())
-                .privateKey(certResp.keyPair().privateKey())
-                .publicKey(certResp.keyPair().publicKey())
-                .createdAt(new Date())
-                .endpoint(endpoint)
-                .build();
+            // 2. Create Certificate
+            CreateKeysAndCertificateResponse certResp = iotClient.createKeysAndCertificate(
+                    CreateKeysAndCertificateRequest.builder()
+                            .setAsActive(true)
+                            .build()
+            );
 
-        return awsIotCredentialsRepo.save(awsIotCredentials);
+            // 3. Attach policy
+            iotClient.attachPolicy(AttachPolicyRequest.builder()
+                    .policyName("IOT_policy")
+                    .target(certResp.certificateArn())
+                    .build());
 
+            // 4. Attach certificate to thing
+            iotClient.attachThingPrincipal(AttachThingPrincipalRequest.builder()
+                    .thingName(thingName)
+                    .principal(certResp.certificateArn())
+                    .build());
+
+            AwsIotCredentials awsIotCredentials = AwsIotCredentials.builder()
+                    .thingName(thingName)
+                    .device(device)
+                    .certificatePem(certResp.certificatePem())
+                    .privateKey(certResp.keyPair().privateKey())
+                    .publicKey(certResp.keyPair().publicKey())
+                    .createdAt(new Date())
+                    .endpoint(endpoint)
+                    .build();
+
+            return awsIotCredentialsRepo.save(awsIotCredentials);
+
+        } catch (Exception e) {
+            System.err.println("Error creating AWS IoT thing: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to create AWS IoT thing: " + e.getMessage());
+        }
     }
 
 }

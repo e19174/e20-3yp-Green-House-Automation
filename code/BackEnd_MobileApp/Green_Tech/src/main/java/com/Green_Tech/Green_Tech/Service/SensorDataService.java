@@ -23,7 +23,7 @@ public class SensorDataService {
     private DeviceRepo deviceRepo;
 
     public SensorData getSensorData(Long id) {
-        return sensorDataRepository.findFirstByIdOrderByIdDesc(id);
+        return sensorDataRepository.findFirstByDeviceIdOrderByIdDesc(id);
     }
 
     public HashMap convertByteArrayToHashMap(byte[] jsonData) {

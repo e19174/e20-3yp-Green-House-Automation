@@ -20,7 +20,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = generateKey();
+    private static final String SECRET_KEY = "CO5dqlZYIDcIewOOubTBV6FQIl0URrfu85IPvkSqG6U=";
 
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
@@ -29,6 +29,7 @@ public class JwtService {
 
     public static String generateKey() {
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        System.out.println("token - "+Base64.getEncoder().encodeToString(key.getEncoded()));
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 

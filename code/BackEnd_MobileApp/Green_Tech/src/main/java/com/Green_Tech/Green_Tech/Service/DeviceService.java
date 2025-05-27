@@ -6,8 +6,11 @@ import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
 import com.Green_Tech.Green_Tech.Entity.AwsIotCredentials;
 import com.Green_Tech.Green_Tech.Entity.Device;
 import com.Green_Tech.Green_Tech.Entity.User;
+import com.Green_Tech.Green_Tech.Repository.AwsIotCredentialsRepo;
 import com.Green_Tech.Green_Tech.Repository.DeviceRepo;
+import com.Green_Tech.Green_Tech.Repository.SensorDataRepository;
 import com.Green_Tech.Green_Tech.Repository.UserRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,10 @@ public class DeviceService {
     private ExtractUserService extractUserService;
     @Autowired
     private AwsIotProvisioningService awsIotProvisioningService;
+    @Autowired
+    private AwsIotCredentialsRepo awsIotCredentialsRepo;
+    @Autowired
+    private SensorDataRepository sensorDataRepository;
 
 
     // Get all devices
@@ -43,18 +50,36 @@ public class DeviceService {
     }
 
     // Create a new device
-    public AwsIotCredentials createDevice(Map<String, String> data) throws UserNotFoundException, DeviceAlreadyFoundException {
+    public AwsIotCredentials createDevice(Map<String, String> data) throws UserNotFoundException {
         // Find user by username
-        User user = userRepo.findByEmail(data.get("email")).
-                orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepo.findByEmail(data.get("email"))
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (deviceRepository.existsByMac(data.get("mac"))){
-            throw new DeviceAlreadyFoundException("Device Already found!!!");
+        String mac = data.get("mac");
+
+        // Check if device already exists
+        if (deviceRepository.existsByMac(mac)) {
+            System.out.println("Device already exists, returning existing credentials for MAC: " + mac);
+
+            // Get existing device
+            Device existingDevice = deviceRepository.findByMac(mac);
+
+            // Get existing AWS credentials
+            AwsIotCredentials existingCredentials = awsIotCredentialsRepo.findByDeviceId(existingDevice.getId());
+
+            if (existingCredentials != null) {
+                System.out.println("Found existing credentials for device: " + existingDevice.getId());
+                return existingCredentials;
+            } else {
+                // Device exists but no credentials - this shouldn't happen, but let's handle it
+                System.out.println("Device exists but no credentials found. Creating new credentials...");
+                return awsIotProvisioningService.createThing(mac);
+            }
         }
 
-        // Build new device
+        // Create new device if it doesn't exist
         Device device = Device.builder()
-                .mac(data.get("mac"))
+                .mac(mac)
                 .addedAt(new Date())
                 .zoneName("undefined")
                 .name("undefined")
@@ -64,8 +89,9 @@ public class DeviceService {
                 .build();
 
         deviceRepository.save(device);
+        System.out.println("New device created with ID: " + device.getId());
 
-        return awsIotProvisioningService.createThing(data.get("mac"));
+        return awsIotProvisioningService.createThing(mac);
     }
 
     // Update an existing device
@@ -80,11 +106,15 @@ public class DeviceService {
     }
 
     // Delete a device by ID
-    public boolean deleteDevice(Long id) {
-        return deviceRepository.findById(id).map(device -> {
-            deviceRepository.delete(device);
+    @Transactional
+    public boolean deleteDevice(Long id) throws DeviceNotFoundException {
+        if (deviceRepository.existsById(id)){
+            awsIotCredentialsRepo.deleteByDeviceId(id);
+            sensorDataRepository.deleteAllByDeviceId(id);
+            deviceRepository.deleteById(id);
             return true;
-        }).orElse(false);
+        }
+        throw new DeviceNotFoundException("device not Found!");
     }
 
     public Device activateDevice(Long id) throws DeviceNotFoundException {
