@@ -32,10 +32,10 @@ const GrowComponents: React.FC<GrowComponentsProps> = ({ isEnabled, toggleStatus
       <Text style={styles.title}>GROW COMPONENTS</Text>
       <View style={styles.growContainer}>
         {[
-          { name: 'Fan', icon: 'flower', isOn: isEnabled[0] },
+          { name: 'Light', icon: 'bulb', isOn: isEnabled[0] },
           { name: 'Nutrients', icon: 'flask', isOn: isEnabled[1] },
           { name: 'Water', icon: 'water', isOn: isEnabled[2] },
-          { name: 'Light', icon: 'bulb', isOn: isEnabled[3] },
+          { name: 'Fan', icon: 'flower', isOn: isEnabled[3] },
         ].map((item, index) => (
           <View key={index} style={styles.growItem}>
             <Text style={styles.growLabel}>{item.name}</Text>
