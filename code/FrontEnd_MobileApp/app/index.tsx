@@ -1,7 +1,7 @@
-import { Link, router, useFocusEffect } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useState } from "react";
 import {StyleSheet, Text, View, Image, Alert } from "react-native";
-import { get, remove } from "../Storage/secureStorage";
+import { get } from "../Storage/secureStorage";
 import { themeAuth } from "../Contexts/ThemeContext";
 import * as SplashScreen from 'expo-splash-screen';
 import { ActivityIndicator } from "react-native";
@@ -18,7 +18,7 @@ const Page:React.FC = () => {
         const token = await get("token");
         setTimeout(async () => {
           if (!token && isActive) {
-            router.push("../Authentication/login");
+            router.push("/Authentication/login");
           } else if (isActive) {
             router.push("/Components/Home/Home");
           }

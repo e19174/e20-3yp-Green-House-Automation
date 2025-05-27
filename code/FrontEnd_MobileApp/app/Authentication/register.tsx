@@ -4,8 +4,8 @@ import { Link, router } from 'expo-router'
 // import * as WebBrowser from "expo-web-browser";
 // import * as Google from "expo-auth-session/providers/google";
 // import * as AuthSession from "expo-auth-session";
-import { Axios } from '../app/AxiosRequestBuilder';
-import { themeAuth } from '../Contexts/ThemeContext';
+import { Axios } from '../../app/AxiosRequestBuilder';
+import { themeAuth } from '../../Contexts/ThemeContext';
 // import {
 //     GoogleSignin,
 //     isSuccessResponse,
@@ -33,7 +33,7 @@ const Register:React.FC = () => {
         try {
             const response = await Axios.post("/auth/user/register", {email, password, confirmPassword});
             console.log(response.data);
-            router.push("/Components/Authentication/login");
+            router.push("/Authentication/login");
         } catch (error) {
             console.log(error)
         }
@@ -104,7 +104,7 @@ const Register:React.FC = () => {
                     </Pressable>
                 </View>
                 <Text style={styles.already}>Already have an one?</Text>
-                <Link href={"/Components/Authentication/login"} style={styles.login}>LOGIN</Link>
+                <Link href={"/Authentication/login"} style={styles.login}>LOGIN</Link>
 
                 <View>
                     {/* {userInfo ? (

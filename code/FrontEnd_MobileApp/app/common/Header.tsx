@@ -27,7 +27,7 @@ const Header: React.FC = () => {
     const checkToken = async () => {
       const token = await get("token");
       if (!token) {
-        router.push('../../Authentication/login');
+        router.push('/Authentication/login');
       }
     };
     checkToken();
@@ -37,7 +37,7 @@ const Header: React.FC = () => {
     remove("token");
     setUser({} as USER);
     setSidebarVisible(false);
-    router.push('../../Authentication/login');
+    router.push('/Authentication/login');
   }
 
   return (
@@ -86,7 +86,15 @@ const Header: React.FC = () => {
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.sidebarItem, {backgroundColor: theme.colors.primary}]} onPress={() => {
-                  router.push('Components/Settings');
+                  router.push('Components/Tools/Tools');
+                  setSidebarVisible(false);
+                  }}>
+              <Ionicons name="square-sharp" size={24} color={theme.colors.text}/>
+              <Text style={styles.sidebarText}>Components</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.sidebarItem, {backgroundColor: theme.colors.primary}]} onPress={() => {
+                  router.push('Components/Setting/Setting');
                   setSidebarVisible(false);
                   }}>
               <Ionicons name="settings" size={24} color={theme.colors.text} />
@@ -97,7 +105,7 @@ const Header: React.FC = () => {
                   router.push('Components/Manual/Manual');
                   setSidebarVisible(false);
                   }}>
-              <Ionicons name="square-sharp" size={24} color={theme.colors.text}/>
+              <Ionicons name="book" size={24} color={theme.colors.text} />
               <Text style={styles.sidebarText}>Manual</Text>
             </TouchableOpacity>
 

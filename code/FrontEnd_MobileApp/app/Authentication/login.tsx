@@ -1,10 +1,10 @@
 import { Link, router, useFocusEffect } from 'expo-router';
 import React, { useState } from 'react'
 import { View, Text, TextInput, StyleSheet, Pressable, ActivityIndicator } from 'react-native'
-import { useAuth } from '../Contexts/UserContext';
-import { Axios } from '../app/AxiosRequestBuilder';
-import { themeAuth } from '../Contexts/ThemeContext';
-import { get, save } from '../Storage/secureStorage';
+import { useAuth } from '../../Contexts/UserContext';
+import { Axios } from '../../app/AxiosRequestBuilder';
+import { themeAuth } from '../../Contexts/ThemeContext';
+import { get, save } from '../../Storage/secureStorage';
 
 const Login:React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -65,7 +65,7 @@ const Login:React.FC = () => {
                     </Pressable>
                 </View>
                 <Text style={styles.already}>Dont have an account?</Text>
-                <Link style={styles.register} href={"/Components/Authentication/register"}>REGISTER</Link>
+                <Link style={styles.register} href={"/Authentication/register"}>REGISTER</Link>
             </View>
         </View>
     )
