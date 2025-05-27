@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import axios from 'axios';
 import { CircularProgressBase  } from 'react-native-circular-progress-indicator';
+import { Axios } from '../../AxiosRequestBuilder';
+import { themeAuth } from '../../../Contexts/ThemeContext';
+import { useFocusEffect } from 'expo-router';
 
 
 interface GrowDataItem {
@@ -13,15 +15,22 @@ interface GrowDataItem {
   percentage: number;
 }
 
-const GrowData: React.FC = () => {
+interface GrowDataProps {
+  deviceId: number | undefined;
+}
+
+const GrowData: React.FC<GrowDataProps> = ({deviceId}) => {
+  const { theme } = themeAuth();
   const [growDataItems, setGrowDataItems] = useState<GrowDataItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setInterval(() => {
-      axios.get('http://localhost:8080/api/v1/sensors/currentData') 
-      .then(response => {
+useFocusEffect(
+  React.useCallback(() => {
+    let isActive = true;
+    const fetchSensorData = async () => {
+      try {
+        const response = await Axios.get(`/sensors/currentData/${deviceId}`);
         const sensorData = response.data
         console.log(sensorData);
         const formattedData: GrowDataItem[] = [
@@ -34,15 +43,22 @@ const GrowData: React.FC = () => {
         ];
         setGrowDataItems(formattedData);
         setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error fetching sensor data:', err);
+      } catch (error) {
+        console.error('Error fetching sensor data:', error);
         setError('Failed to load data');
-        setLoading(false);
-      });
+      }
+    }
+    const intervalId = setInterval(() => {
+      if (!isActive) return;
+      fetchSensorData();
     }, 1000);
     
-  }, []);
+    return () => {
+      clearInterval(intervalId);
+      isActive = false;
+    }
+  }, [])
+);
 
   if (loading) {
     return <ActivityIndicator size="large" color="#16F08B" />;
@@ -56,7 +72,7 @@ const GrowData: React.FC = () => {
   const secondRow = growDataItems.slice(3, 6);
 
   return (
-    <View style={styles.growDataSection}>
+    <View style={[styles.growDataSection, { backgroundColor: theme.colors.primary }]}>
       <Text style={styles.growDataMainTitle}>GROW DATA</Text>
 
       <View style={styles.rowContainer}>

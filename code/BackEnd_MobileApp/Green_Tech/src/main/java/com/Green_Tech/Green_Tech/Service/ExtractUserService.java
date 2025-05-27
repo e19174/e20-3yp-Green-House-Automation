@@ -15,7 +15,7 @@ public class ExtractUserService {
     private UserRepo userRepo;
 
     public User extractUserFromJwt(String auth) throws UserNotFoundException {
-        String token = auth.substring('7');
+        String token = auth.substring(7);
         String email = jwtService.extractUserEmail(token);
         return userRepo.findByEmail(email).orElseThrow(()->
                 new UserNotFoundException("There is no user with "+ email)

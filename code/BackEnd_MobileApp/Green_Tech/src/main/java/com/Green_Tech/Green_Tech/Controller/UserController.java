@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @CrossOrigin
@@ -37,7 +40,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody AuthDTO authDTO) throws UserNotFoundException {
+    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody AuthDTO authDTO) throws UserNotFoundException {
         return ResponseEntity.ok(userService.loginUser(authDTO));
     }
 
@@ -46,16 +49,10 @@ public class UserController {
         return ResponseEntity.ok(userService.getUser(auth));
     }
 
-    @PostMapping("/upload-image")
-    public ResponseEntity<String> uploadUserImage(
-            @RequestHeader("Authorization") String auth,
-            @RequestParam("file") MultipartFile file,
-            @RequestBody UserDTO userDto) throws UserNotFoundException, IOException {
-
-            if (file.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File is empty. Please upload a valid image.");
-            }
-
+    @PutMapping("/update")
+    public ResponseEntity<User> uploadUserImage(@RequestHeader("Authorization") String auth,
+                                                  @RequestParam(value = "file", required = false) MultipartFile file,
+                                                  @ModelAttribute UserDTO userDto) throws UserNotFoundException, IOException {
         return ResponseEntity.ok(userService.updateUser(auth, userDto, file));
     }
 

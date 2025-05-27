@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Axios } from '../../AxiosRequestBuilder';
+import { themeAuth } from '../../../Contexts/ThemeContext';
 
 interface GrowComponentsProps {
   isEnabled: boolean[];
@@ -8,19 +10,12 @@ interface GrowComponentsProps {
 }
 
 const GrowComponents: React.FC<GrowComponentsProps> = ({ isEnabled, toggleStatus }) => {
+  const { theme } = themeAuth();
+
   const sendControlSignal = async (index: number, status: boolean) => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/sensors/controlsignal", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            device: index, // Send device index (0 - Fan, 1 - Nutrients, 2 - Water, 3 - Light)
-          turnOn: status, // true or false
-        }),
-      });
-
-      const result = await response.text();
-      Alert.alert("Response", result);
+      const response = await Axios.post("/sensors/controlsignal", {index, status});
+      Alert.alert("Response", response.data);
       toggleStatus(index); // Update UI state
     } catch (error) {
       console.error("Error:", error);
@@ -28,7 +23,7 @@ const GrowComponents: React.FC<GrowComponentsProps> = ({ isEnabled, toggleStatus
   };
 
   return (
-    <View style={styles.section}>
+    <View style={[styles.section, { backgroundColor: theme.colors.primary }]}>
       <Text style={styles.title}>GROW COMPONENTS</Text>
       <View style={styles.growContainer}>
         {[

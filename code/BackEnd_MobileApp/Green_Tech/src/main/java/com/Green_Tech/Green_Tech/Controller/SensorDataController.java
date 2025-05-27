@@ -21,16 +21,16 @@ public class SensorDataController {
     private MQTTService mqttService;
 
 
-    @GetMapping(value = "/currentData")
-    public SensorData getAllSensorData() {
-        return sensorDataService.getAllSensorData();
+    @GetMapping(value = "/currentData/{id}")
+    public SensorData getSensorData(@PathVariable("id") Long id) {
+        return sensorDataService.getSensorData(id);
     }
 
 
     @PostMapping(value = "/controlsignal")
     public String sendControlSignal(@RequestBody Map<String, Object> payload) {
-        int deviceIndex = (int) payload.get("device");
-        boolean turnOn = (boolean) payload.get("turnOn");
+        int deviceIndex = (int) payload.get("index");
+        boolean turnOn = (boolean) payload.get("status");
 
         String deviceName;
         switch (deviceIndex) {

@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -7,101 +7,195 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  Alert,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
-import Footer from "../common/Footer";
-import Header from "../common/Header";
+import { useAuth } from "../../../Contexts/UserContext";
+import { Axios } from "../../AxiosRequestBuilder";
+import { Ionicons } from '@expo/vector-icons';
+import { themeAuth } from "../../../Contexts/ThemeContext";
+import * as ImagePicker from 'expo-image-picker';
+import { get } from "../../../Storage/secureStorage";
 
 interface USER {
-  name: string,
-  email: string,
-  phoneNumber: number,
-  imageData: Uint8Array;
-  imageType: string,
-  imageName: string,
+  name: string;
+  email: string;
+  phoneNumber: number;
+  imageData: string;
+  imageType: string;
+  imageName: string;
 }
 
 const Profile: React.FC = () => {
-    const [user, setUser] = useState<USER>();
-  const params = useLocalSearchParams(); // Fix: Get params without destructuring
+  const {user, setUser} = useAuth();
+  const {theme} = themeAuth();  
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [image, setImage] = useState<FileToUpload>();
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1500);
+  };
+
+  const handlePickImage = async () => {
+    // Ask for media library permissions
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      Alert.alert('Permission Required', 'Permission to access media library is required!');
+      return;
+    }
+
+    // Launch image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+      allowsEditing: true,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      const pickedImage = result.assets[0];
+      setImageUri(pickedImage.uri);
+      setImage({
+        uri: pickedImage.uri,
+        name: pickedImage.fileName || 'photo.jpg',
+        type: pickedImage.type || 'image/jpeg',
+      });
+
+      // You can create a "file-like" object to upload
+      const fileToUpload = {
+        uri: pickedImage.uri,
+        name: pickedImage.fileName || 'photo.jpg',
+        type: pickedImage.type || 'image/jpeg',
+      };
+
+      console.log('Selected image file:', fileToUpload);
+
+      // You can now upload it using fetch or Axios
+    }
+  };
 
   useEffect(() => {
-    if (params.user) {
-      try {
-        const userData: USER = JSON.parse(params.user as string);
-        setUser(userData);
-      } catch (error) {
-        console.error("Failed to parse user data:", error);
+    if (user) {
+      const imageUri = `data:${user.imageType};base64,${user.imageData}`;
+      setImageUri(imageUri);
       }
-    }
-  }, [params.user]); // Fix: Add `params.user` as a dependency
+    }, [user, refreshing]);
+
+  const handleInput = (text: string | number, field: keyof USER) => {
+    setUser((prevUser: USER) => ({
+      ...prevUser,
+      [field]: text,
+    }));
+  };
+  
+  interface FileToUpload {
+    uri: string;
+    name: string;
+    type: string;
+  }
+
+  const handleUpdate = async () => {
+    console.log(image);
+    const formData = new FormData();
     
-    const handleInput = (text: string, field: keyof USER) => {
-  setUser((prevUser) => ({
-    ...prevUser!,
-    [field]: text,  // Correct way to dynamically update state
-  }));
-};
+    if (image?.uri) {
+      const response = await fetch(image.uri);
+      const blob = await response.blob();
+      formData.append("file", blob, image.name);
+    }
+    if (user) {
+      formData.append("name", user.name);
+      formData.append("phoneNumber", user.phoneNumber.toString());
+    }
+    
+    
+    const token = get("token");
+    try {
+      const response = await Axios.put("/auth/user/update", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      setUser(response.data);
+      router.push("Components/Profile/Profile");
+    } catch (error) {
+      Alert.alert(String(error));
+      console.log(error);
+    }
+  };
+  
 
-  // State for user input
   return (
-    <View style={styles.container}>
-      <Header viewZone={false} selectedZone={""} setSelectedZone={() => {}} />
-
+    <ScrollView contentContainerStyle={[styles.container, {backgroundColor: theme.colors.background}]}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+    >
+    
       <View style={styles.profileContainer}>
-        <View style={styles.headings}> Edit Profile </View>
-          <View style={styles.profileWork}>
-            <View style={styles.inner}>
-              <Image
-                source={{
-                  uri: "https://randomuser.me/api/portraits/men/75.jpg",
-                }}
-                style={styles.profileImage}
+        <Text style={[styles.headings, {color: theme.colors.text}]}> Edit Profile </Text>
+        <View style={styles.profileWork}>
+          <View style={[styles.inner, {backgroundColor: theme.colors.primary}]}>
+            <Image
+              source={
+                user?.imageData
+                ? { uri: imageUri }
+                : require("../../../assets/profile_picture.webp")
+              }
+              style={[styles.profileImage, {borderColor: theme.colors.text}]}
               />
-            </View>
           </View>
-        
-        <TouchableOpacity style={styles.editProfileButton} >
+          <Ionicons name="camera" size={26} color={theme.colors.text} onPress={handlePickImage}/>
+        </View>
+
+      </View>
+
+      <View style={[styles.detailsContainer, {backgroundColor: theme.colors.primary}]}>
+        <View style={styles.detailsContent}>
+          <View style={styles.detailsRow}>
+            <Text style={styles.label}>Name</Text>
+            <Text style={styles.separator}>:</Text>
+            <TextInput
+              style={styles.value}
+              value={user?.name || ""}
+              onChangeText={(text) => handleInput(text, "name")}
+              placeholderTextColor="white"
+              />
+          </View>
+
+          <View style={styles.detailsRow}>
+            <Text style={styles.label}>Email</Text>
+            <Text style={styles.separator}>:</Text>
+            <Text style={styles.value}>{user?.email}</Text>
+          </View>
+
+          <View style={styles.detailsRow}>
+            <Text style={styles.label}>Contact-No</Text>
+            <Text style={styles.separator}>:</Text>
+            <TextInput
+              style={styles.value}
+              value={user?.phoneNumber?.toString() || ""}
+              onChangeText={(text) => handleInput(text.replace(/[^0-9]/g, ""), "phoneNumber")}
+              placeholderTextColor="white"
+              />
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={styles.editProfileButton}
+          onPress={() => handleUpdate()}
+          >
           <Text style={styles.editProfileText}>Update</Text>
         </TouchableOpacity>
       </View>
 
-        <View style={styles.detailsRow}>
-          <Text style={styles.label}>Name</Text>
-            <Text style={styles.separator}>:</Text>
-             <TextInput 
-                style={styles.value} 
-                value={user?.name} 
-                onChangeText={(text) => handleInput(text, "name")} // ✅ Pass text and field name
-                placeholderTextColor="white"
-             />
-            </View>
-
-
-        <View style={styles.detailsRow}>
-          <Text style={styles.label}>Email</Text>
-            <Text style={styles.separator}>:</Text>
-               <TextInput 
-                style={styles.value} 
-                value={user?.email} 
-                onChangeText={(text) => handleInput(text, "email")} // ✅ Pass text and field name
-                placeholderTextColor="white"
-             />
-            </View>
-
-        <View style={styles.detailsRow}>
-          <Text style={styles.label}>Contact-No</Text>
-            <Text style={styles.separator}>:</Text>
-              <TextInput 
-                style={styles.value} 
-                 value={user?.phoneNumber} 
-                 onChangeText={(text) => handleInput(text, "phoneNumber")} // ✅ Pass text and field name
-                 placeholderTextColor="white"
-                />
-            </View>
-
-
-      <Footer />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -109,10 +203,11 @@ const Profile: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#012A1C", 
+    backgroundColor: "#012A1C",
     alignItems: "center",
+    paddingTop: 10,
   },
-  headings : {
+  headings: {
     marginTop: 10,
     marginBottom: 10,
     fontSize: 28,
@@ -120,19 +215,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   profileContainer: {
-    marginTop: 30,
     alignItems: "center",
-    backgroundColor: "#012A1C", 
     width: "100%",
-    paddingTop: 50,
     paddingBottom: 50,
   },
   profileWork: {
     width: "100%",
     height: 200,
     display: "flex",
-    alignItems: "center", 
-    justifyContent: "center", 
+    alignItems: "center",
+    justifyContent: "center",
   },
   inner: {
     backgroundColor: "#01694D",
@@ -160,12 +252,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#012A1C",
+    textAlign: "center",
   },
   detailsContainer: {
     width: "90%",
-    backgroundColor: "#01694D", 
+    backgroundColor: "#01694D",
     padding: 20,
-    marginTop: 20, 
+    marginTop: 20,
     borderRadius: 20,
   },
   detailsContent: {
@@ -176,25 +269,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingVertical: 15, 
+    paddingVertical: 15,
   },
   label: {
     fontSize: 16,
     fontWeight: "bold",
     color: "white",
-    width: "30%", 
+    width: "30%",
   },
   separator: {
     fontSize: 18,
     fontWeight: "bold",
     color: "white",
-    marginHorizontal: 12, 
+    marginHorizontal: 12,
   },
   value: {
     fontSize: 15,
     fontWeight: "light",
     color: "#FFFFFF",
-    flex: 1, 
+    flex: 1,
     width: "70%",
     borderBottomWidth: 1,
     borderBottomColor: "white",
