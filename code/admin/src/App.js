@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-
 import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
 import AdminPanel from './pages/AdminPanel';
-import Sidebar from './components/Sidebar';
 import AdminProfile from './components/AdminProfile';
 
 function AppContent() {
@@ -12,13 +11,11 @@ function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Sync activeTab with the current route
   React.useEffect(() => {
-    const path = location.pathname.slice(1) || 'devices'; // Default to 'devices' if path is '/'
-    if (path !== 'profile') setActiveTab(path); // Do not override activeTab for profile page
+    const path = location.pathname.slice(1) || 'devices';
+    if (path !== 'profile') setActiveTab(path);
   }, [location]);
 
-  // Update URL when activeTab changes (e.g., via Sidebar click)
   React.useEffect(() => {
     if (activeTab !== 'profile') navigate(`/${activeTab}`);
   }, [activeTab, navigate]);
