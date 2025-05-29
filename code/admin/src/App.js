@@ -1,35 +1,55 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import Header from './components/Header';
-import Sidebar from './components/Sidebar';
-import Footer from './components/Footer';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+
+import Layout from './Layout';
 import AdminPanel from './pages/AdminPanel';
-import AdminProfile from './components/AdminProfile';
+import AdminProfile from './pages/AdminProfile';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('devices');
   const location = useLocation();
   const navigate = useNavigate();
 
-  React.useEffect(() => {
+  // Sync activeTab with URL except when on /profile
+  useEffect(() => {
     const path = location.pathname.slice(1) || 'devices';
-    if (path !== 'profile') setActiveTab(path);
+    if (path !== 'profile') {
+      setActiveTab(path);
+    }
   }, [location]);
 
-  React.useEffect(() => {
-    if (activeTab !== 'profile') navigate(`/${activeTab}`);
+  // Update URL when activeTab changes (excluding profile)
+  useEffect(() => {
+    if (activeTab !== 'profile') {
+      navigate(`/${activeTab}`, { replace: true });
+    }
   }, [activeTab, navigate]);
 
   return (
-    <>
-      <Header />
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      <Routes>
-        <Route path="/:tab?" element={<AdminPanel activeTab={activeTab} />} />
-        <Route path="/profile" element={<AdminProfile />} />
-      </Routes>
-      <Footer />
-    </>
+    <Routes>
+      {/* Profile route first */}
+      <Route
+        path="/Adminprofile"
+        element={
+          <Layout activeTab="Adminprofile" setActiveTab={() => {}}>
+            <AdminProfile />
+          </Layout>
+        }
+      />
+
+      {/* Dynamic tabs route */}
+      <Route
+        path="/:tab"
+        element={
+          <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+            <AdminPanel activeTab={activeTab} />
+          </Layout>
+        }
+      />
+
+      {/* Redirect root to devices */}
+      <Route path="/" element={<Navigate to="/devices" replace />} />
+    </Routes>
   );
 }
 

@@ -50,6 +50,7 @@ const AdminPanel = ({ activeTab }) => {
     <div style={{
       display: 'flex',
       height: 'calc(100vh - 100px)',
+      width:"calc(100vw - )"
     }}>
       {/* Main Content */}
       <div style={{ marginLeft: '260px', padding: '30px 20px', flex: 1, overflowX: 'auto' }}>
