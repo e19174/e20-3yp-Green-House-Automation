@@ -1,4 +1,5 @@
 package com.Green_Tech.Green_Tech.DTO;
+import com.Green_Tech.Green_Tech.Entity.AuthMethod;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +16,5 @@ public class UserResponseDTO {
     byte[] imageData;
     String imageType;
     String imageName;
+    AuthMethod authMethod;
 }

@@ -31,6 +31,7 @@ interface User {
   imageData: string;
   imageType: string;
   imageName: string;
+  authMethod?: string;
 }
 
 const DisplayDetail: React.FC = () => {

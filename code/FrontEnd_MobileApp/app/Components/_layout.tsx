@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   content: {
-    marginTop: 60,
+    marginTop: 90,
     marginBottom: 55,
     flex: 1
   }

@@ -7,6 +7,7 @@ interface USER {
   imageData: string;
   imageType: string;
   imageName: string;
+  authMethod: string;  
 }
 
 interface UserContextType {
@@ -27,7 +28,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 };
 
 // Custom hook for easier usage
-export const useAuth = () => {
+export const userAuth = () => {
   const context = useContext(UserContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');

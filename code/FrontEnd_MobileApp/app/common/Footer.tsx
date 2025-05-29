@@ -9,13 +9,13 @@ const Footer: React.FC = () => {
   return (
     <View style={[styles.footer, {backgroundColor: theme.colors.primary}]}>
       <TouchableOpacity onPress={() => router.push("Components/Home/Home")}>
-        <Ionicons name="home" size={28} color={theme.colors.text} />
+        <Ionicons name="home" size={28} color={"#fff"} />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push("Components/Device/DisplayList")}>
-        <Ionicons name="radio-sharp" size={28} color={theme.colors.text} />
+        <Ionicons name="radio-sharp" size={28} color={"#fff"} />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push("Components/Statics/Statistics")}>
-        <Ionicons name="bar-chart" size={28} color={theme.colors.text} />
+        <Ionicons name="bar-chart" size={28} color={"#fff"} />
       </TouchableOpacity>
     </View>
   );

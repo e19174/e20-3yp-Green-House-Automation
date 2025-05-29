@@ -8,23 +8,15 @@ import {
   RefreshControl,
   ScrollView,
 } from "react-native";
-import { useAuth } from "../../../Contexts/UserContext";
+import { userAuth } from "../../../Contexts/UserContext";
 import { useState } from 'react';
 import { themeAuth } from '../../../Contexts/ThemeContext';
 
-interface USER {
-  name: string;
-  email: string;
-  phoneNumber: number;
-  imageData: string;
-  imageType: string;
-  imageName: string;
-}
 
 // Main Profile Component
 const Profile: React.FC = () => {
   const {theme} = themeAuth();
-  const {user, setUser} = useAuth();
+  const {user} = userAuth();
   const [refreshing, setRefreshing] = useState(false);
   
     const onRefresh = () => {

@@ -21,6 +21,7 @@ interface User {
   imageData: string;
   imageType: string;
   imageName: string;
+  authMethod: string;
 }
 
 const DeviceListScreen: React.FC = () => {
@@ -47,7 +48,7 @@ const DeviceListScreen: React.FC = () => {
     const fetchDevices = async () => {
       try {
         // const response = filter === "active" ?await Axios.get('device/active') : await Axios.get('/device/by-user')
-        const response = await Axios.get(filter === "active" ? '/device/active': '/device/by-user')
+        const response = await Axios.get(filter === "active" ? '/device/active': '/device/getByUser')
         setDevices(response.data);
       } catch (error) {
         console.error('Error fetching devices:', error);

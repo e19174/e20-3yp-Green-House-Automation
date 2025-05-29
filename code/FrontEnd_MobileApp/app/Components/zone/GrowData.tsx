@@ -32,7 +32,6 @@ useFocusEffect(
       try {
         const response = await Axios.get(`/sensors/currentData/${deviceId}`);
         const sensorData = response.data
-        console.log(sensorData);
         const formattedData: GrowDataItem[] = [
           { name: 'Temp', value: `${sensorData.temperature}`, unit: '°C', icon: 'thermometer', percentage: (sensorData.temperature || 0) / 50 },
           { name: 'Humidity', value: `${sensorData.humidity}`, unit: '%', icon: 'water', percentage: (sensorData.humidity || 0) / 100 },

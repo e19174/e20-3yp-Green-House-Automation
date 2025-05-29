@@ -4,8 +4,10 @@ import com.Green_Tech.Green_Tech.Config.JwtService;
 import com.Green_Tech.Green_Tech.CustomException.UserAlreadyFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
 import com.Green_Tech.Green_Tech.DTO.AuthDTO;
+import com.Green_Tech.Green_Tech.DTO.GoogleAuthDto;
 import com.Green_Tech.Green_Tech.DTO.UserDTO;
 import com.Green_Tech.Green_Tech.DTO.UserResponseDTO;
+import com.Green_Tech.Green_Tech.Entity.AuthMethod;
 import com.Green_Tech.Green_Tech.Entity.Role;
 import com.Green_Tech.Green_Tech.Entity.User;
 import com.Green_Tech.Green_Tech.Repository.UserRepo;
@@ -57,6 +59,8 @@ public class UserService {
                 .password(password)
                 .createdAt(new Date())
                 .updatedAt(new Date())
+                .authMethod(AuthMethod.EMAIL_PASSWORD)
+                .clerkUserId(null)
                 .role(Role.USER)
                 .build();
 
@@ -142,6 +146,7 @@ public class UserService {
                 .imageType(user.getImageType())
                 .imageName(user.getImageName())
                 .imageData(user.getImageData())
+                .authMethod(user.getAuthMethod())
                 .build();
     }
 
@@ -152,5 +157,59 @@ public class UserService {
             user.setImageName(file.getOriginalFilename());
         }
         userRepo.save(user);
+    }
+
+    // Google OAuth registration/login
+    public Map<String, Object> handleGoogleAuth(GoogleAuthDto dto) {
+        Optional<User> existingUser = userRepo.findByEmail(dto.getEmail());
+        System.out.println(existingUser.toString());
+        Map<String, Object> userData = new HashMap<>();
+
+        if (existingUser.isPresent()) {
+            // Existing user - update info if needed
+            User user = existingUser.get();
+            updateUserFromGoogle(user, dto);
+            userRepo.save(user);
+            String token = jwtService.generateToken(user, user.getRole());
+
+            userData.put("user", user);
+            userData.put("token", token);
+            System.out.println("uuuuuuuuuuuuuuuuuuuuuu");
+            return userData;
+
+        } else {
+            // New user - register via Google
+            User newUser = User.builder()
+                    .email(dto.getEmail())
+                    .name(dto.getName())
+                    .imageData(null)
+                    .imageName(null)
+                    .imageType(null)
+                    .clerkUserId(dto.getClerkUserId())
+                    .authMethod(AuthMethod.GOOGLE_OAUTH)
+                    .role(Role.USER)
+                    .createdAt(new Date())
+                    .password(null)
+                    .build();
+
+            System.out.println("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+            userRepo.save(newUser);
+            String token = jwtService.generateToken(newUser, newUser.getRole());
+
+            userData.put("user", newUser);
+            userData.put("token", token);
+
+            return userData;
+        }
+    }
+
+    private void updateUserFromGoogle(User user, GoogleAuthDto dto) {
+        // Update profile image and other info if changed
+//        if (dto.getProfileImage() != null) {
+//            user.setImageData(dto.getProfileImage().getBytes());
+//        }
+        if (user.getClerkUserId() == null) {
+            user.setClerkUserId(dto.getClerkUserId());
+        }
     }
 }

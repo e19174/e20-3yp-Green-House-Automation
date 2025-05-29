@@ -2,10 +2,25 @@
 #include <register.h>
 #include "aws_setup.h"
 #include "ArduinoHttpClient.h"
+#include "DHT.h"
 
+// Define Control Pins
+#define DHTPIN 4
+#define DHTTYPE DHT22   // DHT 22  (AM2302)
+#define FAN_PIN 22
+#define NUTRIENT_N 18
+#define NUTRIENT_P 19
+#define NUTRIENT_K 21
+#define WATER_PIN 5
 #define BUTTON_PIN 2
+#define MOISTURE_SENSOR_PIN_1 32
+#define MOISTURE_SENSOR_PIN_2 33
+#define MOISTURE_SENSOR_PIN_3 34
+#define MOISTURE_SENSOR_PIN_4 35
 
 WebServer server(80);
+
+// Global variables
 String ssid = "";
 String password = "";
 String email = "";
@@ -16,21 +31,6 @@ const char* AWS_CERT_PRIVATE = nullptr;
 const char* THINGNAME = nullptr;
 const char* AWS_IOT_ENDPOINT = nullptr;
 
-#include "DHT.h"
-#define DHTPIN 4    // Digital pin connected to the DHT sensor
-#define DHTTYPE DHT22   // DHT 22  (AM2302)
-
-// Capsitive moisture sensor
-#define MOISTURE_SENSOR_PIN_1 32
-#define MOISTURE_SENSOR_PIN_2 33
-#define MOISTURE_SENSOR_PIN_3 34
-#define MOISTURE_SENSOR_PIN_4 35
-
-// Define Control Pins
-#define FAN_PIN 15
-#define NUTRIENTS_PIN 16
-#define WATER_PIN 17
-#define LIGHT_PIN 5
 
 float h;
 float t;
@@ -79,9 +79,14 @@ void setup() {
   tryConnectToWiFi();
 
   pinMode(FAN_PIN, OUTPUT);
-  pinMode(NUTRIENTS_PIN, OUTPUT);
+  pinMode(NUTRIENT_N, OUTPUT);
+  pinMode(NUTRIENT_P, OUTPUT);
+  pinMode(NUTRIENT_K, OUTPUT);
   pinMode(WATER_PIN, OUTPUT);
-  pinMode(LIGHT_PIN, OUTPUT);
+  pinMode(MOISTURE_SENSOR_PIN_1, INPUT);
+  pinMode(MOISTURE_SENSOR_PIN_2, INPUT);
+  pinMode(MOISTURE_SENSOR_PIN_3, INPUT);
+  // pinMode(MOISTURE_SENSOR_PIN_4, INPUT);
 
   if (registered) {
     Serial.println("Device already registered. Connecting to AWS...");
@@ -95,10 +100,6 @@ void setup() {
 
 void loop() {
   server.handleClient();
-  
-  if (!client.connected() && registered) {
-    connectAWS();
-  }
 
   h = dht.readHumidity();
   t = dht.readTemperature();
@@ -150,9 +151,10 @@ void loop() {
 void processCommand(const char* command) {
   Command commands[] = {
       {"FAN_ON", FAN_PIN, HIGH}, {"FAN_OFF", FAN_PIN, LOW},
-      {"NUTRIENTS_ON", NUTRIENTS_PIN, HIGH}, {"NUTRIENTS_OFF", NUTRIENTS_PIN, LOW},
+      {"NUTRIENTS_ON", NUTRIENT_P, HIGH}, {"NUTRIENTS_OFF", NUTRIENT_P, LOW},
+      {"NUTRIENT_N_ON", NUTRIENT_N, HIGH}, {"NUTRIENT_N_OFF", NUTRIENT_N, LOW},
+      {"NUTRIENT_K_ON", NUTRIENT_K, HIGH}, {"NUTRIENT_K_OFF", NUTRIENT_K, LOW},
       {"WATER_ON", WATER_PIN, HIGH}, {"WATER_OFF", WATER_PIN, LOW},
-      {"LIGHT_ON", LIGHT_PIN, HIGH}, {"LIGHT_OFF", LIGHT_PIN, LOW}
   };
 
   for (const auto& cmd : commands) {

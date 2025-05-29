@@ -11,7 +11,7 @@ const Manual = () => {
 
     return (
         <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
-            <Text style={styles.heading}>Manual</Text>
+            <Text style={[styles.heading, {color: theme.colors.text}]}>Manual</Text>
 
             <View style={styles.navigationContainer}>
                 <TouchableOpacity style={styles.navigationButton} onPress={() => setFilter("about")}>

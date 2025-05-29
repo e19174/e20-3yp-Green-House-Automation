@@ -33,6 +33,7 @@ interface User {
   imageData: string;
   imageType: string;
   imageName: string;
+  authMethod: string;
 }
 
 const Home = () => {
@@ -54,7 +55,6 @@ const Home = () => {
     const fetchDevices = async () => {
       try {
         const response = await Axios.get('/device/activeByZones');
-        // setDevices(response.data);
         setZones(response.data);
       } catch (error) {
         console.error('Error fetching devices:', error);

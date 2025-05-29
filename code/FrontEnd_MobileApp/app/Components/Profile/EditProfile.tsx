@@ -11,7 +11,7 @@ import {
   ScrollView,
   RefreshControl,
 } from "react-native";
-import { useAuth } from "../../../Contexts/UserContext";
+import { userAuth } from "../../../Contexts/UserContext";
 import { Axios } from "../../AxiosRequestBuilder";
 import { Ionicons } from '@expo/vector-icons';
 import { themeAuth } from "../../../Contexts/ThemeContext";
@@ -25,10 +25,11 @@ interface USER {
   imageData: string;
   imageType: string;
   imageName: string;
+  authMethod: string;
 }
 
 const Profile: React.FC = () => {
-  const {user, setUser} = useAuth();
+  const {user, setUser} = userAuth();
   const {theme} = themeAuth();  
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [image, setImage] = useState<FileToUpload>();

@@ -7,15 +7,15 @@ import { themeAuth } from '../../../Contexts/ThemeContext';
 interface GrowComponentsProps {
   isEnabled: boolean[];
   toggleStatus: (index: number) => void;
+  deviceId: number;
 }
 
-const GrowComponents: React.FC<GrowComponentsProps> = ({ isEnabled, toggleStatus }) => {
+const GrowComponents: React.FC<GrowComponentsProps> = ({ isEnabled, toggleStatus, deviceId }) => {
   const { theme } = themeAuth();
 
   const sendControlSignal = async (index: number, status: boolean) => {
     try {
-      const response = await Axios.post("/sensors/controlsignal", {index, status});
-      Alert.alert("Response", response.data);
+      const response = await Axios.post("/sensors/controlsignal", {index, status, deviceId});
       toggleStatus(index); // Update UI state
     } catch (error) {
       console.error("Error:", error);
@@ -27,14 +27,15 @@ const GrowComponents: React.FC<GrowComponentsProps> = ({ isEnabled, toggleStatus
       <Text style={styles.title}>GROW COMPONENTS</Text>
       <View style={styles.growContainer}>
         {[
-          { name: 'Light', icon: 'bulb', isOn: isEnabled[0] },
-          { name: 'Nutrients', icon: 'flask', isOn: isEnabled[1] },
-          { name: 'Water', icon: 'water', isOn: isEnabled[2] },
-          { name: 'Fan', icon: 'flower', isOn: isEnabled[3] },
+          { name: 'Fan', icon: 'flower', isOn: isEnabled[0] },
+          { name: 'Nitrogen', icon: 'flask', isOn: isEnabled[1] },
+          { name: 'Phosphorus', icon: 'flask', isOn: isEnabled[2] },
+          { name: 'Potassium', icon: 'flask', isOn: isEnabled[3] },
+          { name: 'Water', icon: 'water', isOn: isEnabled[4] },
         ].map((item, index) => (
           <View key={index} style={styles.growItem}>
             <Text style={styles.growLabel}>{item.name}</Text>
-            <View style={[styles.circle, isEnabled[index] ? styles.activeCircle : styles.inactiveCircle]}>
+            <View style={[styles.circle, isEnabled[index] ? styles.activeCircle : [styles.inactiveCircle, { backgroundColor: theme.dark ? "#264B44" : "#01694D" }]]}>
               <Ionicons name={item.icon as any} size={32} color={isEnabled[index] ? '#16F08B' : '#5F6E67'} />
             </View>
 
@@ -87,8 +88,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   circle: {
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
     borderRadius: 35,
     alignItems: 'center',
     justifyContent: 'center',
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 5,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     borderRadius: 20,
     marginBottom: 5,
   },

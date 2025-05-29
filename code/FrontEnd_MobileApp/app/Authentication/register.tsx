@@ -1,95 +1,129 @@
-import { View, Text, StyleSheet, TextInput, Pressable, Button, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TextInput, Pressable, Button, Alert, TouchableOpacity } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Link, router } from 'expo-router'
-// import * as WebBrowser from "expo-web-browser";
-// import * as Google from "expo-auth-session/providers/google";
-// import * as AuthSession from "expo-auth-session";
 import { Axios } from '../../app/AxiosRequestBuilder';
 import { themeAuth } from '../../Contexts/ThemeContext';
-// import {
-//     GoogleSignin,
-//     isSuccessResponse,
-//     isErrorWithCode,
-//     statusCodes
-// } from "@react-native-google-signin/google-signin"
+import * as WebBrowser from 'expo-web-browser'
+import * as AuthSession from 'expo-auth-session'
+import { useAuth, useSSO, useUser } from '@clerk/clerk-expo'
+import { save } from '../../Storage/secureStorage';
+import { userAuth } from '../../Contexts/UserContext';
+import { Ionicons } from '@expo/vector-icons';
+
+export const useWarmUpBrowser = () => {
+useEffect(() => {
+  // Preloads the browser for Android devices to reduce authentication load time
+  // See: https://docs.expo.dev/guides/authentication/#improving-user-experience
+  void WebBrowser.warmUpAsync()
+  return () => {
+    // Cleanup: closes browser when component unmounts
+    void WebBrowser.coolDownAsync()
+  }
+}, [])
+}
+WebBrowser.maybeCompleteAuthSession()
 
 const Register:React.FC = () => {
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [confirmPassword, setConfirmPassword] = useState<string>('')
     const {theme} = themeAuth();
+    const { setUser } = userAuth();
+
+    useWarmUpBrowser()
+
+    // Use the `useSSO()` hook to access the `startSSOFlow()` method
+    const { startSSOFlow } = useSSO()
+
+    const onPress = useCallback(async () => {
+    try {
+        // Start the authentication process by calling `startSSOFlow()`
+        const { createdSessionId, setActive, signIn, signUp } = await startSSOFlow({
+        strategy: 'oauth_google',
+        // For web, defaults to current path
+        // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
+        // For more info, see https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturioptions
+        redirectUrl: AuthSession.makeRedirectUri({ scheme: 'myapp', path: '/' }),
+        })
+
+        // If sign in was successful, set the active session
+        if (createdSessionId) {
+          setActive!({ session: createdSessionId });
+        } else {
+        // If there is no `createdSessionId`,
+        // there are missing requirements, such as MFA
+        // Use the `signIn` or `signUp` returned from `startSSOFlow`
+        // to handle next steps
+          Alert.alert('Sign in or sign up is required to complete the authentication process.');
+        }
+    } catch (err) {
+        // See https://clerk.com/docs/custom-flows/error-handling
+        // for more info on error handling
+        console.error(JSON.stringify(err, null, 2))
+    }
+    }, [])
+
+    const {user} = useUser();
+    const {isSignedIn, signOut} = useAuth();
+
+    useEffect(() => {
+      if (isSignedIn) {
+        handleGoogleSignIn();
+      } else {
+          console.log('No user is signed in')
+      }
+    }, [signOut, isSignedIn, user])
+    
 
     const handleRegister = async () => {
-        if (password == '' || confirmPassword == "" || email == "") {
-            alert("Fill the feilds");
-            return;
-        }
+      if (password == '' || confirmPassword == "" || email == "") {
+        alert("Fill the feilds");
+        return;
+      }
 
-        if (password !== confirmPassword) {
-            alert('Password and Confirm Password not match');
-            return;
-        }
+      if (password !== confirmPassword) {
+        alert('Password and Confirm Password not match');
+        return;
+      }
 
-        try {
-            const response = await Axios.post("/auth/user/register", {email, password, confirmPassword});
-            console.log(response.data);
-            router.push("/Authentication/login");
-        } catch (error) {
-            console.log(error)
-        }
-        
+      try {
+        const response = await Axios.post("/auth/user/register", {email, password, confirmPassword});
+        console.log(response.data);
+        router.push("/Authentication/login");
+      } catch (error) {
+        console.log(error)
+      }
     }
 
-    // const handleGoogleSignin = async () => {
-    //     try{
-    //         await GoogleSignin.hasPlayServices();
-    //         const response = await GoogleSignin.signIn();
-    //         if(isSuccessResponse(response)){
-    //             const {idToken, user } = response.data;
-    //             const {name , email, photo} = user;
-    //             Alert.alert(`Success, ${name}`)
-    //         }else{
-    //             Alert.alert("Google Signin was cancelled!")
-    //         }
-    //     }catch(error){
-    //         if(isErrorWithCode(error)){
-    //             switch(error.code){
-    //                 case statusCodes.IN_PROGRESS:
-    //                     Alert.alert("Google Signin is in progress");
-    //                     break;
-    //                 default:
-    //                     Alert.alert(error.code);
-    //             }
-    //         }else{
-    //             Alert.alert("Error has occured");
-    //         }
-    //     }
-    // }
-
-//     const [userInfo, setUserInfo] = useState<AuthSession.TokenResponse>();
-
-//     // const redirectUri = AuthSession.makeRedirectUri({
-//     //     native: "Routing://oauthredirect",
-//     //   });
-//     const redirectUri = "https://auth.expo.io/@vithustennysan/Routing";
-
-
-//     // Function to handle Google Sign-In
-//     const [request, response, promptAsync] = Google.useAuthRequest({
-//         clientId: "994434333-4kpuihtinousoimldvrl537hcb008n1o.apps.googleusercontent.com",
-//         redirectUri: redirectUri, // Use Expo proxy redirect
-//         scopes: ["openid", "profile", "email"],
-//       });
-  
-//    // Handle the authentication response
-//     useEffect(() => {
-//         if (response?.type === "success") {
-//             const { authentication } = response;
-//             if (authentication) {
-//                 setUserInfo(authentication);
-//             }
-//         }
-//     }, [response]);
+    // For Google OAuth registration
+  const handleGoogleSignIn = async () => {
+    try {
+      // After successful Clerk Google sign-in
+      const googleAuthData = {
+        email: user?.primaryEmailAddress?.emailAddress,
+        name: user?.fullName,
+        profileImage: user?.imageUrl,
+        clerkUserId: user?.id
+      };
+      
+      const response = await Axios.post("auth/user/google-auth", googleAuthData);
+        console.log('Google Sign-In Response:', response.data);
+        if (response.data.action === 'REGISTERED') {
+          // New user registered via Google
+          Alert.alert('Welcome! Your account has been created.');
+        } else {
+          // Existing user logged in
+          Alert.alert('Welcome back!');
+        }
+        setUser(response.data.data.user);  
+        await save("token", response.data.data.token);
+        router.replace("/Components/Home/Home");
+    } catch (error) {
+      Alert.alert('Error', 'Failed to sign in with Google. Please try again.')
+      console.error('Google Sign-In Error:', error);
+    }
+      
+  };
     
     return (
         <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
@@ -99,21 +133,18 @@ const Register:React.FC = () => {
                     <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Email' placeholderTextColor="rgb(173, 173, 173)" value={email} onChangeText={(value) => setEmail(value)}/>
                     <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Password' placeholderTextColor="rgb(173, 173, 173)" value={password} onChangeText={(value) => setPassword(value)}/>
                     <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='ConfirmPassword' placeholderTextColor="rgb(173, 173, 173)" value={confirmPassword} onChangeText={(value) => setConfirmPassword(value)}/>
-                    <Pressable onPress={handleRegister} style={styles.register}>
+                    <TouchableOpacity onPress={handleRegister} style={styles.register}>
                         <Text style={styles.text}>REGISTER</Text>
-                    </Pressable>
+                    </TouchableOpacity>
                 </View>
                 <Text style={styles.already}>Already have an one?</Text>
                 <Link href={"/Authentication/login"} style={styles.login}>LOGIN</Link>
 
                 <View>
-                    {/* {userInfo ? (
-                        <Text>Welcome! Access Token: {userInfo.accessToken}</Text>
-                    ) : ( */}
-                        <Pressable style={styles.googleLogin}>
-                            <Text onPress={() => handleGoogleSignin()} style={styles.googleLoginText}>Sign in with Google</Text>
-                        </Pressable>
-                    
+                    <TouchableOpacity style={styles.googleLogin}>
+                        <Ionicons name="logo-google" size={18} color="black" />
+                        <Text onPress={onPress} style={styles.googleLoginText}>Sign in with Google</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </View>
@@ -184,6 +215,10 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     googleLogin : {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        gap: 10,
         marginTop: 20,
         padding: 10,
         backgroundColor: "#F6FCDF",

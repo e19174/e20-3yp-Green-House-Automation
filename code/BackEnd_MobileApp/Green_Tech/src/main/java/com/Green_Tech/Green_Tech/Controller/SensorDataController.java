@@ -1,13 +1,11 @@
 package com.Green_Tech.Green_Tech.Controller;
 
+import com.Green_Tech.Green_Tech.DTO.ControlSignalRequestDTO;
 import com.Green_Tech.Green_Tech.Entity.SensorData;
 import com.Green_Tech.Green_Tech.Service.MQTT.MQTTService;
 import com.Green_Tech.Green_Tech.Service.SensorDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/sensors")
@@ -28,9 +26,10 @@ public class SensorDataController {
 
 
     @PostMapping(value = "/controlsignal")
-    public String sendControlSignal(@RequestBody Map<String, Object> payload) {
-        int deviceIndex = (int) payload.get("index");
-        boolean turnOn = (boolean) payload.get("status");
+    public String sendControlSignal(@RequestBody ControlSignalRequestDTO payload) {
+        int deviceIndex = payload.getIndex();
+        boolean turnOn = payload.isStatus();
+        Long deviceId = payload.getDeviceId();
 
         String deviceName;
         switch (deviceIndex) {
@@ -38,20 +37,23 @@ public class SensorDataController {
                 deviceName = "FAN";
                 break;
             case 1:
-                deviceName = "NUTRIENTS";
+                deviceName = "NUTRIENT_N";
                 break;
             case 2:
-                deviceName = "WATER";
+                deviceName = "NUTRIENT_P";
                 break;
             case 3:
-                deviceName = "LIGHT";
+                deviceName = "NUTRIENT_K";
+                break;
+            case 4:
+                deviceName = "WATER";
                 break;
             default:
                 return "Invalid device index!";
         }
 
         String command = turnOn ? deviceName + "_ON" : deviceName + "_OFF";
-        mqttService.publishControlSignal("{message:\""+command+"\"}");
+        mqttService.publishControlSignal("{message:\""+command+"\"}", deviceId);
         return "Command Sent: " + command;
     }
 

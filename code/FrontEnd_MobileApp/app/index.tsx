@@ -1,15 +1,19 @@
 import { router, useFocusEffect } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {StyleSheet, Text, View, Image, Alert } from "react-native";
 import { get } from "../Storage/secureStorage";
 import { themeAuth } from "../Contexts/ThemeContext";
 import * as SplashScreen from 'expo-splash-screen';
 import { ActivityIndicator } from "react-native";
+import { userAuth } from "../Contexts/UserContext";
+import { Axios } from "./AxiosRequestBuilder";
 
 SplashScreen.preventAutoHideAsync();
 
 const Page:React.FC = () => {
   const { theme } = themeAuth();
+  const {user, setUser} = userAuth();
+
 
   useFocusEffect(
     React.useCallback(() => {
@@ -20,7 +24,17 @@ const Page:React.FC = () => {
           if (!token && isActive) {
             router.push("/Authentication/login");
           } else if (isActive) {
-            router.push("/Components/Home/Home");
+            try {
+              const response = await Axios.get("/auth/user/getUser", {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
+              });
+              router.replace("/Components/Home/Home");
+              setUser(response.data);
+            } catch (error: any) {
+                Alert.alert("Error", "Failed to fetch user data. Please try again.");
+            }
           }
           await SplashScreen.hideAsync();
         }, 2000);

@@ -22,6 +22,7 @@ interface User {
   imageData: string;
   imageType: string;
   imageName: string;
+  authMethod?: string;
 }
 
 const Zone: React.FC = () => {
@@ -29,7 +30,7 @@ const Zone: React.FC = () => {
   const [devices, setDevices] = useState<Device[]>([]);
   const params = useLocalSearchParams();
   const [selectedDevice, setSelectedDevice] = useState<Device | undefined>(JSON.parse(params.zone as string)[0]);
-  const [isEnabled, setIsEnabled] = useState<boolean[]>([false, false, false, false]);
+  const [isEnabled, setIsEnabled] = useState<boolean[]>([false, false, false, false, false]);
   const { theme } = themeAuth();
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
@@ -96,10 +97,8 @@ const Zone: React.FC = () => {
         </View>
       </Modal>
 
-      <View style={styles.content}>
-        
-
-        <GrowComponents isEnabled={isEnabled} toggleStatus={toggleStatus} />
+      <View>
+        <GrowComponents isEnabled={isEnabled} toggleStatus={toggleStatus} deviceId={selectedDevice?.id}/>
         <GrowData deviceId={selectedDevice?.id} />
       </View>
 
