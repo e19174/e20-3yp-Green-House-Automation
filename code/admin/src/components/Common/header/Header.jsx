@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from "../assets/logopng.png"
+import logo from "../../assets/logopng.png"
 
 const Header = () => (
   <header style={{
@@ -14,7 +14,7 @@ const Header = () => (
     zIndex: 5
   }}>
     {/* Left - spacer (optional logo) */}
-    <div style={{
+    <div className='header-container' style={{
       flex: 1,
       display: "flex",
       alignItems: "center",

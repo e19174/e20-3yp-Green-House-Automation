@@ -26,13 +26,13 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       </div>
       <div 
         style={{ opacity: 0.8, marginBottom: '20px', cursor: 'pointer', fontWeight: activeTab === 'dashboard' ? 'bold' : 'normal' }}
-        onClick={() => handleTabClick('dashboard')}
+        onClick={() => handleTabClick('')}
       >
         Dashboard
       </div>
       <div 
         style={{ opacity: 0.8, marginBottom: '20px', cursor: 'pointer', fontWeight: activeTab === 'devices' ? 'bold' : 'normal' }}
-        onClick={() => handleTabClick('devices')}
+        onClick={() => handleTabClick('panel')}
       >
         Devices
       </div>
@@ -44,7 +44,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       </div>
       <div 
         style={{ opacity: 0.8, marginBottom: '20px', cursor: 'pointer', fontWeight: activeTab === 'settings' ? 'bold' : 'normal' }}
-        onClick={() => handleTabClick('settings')}
+        onClick={() => handleTabClick('profile')}
       >
         Settings
       </div>

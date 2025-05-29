@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const AdminPanel = ({ activeTab }) => {
   const [devices, setDevices] = useState([]);
@@ -54,7 +55,7 @@ const AdminPanel = ({ activeTab }) => {
       {/* Main Content */}
       <div style={{ marginLeft: '260px', padding: '30px 20px', flex: 1, overflowX: 'auto' }}>
         {/* Device Tab */}
-        {activeTab === 'devices' && (
+        {activeTab !== 'devices' && (
           <div>
             <h2 style={{ fontSize: '22px', marginBottom: '15px' }}>Device Management</h2>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '16px' }}>
@@ -134,6 +135,10 @@ const AdminPanel = ({ activeTab }) => {
             </table>
           </div>
         )}
+
+        <div>
+          <Link to={"/"} >dfvsdvdfbvsdb</Link>
+        </div>
 
         {/* Placeholder for other tabs */}
         {activeTab === 'dashboard' && <div>Dashboard content goes here.</div>}
