@@ -3,10 +3,11 @@ import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from
 
 import Header from './components/Common/header/Header';
 import Footer from './components/Common/footer/Footer';
-import AdminPanel from './pages/AdminPanel';
-import Sidebar from './components/Common/Sidebar';
+import Devices from './components/Devices';
+import Sidebar from './components/Common/sidebar/Sidebar';
 import AdminProfile from './components/AdminProfile';
 import AdminDashboard from './components/AdminDashboard';
+import Users from './components/Users';
 
 function App() {
   const [activeTab, setActiveTab] = useState('devices');
@@ -30,7 +31,8 @@ function App() {
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       <Routes>
         <Route path="/" element={<AdminDashboard/>} />
-        <Route path="/panel" element={<AdminPanel/>} />
+        <Route path="/devices" element={<Devices />} />
+        <Route path="/users" element={<Users />} />
         <Route path="/profile" element={<AdminProfile />} />
       </Routes>
       <Footer />
