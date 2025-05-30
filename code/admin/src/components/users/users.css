@@ -1,0 +1,73 @@
+.users-container {
+  display: flex;
+  height: calc(100vh - 90px);
+  width: calc(100vw - 240px);
+  margin-left: 240px;
+  background-color: white;
+  border-radius: 15px 0 0 15px;
+}
+
+.users-main-content {
+  margin-left: 20px;
+  padding: 30px 20px;
+  flex: 1;
+  overflow-x: auto;
+  background-color: white;
+}
+
+.users-header {
+  color: #1b4332;
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.add-user-btn {
+  background-color: #105739;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px 0 5px 0;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+.users-table thead tr {
+  text-align: left;
+  border-bottom: 2px solid #ddd;
+  height: 40px;
+}
+
+.users-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  height: 50px;
+}
+
+.users-table td,
+.users-table th {
+  padding: 10px 5px;
+}
+
+.edit-btn {
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+}
