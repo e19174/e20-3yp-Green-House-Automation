@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SensorDataService {
@@ -22,8 +24,18 @@ public class SensorDataService {
     @Autowired
     private DeviceRepo deviceRepo;
 
-    public SensorData getSensorData(Long id) {
-        return sensorDataRepository.findFirstByDeviceIdOrderByIdDesc(id);
+    public Map<String, Object> getSensorData(Long id) {
+        SensorData data = sensorDataRepository.findFirstByDeviceIdOrderByIdDesc(id);
+        Map<String, Object> sensorData = new HashMap<>();
+        sensorData.put("temperature", data.getTemperature());
+        sensorData.put("humidity", data.getHumidity());
+        sensorData.put("soilMoisture", data.getSoilMoisture());
+        sensorData.put("nitrogenLevel", data.getNitrogenLevel());
+        sensorData.put("phosphorusLevel", data.getPhosphorusLevel());
+        sensorData.put("potassiumLevel", data.getPotassiumLevel());
+        sensorData.put("actuatorStatus", data.getActuatorStatus());
+
+        return sensorData;
     }
 
     public HashMap convertByteArrayToHashMap(byte[] jsonData) {
@@ -49,13 +61,25 @@ public class SensorDataService {
                         : (Double) awsData.get("moisture"))
                 .temperature(awsData.get("temperature") instanceof Integer ? Double.valueOf((Integer) awsData.get("temperature"))
                         : (Double) awsData.get("temperature"))
-                .nitrogenLevel(0.001)
-                .phosphorusLevel(0.001)
-                .potassiumLevel(0.001)
+                .nitrogenLevel(awsData.get("nitrogenLevel") instanceof Integer ? Double.valueOf((Integer) awsData.get("nitrogenLevel"))
+                        : (Double) awsData.get("nitrogenLevel"))
+                .phosphorusLevel(awsData.get("phosphorusLevel") instanceof Integer ? Double.valueOf((Integer) awsData.get("phosphorusLevel"))
+                        : (Double) awsData.get("phosphorusLevel"))
+                .potassiumLevel(awsData.get("potassiumLevel") instanceof Integer ? Double.valueOf((Integer) awsData.get("potassiumLevel"))
+                        : (Double) awsData.get("potassiumLevel"))
+                .actuatorStatus(convertListToBoolArray((List<Boolean>) awsData.get("actuatorState")))
                 .updatedAt(new Date())
                 .build();
 
         sensorDataRepository.save(sensorData);
+    }
+
+    private boolean[] convertListToBoolArray(List<Boolean> list) {
+        boolean[] result = new boolean[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            result[i] = list.get(i);
+        }
+        return result;
     }
 
 

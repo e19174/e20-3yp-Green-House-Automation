@@ -25,4 +25,5 @@ public class SensorData {
     private Double potassiumLevel;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;
+    private boolean[] actuatorStatus = new boolean[5];
 }
