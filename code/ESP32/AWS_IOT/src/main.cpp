@@ -12,7 +12,7 @@
 #define NUTRIENT_P 19
 #define NUTRIENT_K 21
 #define WATER_PIN 5
-#define BUTTON_PIN 2
+#define BUTTON_PIN 13
 #define MOISTURE_SENSOR_PIN_1 32
 #define MOISTURE_SENSOR_PIN_2 33
 #define MOISTURE_SENSOR_PIN_3 34
@@ -30,20 +30,22 @@ const char* AWS_CERT_CRT = nullptr;
 const char* AWS_CERT_PRIVATE = nullptr;
 const char* THINGNAME = nullptr;
 const char* AWS_IOT_ENDPOINT = nullptr;
-
+int commandIndex = -1; // Index of the command to be executed
+bool status;
+bool actuatorState[5] = {false, false, false, false, false}; // FAN, NUTRIENT_N, NUTRIENT_P, NUTRIENT_K, WATER
 
 float h;
 float t;
 DHT dht(DHTPIN, DHTTYPE);
 
 struct Command {
-  const char* name;
+  String name;
   int pin;
   bool state;
 };
 
 // funtion declaration
-void processCommand(const char* command);
+void processCommand(int index, bool status);
 
 void setup() {
   Serial.begin(115200);
@@ -87,6 +89,12 @@ void setup() {
   pinMode(MOISTURE_SENSOR_PIN_2, INPUT);
   pinMode(MOISTURE_SENSOR_PIN_3, INPUT);
   // pinMode(MOISTURE_SENSOR_PIN_4, INPUT);
+
+  digitalWrite(FAN_PIN, HIGH);
+  digitalWrite(NUTRIENT_N, HIGH);
+  digitalWrite(NUTRIENT_P, HIGH);
+  digitalWrite(NUTRIENT_K, HIGH);
+  digitalWrite(WATER_PIN, HIGH);
 
   if (registered) {
     Serial.println("Device already registered. Connecting to AWS...");
@@ -139,32 +147,24 @@ void loop() {
     // }
 
     // control command for equipments
-    processCommand(command);
+    processCommand(commandIndex, status);
 
-    publishMessage(h, t, average_moisture);
+    publishMessage(h, t, average_moisture, actuatorState);
     client.loop();
     delay(2000);
   
 }
 
 
-void processCommand(const char* command) {
-  Command commands[] = {
-      {"FAN_ON", FAN_PIN, HIGH}, {"FAN_OFF", FAN_PIN, LOW},
-      {"NUTRIENTS_ON", NUTRIENT_P, HIGH}, {"NUTRIENTS_OFF", NUTRIENT_P, LOW},
-      {"NUTRIENT_N_ON", NUTRIENT_N, HIGH}, {"NUTRIENT_N_OFF", NUTRIENT_N, LOW},
-      {"NUTRIENT_K_ON", NUTRIENT_K, HIGH}, {"NUTRIENT_K_OFF", NUTRIENT_K, LOW},
-      {"WATER_ON", WATER_PIN, HIGH}, {"WATER_OFF", WATER_PIN, LOW},
-  };
+void processCommand(int index, bool status) {
+  const int commandPins[] = { FAN_PIN, NUTRIENT_N, NUTRIENT_P, NUTRIENT_K, WATER_PIN };
 
-  for (const auto& cmd : commands) {
-      if (strcmp(command, cmd.name) == 0) {
-          digitalWrite(cmd.pin, cmd.state);
-          Serial.print(cmd.name);
-          Serial.println(" executed");
-          return;
-      }
+  if (index >= 0 && index < sizeof(commandPins) / sizeof(commandPins[0])) {
+    digitalWrite(commandPins[index], status ? LOW : HIGH);
+    actuatorState[index] = status;
+    Serial.print("Command executed: ");
+    Serial.print(index);
+    Serial.print(" - State: ");
+    Serial.println(status ? "ON" : "OFF");
   }
-  
-  // Serial.println("Unknown command received");
 }
