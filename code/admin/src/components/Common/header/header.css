@@ -1,9 +1,66 @@
-.header-container{
-    flex: 1;
-    display: flex;
-    align-items: "center";
-    gap: 10px;
+/* Header.css */
+.header {
+  height: 60px;
+  background-color: #1b4332;
+  color: white;
+  display: flex;
+  padding: 0 40px;
+  align-items: center;
+  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); */
+  z-index: 5;
 }
-.header-container .header-title{
-    
+
+.header-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-logo {
+  width: 40px;
+  height: 30px;
+  object-fit: fill;
+}
+
+.header-brand {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.header-profile {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.header-profile img{
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-circle {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background-color: #ffffff33;
+  border: 1px solid #fff;
+}
+
+.profile-name {
+  font-size: 16px;
+  font-weight: bold;
 }

@@ -1,41 +1,120 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import Header from './components/Common/header/Header';
-import Footer from './components/Common/footer/Footer';
-import Devices from './components/Devices';
-import Sidebar from './components/Common/sidebar/Sidebar';
-import AdminProfile from './components/AdminProfile';
-import AdminDashboard from './components/AdminDashboard';
-import Users from './components/Users';
+import Devices from "./components/devices/Devices";
+import AdminProfile from "./components/profile/AdminProfile";
+import AdminDashboard from "./components/dashboard/AdminDashboard";
+import Users from "./components/users/Users";
+import Settings from "./components/setting/Settings";
+import LoginPage from "./components/login/Login";
+import NotFound from "./components/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute ";
+import Layout from "./components/Layout";
+import { UserAuth } from "./Context/UserContext";
+import { Axios } from "./AxiosBuilder";
+
+const isTokenExpired = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return Date.now() > payload.exp * 1000;
+  } catch {
+    return true;
+  }
+};
 
 function App() {
-  const [activeTab, setActiveTab] = useState('devices');
-  // const location = useLocation();
-  // const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("");
+  const {setUser, user} = UserAuth();
 
-  // // Sync activeTab with the current route
-  // React.useEffect(() => {
-  //   const path = location.pathname.slice(1) || 'devices'; // Default to 'devices' if path is '/'
-  //   if (path !== 'profile') setActiveTab(path); // Do not override activeTab for profile page
-  // }, [location]);
+  
+  useEffect(() => {
+    const intervelId = setInterval(() => {
+      const currentToken = localStorage.getItem("token");
+      if(isTokenExpired(currentToken) || !currentToken ){
+        localStorage.removeItem("token");
+        setUser(null);
+      }else if(user === null){
+        fetchUserData();
+      }
+    }, 1000);
+    
+    const fetchUserData = async () => {
+      try {
+        const response = await Axios.get("/adminData", {
+          headers: {
+            Authorization: localStorage.getItem("token")
+          }
+        });
+        setUser(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
 
-  // // Update URL when activeTab changes (e.g., via Sidebar click)
-  // React.useEffect(() => {
-  //   if (activeTab !== 'profile') navigate(`/${activeTab}`);
-  // }, [activeTab, navigate]);
+    return () => {
+      clearInterval(intervelId);
+    };
+  }, [setUser, user])
 
   return (
     <Router>
-      <Header />
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       <Routes>
-        <Route path="/" element={<AdminDashboard/>} />
-        <Route path="/devices" element={<Devices />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/profile" element={<AdminProfile />} />
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+                <AdminDashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/devices"
+          element={
+            <ProtectedRoute>
+              <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+                <Devices />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+                <Users />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+                <AdminProfile />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/setting"
+          element={
+            <ProtectedRoute>
+              <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+                <Settings />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch all */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
-      <Footer />
     </Router>
   );
 }

@@ -1,10 +1,12 @@
 package com.Green_Tech.Green_Tech.Controller;
 
 import com.Green_Tech.Green_Tech.DTO.ControlSignalRequestDTO;
+import com.Green_Tech.Green_Tech.Entity.Admin;
 import com.Green_Tech.Green_Tech.Entity.SensorData;
 import com.Green_Tech.Green_Tech.Service.MQTT.MQTTService;
 import com.Green_Tech.Green_Tech.Service.SensorDataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -22,8 +24,8 @@ public class SensorDataController {
 
 
     @GetMapping(value = "/currentData/{id}")
-    public Map<String, Object> getSensorData(@PathVariable("id") Long id) {
-        return sensorDataService.getSensorData(id);
+    public ResponseEntity<Map<String, Object>> getSensorData(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(sensorDataService.getSensorData(id));
     }
 
 

@@ -1,8 +1,7 @@
-import React from 'react';
 
 const Footer = () => (
   <footer style={{
-    height: '40px',
+    height: '30px',
     backgroundColor: '#1b4332',
     color: 'white',
     display: 'flex',
@@ -11,7 +10,8 @@ const Footer = () => (
     position: "fixed",
     bottom: 0,
     right: 0,
-    left: 0
+    left: 0,
+    fontSize: "0.75rem"
   }}>
     &copy; 2025 Greenhouse Automation
   </footer>

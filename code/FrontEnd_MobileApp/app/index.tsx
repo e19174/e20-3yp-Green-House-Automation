@@ -1,7 +1,7 @@
 import { router, useFocusEffect } from "expo-router";
 import React from "react";
 import {StyleSheet, Text, View, Image, Alert } from "react-native";
-import { get } from "../Storage/secureStorage";
+import { get, remove } from "../Storage/secureStorage";
 import { themeAuth } from "../Contexts/ThemeContext";
 import * as SplashScreen from 'expo-splash-screen';
 import { ActivityIndicator } from "react-native";
@@ -33,7 +33,8 @@ const Page:React.FC = () => {
               router.replace("/Components/Home/Home");
               setUser(response.data);
             } catch (error: any) {
-                Alert.alert("Error", "Failed to fetch user data. Please try again.");
+                remove("token")
+                router.push("/Authentication/login");
             }
           }
           await SplashScreen.hideAsync();

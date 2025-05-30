@@ -1,59 +1,64 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import './sidebar.css';
+import logo from "../../../assets/logopng.png";
+import LoginPage from '../../login/Login';
+import { UserAuth } from '../../../Context/UserContext';
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const navigate = useNavigate();
+  const {setUser} = UserAuth();
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     navigate(`/${tab}`);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate('/login');
+  }
+
   return (
-    <div style={{
-      width: '220px',
-      background: 'linear-gradient(to bottom, #1b4332, #14532d)',
-      color: 'white',
-      padding: '20px',
-      height: 'calc(100vh - 100px)',
-      boxShadow: '2px 0 5px rgba(0, 0, 0, 0.3)',
-      position: 'fixed',
-      left: 0,
-      textAlign: 'center'
-    }}>
-      <div style={{ marginBottom: '30px', fontSize: '20px', fontWeight: 'bold' }}>
-        🌿 Admin Menu
+    <div className="sidebar">
+      <div className='sideBar-content'>
+        <div className="sidebar-title">
+          <img src={logo} alt="" className='sidebar-logo'/>
+        </div>
+        <div
+          className={`sidebar-item ${activeTab === '' ? 'active' : ''}`}
+          onClick={() => handleTabClick('')}
+        >
+          Dashboard
+        </div>
+        <div
+          className={`sidebar-item ${activeTab === 'devices' ? 'active' : ''}`}
+          onClick={() => handleTabClick('devices')}
+        >
+          Devices
+        </div>
+        <div
+          className={`sidebar-item ${activeTab === 'users' ? 'active' : ''}`}
+          onClick={() => handleTabClick('users')}
+        >
+          Users
+        </div>
+        <div
+          className={`sidebar-item ${activeTab === 'profile' ? 'active' : ''}`}
+          onClick={() => handleTabClick('profile')}
+        >
+          Profile
+        </div>
+        <div
+          className={`sidebar-item ${activeTab === 'setting' ? 'active' : ''}`}
+          onClick={() => handleTabClick('setting')}
+        >
+          Settings
+        </div>
       </div>
-      <div 
-        style={{ opacity: 0.8, marginBottom: '20px', cursor: 'pointer', fontWeight: activeTab === 'dashboard' ? 'bold' : 'normal' }}
-        onClick={() => handleTabClick('')}
-      >
-        Dashboard
-      </div>
-      <div 
-        style={{ opacity: 0.8, marginBottom: '20px', cursor: 'pointer', fontWeight: activeTab === 'devices' ? 'bold' : 'normal' }}
-        onClick={() => handleTabClick('devices')}
-      >
-        Devices
-      </div>
-      <div 
-        style={{ opacity: 0.8, marginBottom: '20px', cursor: 'pointer', fontWeight: activeTab === 'users' ? 'bold' : 'normal' }}
-        onClick={() => handleTabClick('users')}
-      >
-        Users
-      </div>
-      <div 
-        style={{ opacity: 0.8, marginBottom: '20px', cursor: 'pointer', fontWeight: activeTab === 'settings' ? 'bold' : 'normal' }}
-        onClick={() => handleTabClick('settings')}
-      >
-        Settings
-      </div>
-      <div 
-        style={{ opacity: 0.8, marginBottom: '20px', cursor: 'pointer', fontWeight: activeTab === 'profile' ? 'bold' : 'normal' }}
-        onClick={() => handleTabClick('profile')}
-      >
-        Profile
-      </div>
+
+      <button type='button' className='logout' onClick={handleLogout}>Logout</button>
     </div>
   );
 };
