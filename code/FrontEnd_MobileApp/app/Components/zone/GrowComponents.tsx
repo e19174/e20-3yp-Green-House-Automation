@@ -7,7 +7,7 @@ import { themeAuth } from '../../../Contexts/ThemeContext';
 interface GrowComponentsProps {
   isEnabled: boolean[];
   toggleStatus: (index: number) => void;
-  deviceId: number;
+  deviceId: number | undefined;
 }
 
 const GrowComponents: React.FC<GrowComponentsProps> = ({ isEnabled, toggleStatus, deviceId }) => {
@@ -15,7 +15,7 @@ const GrowComponents: React.FC<GrowComponentsProps> = ({ isEnabled, toggleStatus
 
   const sendControlSignal = async (index: number, status: boolean) => {
     try {
-      const response = await Axios.post("/sensors/controlsignal", {index, status, deviceId});
+      const response = await Axios.post("/sensors/controlSignal", {index, status, deviceId});
       toggleStatus(index); // Update UI state
     } catch (error) {
       console.error("Error:", error);

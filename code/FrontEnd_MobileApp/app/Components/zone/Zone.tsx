@@ -3,7 +3,8 @@ import { View, StyleSheet, ScrollView, RefreshControl, Alert, Text, FlatList, To
 import GrowComponents from './GrowComponents';
 import GrowData from './GrowData';
 import { themeAuth } from '../../../Contexts/ThemeContext';
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { Axios } from '../../AxiosRequestBuilder';
 
 type Device = {
   id: number;
@@ -25,6 +26,16 @@ interface User {
   authMethod?: string;
 }
 
+type SensorData = {
+  temperature: number;
+  humidity: number;
+  soilMoisture: number;
+  nitrogenLevel: number;
+  phosphorusLevel: number;
+  potassiumLevel: number;
+  actuatorStatus: boolean[];
+};
+
 const Zone: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [devices, setDevices] = useState<Device[]>([]);
@@ -33,6 +44,9 @@ const Zone: React.FC = () => {
   const [isEnabled, setIsEnabled] = useState<boolean[]>([false, false, false, false, false]);
   const { theme } = themeAuth();
   const [refreshing, setRefreshing] = useState(false);
+  const [sensorData, setSensorData] = useState<SensorData>();
+  const [error, setError] = useState<string | null>(null);
+  
   const onRefresh = () => {
     setRefreshing(true);
     setTimeout(() => {
@@ -58,6 +72,31 @@ const Zone: React.FC = () => {
       return newStates;
     });
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+      const fetchSensorData = async () => {
+        try {
+          const response = await Axios.get(`/sensors/currentData/${selectedDevice?.id}`);
+          setSensorData(response.data);
+          setIsEnabled(response.data.actuatorStatus || [false, false, false, false, false]);
+        } catch (error) {
+          console.error('Error fetching sensor data:', error);
+          setError('Failed to load data');
+        }
+      }
+      const intervalId = setInterval(() => {
+        if (!isActive) return;
+        fetchSensorData();
+      }, 1000);
+      
+      return () => {
+        clearInterval(intervalId);
+        isActive = false;
+      }
+    }, [selectedDevice?.id])
+  );
 
   return (
     <ScrollView contentContainerStyle={[styles.container, {backgroundColor: theme.colors.background}]}
@@ -99,7 +138,7 @@ const Zone: React.FC = () => {
 
       <View>
         <GrowComponents isEnabled={isEnabled} toggleStatus={toggleStatus} deviceId={selectedDevice?.id}/>
-        <GrowData deviceId={selectedDevice?.id} />
+        <GrowData deviceId={selectedDevice?.id} sensorData={sensorData} error={error}/>
       </View>
 
     </ScrollView>
