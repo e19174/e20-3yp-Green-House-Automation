@@ -66,6 +66,7 @@
                 <li><a href="#home" class="hover:text-green-500">Home</a></li>
                 <li><a href="#about" class="hover:text-green-500">About</a></li>
                 <li><a href="#SolutionArchitecture" class="hover:text-green-500">Solution Architecture</a></li>
+                <li><a href="#testing" class="hover:text-green-500">Testing</a></li>
                 <li><a href="#budget" class="hover:text-green-500">Budget</a></li>
                 <li><a href="#team" class="hover:text-green-500">Team</a></li>
             </ul>
@@ -87,6 +88,7 @@
             <li><a href="#home" class="hover:text-green-500">Home</a></li>
             <li><a href="#about" class="hover:text-green-500">About</a></li>
             <li><a href="#SolutionArchitecture" class="hover:text-green-500">Solution Architecture</a></li>
+            <li><a href="#testing" class="hover:text-green-500">Testing</a></li>
             <li><a href="#budget" class="hover:text-green-500">Budget</a></li>
             <li><a href="#team" class="hover:text-green-500">Team</a></li>
             <li>
@@ -155,6 +157,37 @@
               </div>
             </dl>
           </div>
+          <div class="mx-auto mt-16 max-w-4xl lg:mx-0 lg:max-w-none">
+            <div class="grid grid-cols-1 gap-x-8 gap-y-6 text-base/7 font-semibold text-white sm:grid-cols-2 md:flex lg:gap-x-10">
+              <p class="text-5xl md:text-6xl mb-12">Benefits</p>
+            </div>
+            <div class="grid grid-cols-1 gap-x-8 gap-y-6 text-base/7 font-semibold text-white sm:grid-cols-2 lg:grid-cols-3">
+              <div class="bg-white/10 rounded-lg p-6 shadow-md flex flex-col h-full">
+                <h3 class="text-2xl font-semibold text-white mb-2">Resource Efficiency</h3>
+                <p class="text-base text-gray-200">Automated control of irrigation and nutrients reduces water and fertilizer waste, optimizing resource usage and lowering operational costs.</p>
+              </div>
+              <div class="bg-white/10 rounded-lg p-6 shadow-md flex flex-col h-full">
+                <h3 class="text-2xl font-semibold text-white mb-2">Increased Productivity</h3>
+                <p class="text-base text-gray-200">Continuous monitoring and timely adjustments create optimal growing conditions, leading to healthier plants and higher yields.</p>
+              </div>
+              <div class="bg-white/10 rounded-lg p-6 shadow-md flex flex-col h-full">
+                <h3 class="text-2xl font-semibold text-white mb-2">Remote Accessibility</h3>
+                <p class="text-base text-gray-200">Monitor and control the greenhouse environment from anywhere using the mobile app, providing flexibility and peace of mind.</p>
+              </div>
+              <div class="bg-white/10 rounded-lg p-6 shadow-md flex flex-col h-full">
+                <h3 class="text-2xl font-semibold text-white mb-2">Reduced Labor</h3>
+                <p class="text-base text-gray-200">Automation minimizes manual intervention, allowing staff to focus on other important tasks and reducing labor requirements.</p>
+              </div>
+              <div class="bg-white/10 rounded-lg p-6 shadow-md flex flex-col h-full">
+                <h3 class="text-2xl font-semibold text-white mb-2">Data-Driven Decisions</h3>
+                <p class="text-base text-gray-200">Historical data and analytics enable informed decision-making for future crop cycles and system improvements.</p>
+              </div>
+              <div class="bg-white/10 rounded-lg p-6 shadow-md flex flex-col h-full">
+                <h3 class="text-2xl font-semibold text-white mb-2">Scalability</h3>
+                <p class="text-base text-gray-200">The modular design allows easy expansion to accommodate larger greenhouses or additional sensors and actuators.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -183,6 +216,51 @@
         <h2 class="text-4xl font-semibold tracking-tight sm:text-4xl mt-6 text-center">Control Flow</h2>
         <div class="mt-10 gap-8 sm:mt-16 flex justify-center mb-8">
           <img src="./images/data-flow-new.png" alt="control flow" class="max-w-4xl mx-auto w-full">
+        </div>
+      </div>
+    </div>
+
+    <!-- Testing -->
+    <div class="relative isolate overflow-hidden py-24 sm:py-16" id="testing">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <h2 class="text-4xl font-semibold tracking-tight sm:text-6xl text-center">Testing</h2>
+        <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2">
+          <!-- Software Testing -->
+          <div class="bg-white rounded-lg p-8 shadow-lg">
+            <h3 class="text-2xl font-semibold tracking-tight text-gray-900 mb-4">Software Testing Plan</h3>
+            <ul class="list-disc pl-6 text-gray-700 space-y-3">
+              <li>
+                <span class="font-semibold">Unit Testing:</span> Each software module (backend APIs, mobile app components) is tested individually to ensure correct functionality.
+              </li>
+              <li>
+                <span class="font-semibold">Integration Testing:</span> Interactions between modules (e.g., mobile app and backend, backend and database) are validated to ensure seamless data flow.
+              </li>
+              <li>
+                <span class="font-semibold">System Testing:</span> The complete software system is tested in an environment that simulates real-world usage, including user authentication, data visualization, and remote control features.
+              </li>
+              <li>
+                <span class="font-semibold">User Acceptance Testing (UAT):</span> End-users interact with the system to verify that requirements are met and the user experience is satisfactory.
+              </li>
+            </ul>
+          </div>
+          <!-- Hardware Testing -->
+          <div class="bg-white rounded-lg p-8 shadow-lg">
+            <h3 class="text-2xl font-semibold tracking-tight text-gray-900 mb-4">Hardware Testing Plan</h3>
+            <ul class="list-disc pl-6 text-gray-700 space-y-3">
+              <li>
+                <span class="font-semibold">Component Testing:</span> Each hardware component (sensors, actuators, ESP32, relays) is tested individually to confirm correct operation.
+              </li>
+              <li>
+                <span class="font-semibold">Integration Testing:</span> Sensors and actuators are connected to the microcontroller and tested for accurate data acquisition and response.
+              </li>
+              <li>
+                <span class="font-semibold">Environmental Testing:</span> The system is operated in real greenhouse conditions to ensure reliability under varying temperature, humidity, and soil conditions.
+              </li>
+              <li>
+                <span class="font-semibold">End-to-End Testing:</span> The complete hardware-software system is tested to verify that sensor data is correctly processed and appropriate actions (e.g., irrigation, nutrient supply) are triggered.
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
