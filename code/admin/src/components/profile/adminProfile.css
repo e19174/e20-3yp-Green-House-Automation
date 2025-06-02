@@ -8,26 +8,47 @@
 }
 
 .admin-profile-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-left: 20px;
   padding: 30px 20px;
   flex: 1;
   overflow-x: auto;
+  
 }
 
 .admin-profile-title {
   font-size: 22px;
   margin-bottom: 15px;
-  color: #1b4332;
+  color: #40916c;
 }
 
 .admin-profile-card {
-  background-color: #01694D;
+  background-color: #e6f0ea;
   padding: 20px;
   border-radius: 10px;
-  color: white;
+  color: #40916c;
   width: 500px;
   margin: auto;
   text-align: center;
+}
+
+.admin-profile-image {
+  width: 100px;
+  /* Adjust the width as needed */
+  height: 100px;
+  /* Adjust the height as needed */
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  overflow: hidden;
+}
+
+.admin-profile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Ensures the image covers the area without distortion */
 }
 
 .admin-profile-field {
@@ -44,10 +65,11 @@
 }
 
 .edit-profile-button {
-  background-color: #3498db;
+  background-color: hsl(136, 63%, 25%);
   color: #fff;
   border: none;
   padding: 8px 16px;
   border-radius: 5px;
   cursor: pointer;
+  margin-bottom: 30px;
 }

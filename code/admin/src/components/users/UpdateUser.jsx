@@ -1,32 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const AddUser = ({ isOpen, onClose, onSave }) => {
-  // Ensure the useState is not inside any conditional block
-  const [userDetails, setUserDetails] = useState({
-    name: '',
-    email: '',
-    phoneNumber: '',
-  });
+const UpdateUser = ({ isOpen, onClose, onSave, user, setUser }) => {
 
-  // Don't return early before hooks, always call them first
-  if (!isOpen) return null; // The modal won't open unless isOpen is true
+  if (!isOpen) return null;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserDetails((prevState) => ({
+    setUser((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
 
   const handleSave = () => {
-    onSave(userDetails);
-    onClose(); // Close the modal after saving
+      setUser(user);
+      onClose();
   };
 
   return (
     <>
-      {/* Modal backdrop */}
       <div
         onClick={onClose}
         style={{
@@ -40,7 +32,6 @@ const AddUser = ({ isOpen, onClose, onSave }) => {
         }}
       ></div>
 
-      {/* Modal content */}
       <div
         style={{
           position: 'fixed',
@@ -48,7 +39,7 @@ const AddUser = ({ isOpen, onClose, onSave }) => {
           left: '50%',
           transform: 'translate(-50%, -50%)',
           backgroundColor: '#e6f0ea',
-          color: 'white',
+          color: '#40916c',
           padding: '40px',
           borderRadius: '25px',
           zIndex: 1001,
@@ -56,45 +47,30 @@ const AddUser = ({ isOpen, onClose, onSave }) => {
           maxWidth: '90%',
         }}
       >
-        <h2 style={{ marginBottom: '15px', textAlign:'center', color: '#40916c' }}>Add User</h2>
+        <h2 style={{ marginBottom: '15px', textAlign:'center' }}>Update User</h2>
 
-        {/* Name input */}
-        <div style={{ marginBottom: '15px', color: '#40916c' }}>
+        <div style={{ marginBottom: '15px' }}>
           <strong>Name:</strong>
           <input
             type="text"
             name="name"
-            value={userDetails.name}
+            value={user?.name}
             onChange={handleChange}
             style={{ marginLeft: '2px', padding: '5px', width: '95%' }}
           />
         </div>
 
-        {/* Email input */}
-        <div style={{ marginBottom: '15px', color: '#40916c' }}>
-          <strong>Email:</strong>
-          <input
-            type="email"
-            name="email"
-            value={userDetails.email}
-            onChange={handleChange}
-            style={{ marginLeft: '2px', padding: '5px', width: '95%' }}
-          />
-        </div>
-
-        {/* Phone number input */}
-        <div style={{ marginBottom: '15px', color: '#40916c' }}>
+        <div style={{ marginBottom: '15px' }}>
           <strong>Contact No:</strong>
           <input
             type="text"
             name="phoneNumber"
-            value={userDetails.phoneNumber}
+            value={user?.phoneNumber}
             onChange={handleChange}
             style={{ marginLeft: '2px', padding: '5px', width: '95%' }}
           />
         </div>
 
-        {/* Buttons */}
         <div style={{ textAlign: 'center' }}>
           <button
             onClick={handleSave}
@@ -129,4 +105,4 @@ const AddUser = ({ isOpen, onClose, onSave }) => {
   );
 };
 
-export default AddUser;
+export default UpdateUser;
