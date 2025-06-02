@@ -24,7 +24,7 @@ public class User implements UserDetails {
     private String email;
     @Column(nullable = true)
     private String password;
-    private Long phoneNumber;
+    private Integer phoneNumber;
     private Role role;
     private Date createdAt;
     private Date updatedAt;

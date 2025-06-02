@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="45b3c140-692a-4af0-9232-ffa87b02cf65" name="Changes" comment="" />
+    <list default="true" id="45b3c140-692a-4af0-9232-ffa87b02cf65" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/code/admin/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/code/admin/package-lock.json" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -40,8 +42,8 @@
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "del",
-    "last_opened_file_path": "C:/Users/USER/OneDrive - University of Peradeniya/Desktop/e20-3yp-Green-House-Automation/code/BackEnd_MobileApp",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/USER/OneDrive - University of Peradeniya/Desktop/e20-3yp-Green-House-Automation/code/BackEnd_MobileApp/Green_Tech",
     "settings.editor.selected.configurable": "project.propCompiler"
   }
 }]]></component>

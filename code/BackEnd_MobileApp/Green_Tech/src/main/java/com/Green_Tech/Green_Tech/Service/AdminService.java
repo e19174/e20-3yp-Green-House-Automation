@@ -130,7 +130,7 @@ public class AdminService {
         User user = User.builder()
                 .name( (String) userData.get("name"))
                 .email( (String) userData.get("email"))
-                .phoneNumber((Long) userData.get("phoneNumber"))
+                .phoneNumber((Integer) userData.get("phoneNumber"))
                 .authMethod(AuthMethod.EMAIL_PASSWORD)
                 .role(Role.USER)
                 .createdAt(new Date())
@@ -148,7 +148,7 @@ public class AdminService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with "+ (String) userData.get("email")));
 
         user.setName((String) userData.get("name"));
-        user.setPhoneNumber((Long) userData.get("phoneNumber"));
+        user.setPhoneNumber((Integer) userData.get("phoneNumber"));
         user.setUpdatedAt(new Date());
         userRepo.save(user);
 
@@ -191,7 +191,7 @@ public class AdminService {
         Admin admin = extractUserService.extractAdminFromJwt(auth);
 
         admin.setName((String) adminData.get("name"));
-        admin.setPhoneNumber((Long) adminData.get("phoneNumber"));
+        admin.setPhoneNumber((Integer) adminData.get("phoneNumber"));
         admin.setImageName(image != null ? image.getName() : null);
         admin.setImageType(image != null ? image.getContentType() : null);
         admin.setImageData(image != null ? image.getBytes(): null);

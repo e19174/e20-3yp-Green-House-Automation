@@ -6,6 +6,7 @@
 #include <ArduinoJson.h>
 #include <WiFiClient.h>
 #include "SPIFFS.h"
+#include <EEPROM.h>
 
 extern WebServer server;
 extern String ssid;
@@ -212,10 +213,10 @@ void loadCredentials() {
   endpointString = readFileAsString(SPIFFS, "/endpoint.txt");
   
   // Point const char* to String c_str() - these remain valid as long as String objects exist
-  AWS_CERT_CRT = certString.length() > 0 ? certString.c_str() : nullptr;
-  AWS_CERT_PRIVATE = privateKeyString.length() > 0 ? privateKeyString.c_str() : nullptr;
-  THINGNAME = thingNameString.length() > 0 ? thingNameString.c_str() : nullptr;
-  AWS_IOT_ENDPOINT = endpointString.length() > 0 ? endpointString.c_str() : nullptr;
+  const char *AWS_CRT = certString.length() > 0 ? certString.c_str() : nullptr;
+  const char *AWS_PRIVATE = privateKeyString.length() > 0 ? privateKeyString.c_str() : nullptr;
+  const char *THINGNAME = thingNameString.length() > 0 ? thingNameString.c_str() : nullptr;
+  const char *AWS_ENDPOINT = endpointString.length() > 0 ? endpointString.c_str() : nullptr;
 }
 
 bool sendRegistrationToBackend() {
@@ -267,11 +268,11 @@ bool sendRegistrationToBackend() {
       deviceId = respDoc["deviceId"]["id"];
       
       // Point const char* to the String objects
-      AWS_CERT_CRT = certString.c_str();
-      AWS_CERT_PRIVATE = privateKeyString.c_str();
-      AWS_IOT_ENDPOINT = endpointString.c_str();
-      THINGNAME = thingNameString.c_str();
-      
+      const char *AWS_CERT_CRT = certString.c_str();
+      const char *AWS_CERT_PRIVATE = privateKeyString.c_str();
+      const char *AWS_IOT_ENDPOINT = endpointString.c_str();
+      const char *THINGNAME = thingNameString.c_str();
+
       Serial.println("Device ID: " + String(deviceId));
       Serial.println("Thing Name: " + String(THINGNAME));
       Serial.println("Endpoint: " + String(AWS_IOT_ENDPOINT));

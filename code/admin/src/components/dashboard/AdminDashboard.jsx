@@ -3,8 +3,8 @@ import './adminDashboard.css';
 
 const AdminDashboard = () => {
   // Example static data, replace with dynamic data if needed
-  const userCount = 120;
-  const deviceCount = 45;
+  const userCount = 10;
+  const deviceCount = 12;
 
   return (
     <div className="admin-dashboard-container">

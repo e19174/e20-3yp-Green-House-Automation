@@ -28,7 +28,7 @@ int deviceId = -1;
 bool registered = false;
 const char* AWS_CERT_CRT = nullptr;
 const char* AWS_CERT_PRIVATE = nullptr;
-const char* THINGNAME = nullptr;
+const char* THINGNAME = nullptr; 
 const char* AWS_IOT_ENDPOINT = nullptr;
 int commandIndex = -1; // Index of the command to be executed
 bool status;
