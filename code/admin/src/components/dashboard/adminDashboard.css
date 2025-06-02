@@ -15,12 +15,42 @@
 }
 
 .admin-dashboard-title {
-  font-size: 22px;
-  margin-bottom: 15px;
+  font-size: 32px;
+  margin-bottom: 25px;
   color: #1b4332;
+
 }
 
-.admin-dashboard-description {
-  font-size: 16px;
-  color: #333;
+/* Container to hold cards side by side */
+.dashboard-cards-container {
+  display: flex;
+  gap: 30px;
+}
+
+/* Card styles */
+.dashboard-card {
+  flex: 1;
+  /* equal width for both cards */
+  background-color: #e6f0ea;
+  /* padding: 25px 20px; */
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgb(27 67 50 / 0.2);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 200px;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 650;
+  color: #1b4332;
+  /* margin-bottom: 10px; */
+}
+
+.card-count {
+  font-size: 96px;
+  font-weight: 700;
+  color: #40916c;
 }

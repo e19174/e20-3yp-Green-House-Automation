@@ -1,0 +1,81 @@
+/* Modal background */
+.edit-profile-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Edit profile card */
+.edit-profile-card {
+    background-color: #e6f0ea;
+    color: #40916c;
+    width: 400px;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* Header section with image */
+.edit-profile-header {
+    margin-bottom: 20px;
+}
+
+.edit-profile-image-container {
+    position: relative;
+    margin-bottom: 15px;
+    cursor: pointer;
+    /* Change cursor to pointer on image click */
+}
+
+.edit-profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+}
+
+.edit-profile-field {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.edit-profile-field label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.edit-profile-field input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Action buttons */
+.edit-profile-actions {
+    margin-top: 20px;
+}
+
+.edit-profile-actions button {
+    background-color: hsl(136, 63%, 25%);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+.edit-profile-actions button:hover {
+    background-color: hsl(137, 25%, 40%);
+}
