@@ -1,27 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
-const UpdateUser = ({ isOpen, onClose, onSave, user, setUser }) => {
-
+const UpdateDevice = ({ isOpen, onClose, onSave, device, setDevice }) => {
   if (!isOpen) return null;
 
   const handleChange = (e) => {
-    e.preventDefault();
     const { name, value } = e.target;
-    let phoneNumber = null;
-    if (name === "phoneNumber") {
-      phoneNumber = Number(value);
-      setUser((prevState) => ({
-        ...prevState,
-        [name]: phoneNumber,
-      }));
-    } else {
-      setUser((prevState) => ({
-        ...prevState,
-        [name]: value,
-      }));
-    }
+    setDevice((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
-
 
   return (
     <>
@@ -53,26 +41,37 @@ const UpdateUser = ({ isOpen, onClose, onSave, user, setUser }) => {
           maxWidth: '90%',
         }}
       >
-        <h2 style={{ marginBottom: '15px', textAlign:'center' }}>Update User</h2>
+        <h2 style={{ marginBottom: '15px', textAlign: 'center' }}>Update Device</h2>
 
         <div style={{ marginBottom: '15px' }}>
           <strong>Name:</strong>
           <input
             type="text"
             name="name"
-            value={user?.name}
-            onChange={(e) => handleChange(e)}
+            value={device?.name || ''}
+            onChange={handleChange}
+            style={{ marginLeft: '2px', padding: '8px 5px', width: '95%', borderRadius: '5px', border: '1px solid #aaa' }}
+          />
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <strong>Location:</strong>
+          <input
+            type="text"
+            name="location"
+            value={device?.location || ''}
+            onChange={handleChange}
             style={{ marginLeft: '2px',  padding: '8px 5px', width: '95%', borderRadius: '5px', border: '1px solid #aaa' }}
           />
         </div>
 
         <div style={{ marginBottom: '15px' }}>
-          <strong>Contact No:</strong>
+          <strong>Zone:</strong>
           <input
-            type="number"
-            name="phoneNumber"
-            value={user?.phoneNumber}
-            onChange={(e) => handleChange(e)}
+            type="text"
+            name="zoneName"
+            value={device?.zoneName || ''}
+            onChange={handleChange}
             style={{ marginLeft: '2px',  padding: '8px 5px', width: '95%', borderRadius: '5px', border: '1px solid #aaa' }}
           />
         </div>
@@ -111,4 +110,4 @@ const UpdateUser = ({ isOpen, onClose, onSave, user, setUser }) => {
   );
 };
 
-export default UpdateUser;
+export default UpdateDevice;
