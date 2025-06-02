@@ -6,7 +6,9 @@ import com.Green_Tech.Green_Tech.Repository.AwsIotCredentialsRepo;
 import com.Green_Tech.Green_Tech.Repository.DeviceRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import software.amazon.awssdk.services.iot.IotClient;
 import software.amazon.awssdk.services.iot.model.*;
 
@@ -15,71 +17,100 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class AwsIotProvisioningServiceTest {
+public class AwsIotProvisioningServiceTest {
 
-    @InjectMocks
-    private AwsIotProvisioningService awsIotProvisioningService;
+   @Mock
+   private DeviceRepo deviceRepo;
 
-    @Mock
-    private DeviceRepo deviceRepo;
+   @Mock
+   private AwsIotCredentialsRepo awsIotCredentialsRepo;
 
-    @Mock
-    private AwsIotCredentialsRepo awsIotCredentialsRepo;
+   @Mock
+   private IotClient iotClient;
 
-    @Mock
-    private IotClient iotClient;
+   @InjectMocks
+   private AwsIotProvisioningService awsIotProvisioningService;
 
-    @Captor
-    ArgumentCaptor<AwsIotCredentials> credentialsCaptor;
+   @BeforeEach
+   public void setUp() {
+       MockitoAnnotations.openMocks(this);
+       awsIotProvisioningService.setIotClient(iotClient); // inject mock
+   }
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+   @Test
+   public void testCreateThing_DeviceFoundAndThingAlreadyExists_ReturnsExistingCredentials() {
+       String mac = "AA:BB:CC:DD:EE:FF";
+       Device device = new Device();
+       device.setId(1L);
 
-        // Manually inject the mock iotClient (normally injected after @PostConstruct)
-        awsIotProvisioningService = new AwsIotProvisioningService();
-        awsIotProvisioningService.deviceRepo = deviceRepo;
-        awsIotProvisioningService.awsIotCredentialsRepo = awsIotCredentialsRepo;
-        awsIotProvisioningService.iotClient = iotClient;
-        awsIotProvisioningService.endpoint = "mock-endpoint.iot.region.amazonaws.com";
-    }
+       AwsIotCredentials creds = AwsIotCredentials.builder()
+               .thingName("esp32-1")
+               .certificatePem("dummy-cert")
+               .privateKey("private-key")
+               .publicKey("public-key")
+               .endpoint("endpoint-url")
+               .device(device)
+               .createdAt(new Date())
+               .build();
 
-    @Test
-    void testCreateThing_successfulProvisioning() {//AAA
-        // Arrange
-        String mac = "AA:BB:CC:DD:EE";
-        Device mockDevice = Device.builder().id(123L).mac(mac).build();
+       when(deviceRepo.findByMac(mac)).thenReturn(device);
+       when(iotClient.describeThing(any(DescribeThingRequest.class)))
+               .thenReturn(DescribeThingResponse.builder().thingName("esp32-1").build());
+       when(awsIotCredentialsRepo.findByDeviceId(device.getId())).thenReturn(creds);
 
-        when(deviceRepo.findByMac(mac)).thenReturn(mockDevice);
+       AwsIotCredentials result = awsIotProvisioningService.createThing(mac);
+       assertNotNull(result);
+       assertEquals("esp32-1", result.getThingName());
+       verify(iotClient).describeThing(any());
+   }
 
-        CreateKeysAndCertificateResponse certResponse = CreateKeysAndCertificateResponse.builder()
-                .certificateArn("arn:aws:iot:cert123")
-                .certificatePem("cert-pem")
-                .keyPair(KeyPair.builder()
-                        .privateKey("private-key")
-                        .publicKey("public-key")
-                        .build())
-                .build();
+   @Test
+   public void testCreateThing_DeviceFound_ThingDoesNotExist_CreatesNewThingAndCert() {
+       String mac = "11:22:33:44:55:66";
+       Device device = new Device();
+       device.setId(2L);
 
-        when(iotClient.createThing(any(CreateThingRequest.class))).thenReturn(CreateThingResponse.builder().build());
-        when(iotClient.createKeysAndCertificate(any(CreateKeysAndCertificateRequest.class))).thenReturn(certResponse);
-        when(awsIotCredentialsRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+       when(deviceRepo.findByMac(mac)).thenReturn(device);
+       when(iotClient.describeThing(any())).thenThrow(ResourceNotFoundException.builder().message("Not found").build());
+       when(iotClient.createThing(any())).thenReturn(CreateThingResponse.builder().thingName("esp32-2").build());
 
-        // Act
-        AwsIotCredentials result = awsIotProvisioningService.createThing(mac);
+       CreateKeysAndCertificateResponse certResponse = CreateKeysAndCertificateResponse.builder()
+               .certificateArn("arn:aws:iot:cert")
+               .certificatePem("cert-pem")
+               .keyPair(KeyPair.builder().privateKey("priv-key").publicKey("pub-key").build())
+               .build();
 
-        // Assert
-        assertNotNull(result);
-        assertEquals("esp32-" + mockDevice.getId(), result.getThingName());
-        assertEquals("cert-pem", result.getCertificatePem());
-        assertEquals("private-key", result.getPrivateKey());
-        assertEquals("mock-endpoint.iot.region.amazonaws.com", result.getEndpoint());
+       when(iotClient.createKeysAndCertificate(any())).thenReturn(certResponse);
+       when(awsIotCredentialsRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        verify(iotClient).attachPolicy(any(AttachPolicyRequest.class));
-        verify(iotClient).attachThingPrincipal(any(AttachThingPrincipalRequest.class));
-        verify(awsIotCredentialsRepo).save(credentialsCaptor.capture());
+       AwsIotCredentials result = awsIotProvisioningService.createThing(mac);
 
-        AwsIotCredentials savedCreds = credentialsCaptor.getValue();
-        assertEquals(mockDevice, savedCreds.getDevice());
-    }
+       assertNotNull(result);
+       assertEquals("esp32-2", result.getThingName());
+       verify(iotClient).createThing(any());
+       verify(iotClient).attachPolicy(any());
+       verify(iotClient).attachThingPrincipal(any());
+   }
+
+   @Test
+   public void testCreateThing_DeviceNotFound_ThrowsException() {
+       when(deviceRepo.findByMac("invalid-mac")).thenReturn(null);
+       assertThrows(NullPointerException.class, () -> {
+           awsIotProvisioningService.createThing("invalid-mac");
+       });
+   }
+
+   @Test
+   public void testCreateThing_CertCreationFails_ThrowsRuntimeException() {
+       String mac = "99:88:77:66:55:44";
+       Device device = new Device();
+       device.setId(3L);
+
+       when(deviceRepo.findByMac(mac)).thenReturn(device);
+       when(iotClient.describeThing(any())).thenThrow(ResourceNotFoundException.builder().build());
+       when(iotClient.createThing(any())).thenReturn(CreateThingResponse.builder().thingName("esp32-3").build());
+       when(iotClient.createKeysAndCertificate(any())).thenThrow(InternalFailureException.builder().message("Fail").build());
+
+       assertThrows(RuntimeException.class, () -> awsIotProvisioningService.createThing(mac));
+   }
 }
