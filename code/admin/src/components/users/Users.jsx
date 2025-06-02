@@ -18,8 +18,13 @@ const Users = ({ activeTab }) => {
     setIsAddUserModalOpen(false);
   };
 
-  const handleSaveUser = (userDetails) => {
-    setUsers((prevUsers) => [...prevUsers, userDetails]);
+  const handleSaveUser = async (userDetails) => {
+    try {
+      const response = await Axios.post(`/addUser`, userDetails)
+      setUsers(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleEditClick = (user) => {
@@ -32,9 +37,9 @@ const Users = ({ activeTab }) => {
     setSelectedUser(null);
   };
 
-  const handleUpdateUser = (selectedUser) => {
+  const handleUpdateUser = async () => {
     try {
-      const response = Axios.put(`/updateUser`, {selectedUser})
+      const response = await Axios.put(`/updateUser`, selectedUser)
       setUsers(response.data);
     } catch (error) {
       console.log(error);
@@ -43,28 +48,14 @@ const Users = ({ activeTab }) => {
   };
 
 
-  const handleDeleteClick = (user) => {
-    setSelectedUser(user);
-    setIsUpdateUserModalOpen(true);
-  };
-
-  const handleCloseDeleteUserModal = () => {
-    setIsUpdateUserModalOpen(false);
-    setSelectedUser(null);
-  };
-
-  const handleDeleteUser = (id) => {
+  const handleDeleteClick = async (id) => {
     try {
-      const response = Axios.delete(`/deleteUser/${id}`)
+      const response = await Axios.delete(`/deleteUser/${id}`);
       setUsers(response.data);
     } catch (error) {
       console.log(error);
     }
-    handleCloseUpdateUserModal();
   };
-
-
-
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -103,7 +94,7 @@ const Users = ({ activeTab }) => {
             </tr>
           </thead>
           <tbody>
-            {users.map(user => (
+            {users?.map(user => (
               <tr key={user.id}>
                 <td>{user?.id}</td>
                 <td>{user?.name}</td>
@@ -130,7 +121,7 @@ const Users = ({ activeTab }) => {
       <UpdateUser
         isOpen={isUpdateUserModalOpen}
         onClose={handleCloseUpdateUserModal}
-        onSave={() => handleUpdateUser(selectedUser)}
+        onSave={handleUpdateUser}
         user={selectedUser} // Pass user data to UpdateUser
         setUser={setSelectedUser}
       />

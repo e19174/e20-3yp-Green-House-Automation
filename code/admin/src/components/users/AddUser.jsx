@@ -5,7 +5,7 @@ const AddUser = ({ isOpen, onClose, onSave }) => {
   const [userDetails, setUserDetails] = useState({
     name: '',
     email: '',
-    phoneNumber: '',
+    phoneNumber: 0,
   });
 
   // Don't return early before hooks, always call them first
@@ -13,10 +13,19 @@ const AddUser = ({ isOpen, onClose, onSave }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserDetails((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    let phoneNumber = null;
+    if (name === "phoneNumber") {
+      phoneNumber = Number(value);
+      setUserDetails((prevState) => ({
+        ...prevState,
+        [name]: phoneNumber,
+      }));
+    } else {
+      setUserDetails((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSave = () => {
