@@ -88,7 +88,7 @@ void setup() {
   pinMode(MOISTURE_SENSOR_PIN_1, INPUT);
   pinMode(MOISTURE_SENSOR_PIN_2, INPUT);
   pinMode(MOISTURE_SENSOR_PIN_3, INPUT);
-  // pinMode(MOISTURE_SENSOR_PIN_4, INPUT);
+  pinMode(MOISTURE_SENSOR_PIN_4, INPUT);
 
   digitalWrite(FAN_PIN, HIGH);
   digitalWrite(NUTRIENT_N, HIGH);
@@ -112,18 +112,18 @@ void loop() {
   h = dht.readHumidity();
   t = dht.readTemperature();
 
-  if (isnan(h) || isnan(t)) // Check if any reads failed and exit early (to try again).
-  {
-    Serial.println(F("Failed to read from DHT sensor!"));
-    return;
-    }
+  // if (isnan(h) || isnan(t)) // Check if any reads failed and exit early (to try again).
+  // {
+  //   Serial.println(F("Failed to read from DHT sensor!"));
+  //   return;
+  //   }
 
     int moisture_1 = analogRead(MOISTURE_SENSOR_PIN_1);
     int moisture_2 = analogRead(MOISTURE_SENSOR_PIN_2);
     int moisture_3 = analogRead(MOISTURE_SENSOR_PIN_3);
-    // int moisture_4 = analogRead(MOISTURE_SENSOR_PIN_4);
+    int moisture_4 = analogRead(MOISTURE_SENSOR_PIN_4);
 
-    int average_moisture = (moisture_1 + moisture_2 + moisture_3) / 3;
+    int average_moisture = (moisture_1 + moisture_2 + moisture_3 + moisture_4) / 4;
 
     // Serial.print(F("Humidity: "));
     // Serial.print(h);

@@ -88,7 +88,13 @@ public class MQTTService {
             MqttClientConnection connection = builder.build();
             builder.close();
 
-            connection.connect().get();
+            try{
+                connection.connect().get();
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
             System.out.println("✅ Connected to AWS IoT: " + deviceId);
 
             connectionStatus.put(deviceId, true);
