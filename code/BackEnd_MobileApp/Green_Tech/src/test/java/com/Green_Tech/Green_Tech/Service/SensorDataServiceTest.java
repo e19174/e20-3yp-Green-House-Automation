@@ -5,22 +5,22 @@ import com.Green_Tech.Green_Tech.Entity.Device;
 import com.Green_Tech.Green_Tech.Entity.SensorData;
 import com.Green_Tech.Green_Tech.Repository.DeviceRepo;
 import com.Green_Tech.Green_Tech.Repository.SensorDataRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Date;
-import java.util.HashMap;
-
 @ExtendWith(MockitoExtension.class)
-public class SensorDataServiceTest {
+class SensorDataServiceTest {
+
+    @InjectMocks
+    private SensorDataService sensorDataService;
 
     @Mock
     private SensorDataRepository sensorDataRepository;
@@ -28,77 +28,111 @@ public class SensorDataServiceTest {
     @Mock
     private DeviceRepo deviceRepo;
 
-    @InjectMocks
-    private SensorDataService sensorDataService;
-
-    private byte[] validJsonBytes;
-
-    @BeforeEach
-    void setUp() {
-        // JSON must match expected AWS format (including MAC)
-        String json = """
-            {
-                "mac": "AA:BB:CC:DD:EE:FF",
-                "temperature": 25.5,
-                "humidity": 60.0,
-                "moisture": 45.0
-            }
-        """;
-        validJsonBytes = json.getBytes();
-    }
-
     @Test
-    void testConvertByteArrayToHashMap_withValidJson() {
-        HashMap result = sensorDataService.convertByteArrayToHashMap(validJsonBytes);
-
-        assertNotNull(result);
-        assertEquals(25.5, (Double) result.get("temperature"));
-        assertEquals(60.0, (Double) result.get("humidity"));
-        assertEquals(45.0, (Double) result.get("moisture"));
-        assertEquals("AA:BB:CC:DD:EE:FF", result.get("mac"));
-    }
-
-    @Test
-    void testConvertByteArrayToHashMap_withInvalidJson() {
-        byte[] badJson = "invalid".getBytes();
-        HashMap result = sensorDataService.convertByteArrayToHashMap(badJson);
-        assertNull(result); // Should return null on failure
-    }
-
-    @Test
-    void testGetDataFromAWS_withValidData() throws DeviceNotFoundException {
-        // Mocking device
-        Device mockDevice = new Device();
-        mockDevice.setMac("AA:BB:CC:DD:EE:FF");
-
-        when(deviceRepo.findByMac("AA:BB:CC:DD:EE:FF")).thenReturn(mockDevice);
-
-        // Act
-        sensorDataService.getDataFromAWS(validJsonBytes);
-
-        // Assert
-        verify(sensorDataRepository, times(1)).save(any(SensorData.class));
-    }
-
-    @Test
-    void testGetSensorData_callsRepository() {
-        Long id = 1L;
-        SensorData mockSensorData = SensorData.builder()
+    void testGetSensorData_validId_returnsSensorMap() {
+        SensorData data = SensorData.builder()
                 .temperature(25.5)
                 .humidity(60.0)
-                .soilMoisture(45.0)
-                .nitrogenLevel(0.001)
-                .phosphorusLevel(0.001)
-                .potassiumLevel(0.001)
-                .updatedAt(new Date())
+                .soilMoisture(40.0)
+                .nitrogenLevel(15.0)
+                .phosphorusLevel(10.0)
+                .potassiumLevel(20.0)
+                .actuatorStatus(new boolean[]{true, false})
                 .build();
 
-        when(sensorDataRepository.findFirstByIdOrderByIdDesc(id)).thenReturn(mockSensorData);
+        when(sensorDataRepository.findFirstByDeviceIdOrderByIdDesc(1L)).thenReturn(data);
 
-        SensorData result = sensorDataService.getSensorData(id);
+        Map<String, Object> result = sensorDataService.getSensorData(1L);
 
-        assertNotNull(result);
-        assertEquals(25.5, result.getTemperature());
-        verify(sensorDataRepository, times(1)).findFirstByIdOrderByIdDesc(id);
+        assertEquals(25.5, result.get("temperature"));
+        assertEquals(60.0, result.get("humidity"));
+        assertEquals(40.0, result.get("soilMoisture"));
+        assertEquals(15.0, result.get("nitrogenLevel"));
+        assertEquals(10.0, result.get("phosphorusLevel"));
+        assertEquals(20.0, result.get("potassiumLevel"));
+        assertArrayEquals(new boolean[]{true, false}, (boolean[]) result.get("actuatorStatus"));
+    }
+
+    @Test
+    void testGetSensorData_noData_throwsNullPointer() {
+        when(sensorDataRepository.findFirstByDeviceIdOrderByIdDesc(1L)).thenReturn(null);
+        assertThrows(NullPointerException.class, () -> sensorDataService.getSensorData(1L));
+    }
+
+    @Test
+    void testConvertByteArrayToHashMap_validJson_returnsMap() {
+        String json = "{\"mac\":\"AA:BB:CC\",\"temperature\":24}";
+        byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+
+        HashMap result = sensorDataService.convertByteArrayToHashMap(bytes);
+
+        assertEquals("AA:BB:CC", result.get("mac"));
+        assertEquals(24, result.get("temperature"));
+    }
+
+    @Test
+    void testConvertByteArrayToHashMap_invalidJson_returnsNull() {
+        byte[] invalid = "{invalidJson}".getBytes(StandardCharsets.UTF_8);
+        HashMap result = sensorDataService.convertByteArrayToHashMap(invalid);
+        assertNull(result);
+    }
+
+    @Test
+    void testGetDataFromAWS_validInput_savesSensorData() throws DeviceNotFoundException {
+        String json = """
+        {
+            "mac": "AA:BB:CC",
+            "temperature": 25,
+            "humidity": 65,
+            "moisture": 32,
+            "nitrogenLevel": 15,
+            "phosphorusLevel": 10,
+            "potassiumLevel": 20,
+            "actuatorState": [true, false]
+        }
+        """;
+
+        byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+        Device device = new Device();
+
+        when(deviceRepo.findByMac("AA:BB:CC")).thenReturn(device);
+
+        sensorDataService.getDataFromAWS(bytes);
+
+        ArgumentCaptor<SensorData> captor = ArgumentCaptor.forClass(SensorData.class);
+        verify(sensorDataRepository, times(1)).save(captor.capture());
+
+        SensorData saved = captor.getValue();
+        assertEquals(25.0, saved.getTemperature());
+        assertEquals(65.0, saved.getHumidity());
+        assertEquals(30.0, saved.getSoilMoisture());
+        assertEquals(15.0, saved.getNitrogenLevel());
+        assertEquals(10.0, saved.getPhosphorusLevel());
+        assertEquals(20.0, saved.getPotassiumLevel());
+        assertArrayEquals(new boolean[]{true, false}, saved.getActuatorStatus());
+        assertNotNull(saved.getUpdatedAt());
+        assertEquals(device, saved.getDevice());
+    }
+
+    @Test
+    void testGetDataFromAWS_deviceNotFound_throwsNullPointer() {
+        String json = """
+        {
+            "mac": "NOT_EXIST",
+            "temperature": 25,
+            "humidity": 65,
+            "moisture": 30,
+            "nitrogenLevel": 15,
+            "phosphorusLevel": 10,
+            "potassiumLevel": 20,
+            "actuatorState": [true, false]
+        }
+        """;
+
+        byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+        when(deviceRepo.findByMac("NOT_EXIST")).thenReturn(null);
+
+        // Will throw NullPointer because device is null and used in builder
+        assertThrows(NullPointerException.class, () -> sensorDataService.getDataFromAWS(bytes));
     }
 }
