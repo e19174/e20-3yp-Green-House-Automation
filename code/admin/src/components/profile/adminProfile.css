@@ -53,15 +53,22 @@
 
 .admin-profile-field {
   margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .field-label {
   font-size: 16px;
   font-weight: bold;
+  width: 40%;
+  text-align: right;
 }
 
 .field-value {
   margin-left: 10px;
+  width: 50%;
+  text-align: left;
 }
 
 .edit-profile-button {

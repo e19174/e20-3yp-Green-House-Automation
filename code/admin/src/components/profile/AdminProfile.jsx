@@ -28,16 +28,16 @@ const AdminProfile = () => {
             Edit Profile
           </button>
           <div className="admin-profile-field">
-            <span className="field-label">Name</span>
-            <span className="field-value">: {user?.name}</span>
+            <div className="field-label">Name</div>
+            <div className="field-value">: {user?.name}</div>
           </div>
           <div className="admin-profile-field">
-            <span className="field-label">Email</span>
-            <span className="field-value">: {user?.email}</span>
+            <div className="field-label">Email</div>
+            <div className="field-value">: {user?.email}</div>
           </div>
           <div className="admin-profile-field">
-            <span className="field-label">Contact No</span>
-            <span className="field-value">: {user?.phoneNumber}</span>
+            <div className="field-label">Contact No</div>
+            <div className="field-value">: {user?.phoneNumber}</div>
           </div>
 
           
