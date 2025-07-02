@@ -4,6 +4,7 @@ import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
 import com.Green_Tech.Green_Tech.Entity.Admin;
 import com.Green_Tech.Green_Tech.Entity.Device;
+import com.Green_Tech.Green_Tech.Entity.Plant;
 import com.Green_Tech.Green_Tech.Entity.User;
 import com.Green_Tech.Green_Tech.Service.AdminService;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -87,4 +88,31 @@ public class AdminController {
         return ResponseEntity.ok(adminService.deleteDevice(auth, id));
     }
 
+
+    // plants //
+
+//    @PostMapping("admin/addPlant")
+//    public ResponseEntity<List<Plant>> addNewPlant(@RequestHeader("Authorization") String auth,
+//                                                   @RequestBody Plant plantData) throws UserNotFoundException {
+//        return ResponseEntity.ok(adminService.addNewPlant(auth, plantData));
+//    }
+//
+//    @PutMapping("admin/updatePlant")
+//    public ResponseEntity<List<Plant>> updatePlant(@RequestHeader("Authorization") String auth,
+//                                                 @RequestBody Map<String, Object> userData) throws UserNotFoundException {
+//        return ResponseEntity.ok(adminService.updatePlant(auth, userData));
+//    }
+//
+//    @DeleteMapping("admin/deletePlant/{id}")
+//    public ResponseEntity<List<Plant>> deletePlant(@RequestHeader("Authorization") String auth,
+//                                                   @RequestBody Long id) throws UserNotFoundException {
+//        return ResponseEntity.ok(adminService.deletePlant(auth, id));
+//    }
+//
+//    @GetMapping("admin/getAllPlants")
+//    public ResponseEntity<List<Plant>> getAllPlants(@RequestHeader("Authorization") String auth) throws UserNotFoundException {
+//        return ResponseEntity.ok(adminService.getAllPlants(auth));
+//    }
+//
+//
 }

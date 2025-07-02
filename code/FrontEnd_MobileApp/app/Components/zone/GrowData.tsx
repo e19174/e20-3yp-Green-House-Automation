@@ -29,9 +29,9 @@ const GrowData: React.FC<GrowDataProps> = ({deviceId, sensorData, error}) => {
           { name: 'Temp', value: `${sensorData?.temperature}`, unit: '°C', icon: 'thermometer', percentage: (sensorData?.temperature || 0) / 50 },
           { name: 'Humidity', value: `${sensorData?.humidity}`, unit: '%', icon: 'water', percentage: (sensorData?.humidity || 0) / 100 },
           { name: 'Soil Moisture', value: `${sensorData?.soilMoisture}`, unit: '%', icon: 'leaf', percentage: (sensorData?.soilMoisture || 0) / 3000 },
-          { name: 'N Level', value: `${sensorData?.nitrogenLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData?.nitrogenLevel || 0) / 0.00125 },
-          { name: 'P Level', value: `${sensorData?.phosphorusLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData?.phosphorusLevel || 0) / 0.00125 },
-          { name: 'K Level', value: `${sensorData?.potassiumLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData?.potassiumLevel || 0) / 0.00125 },
+          { name: 'N Level', value: `${sensorData?.nitrogenLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData?.nitrogenLevel || 0) / 100 },
+          { name: 'P Level', value: `${sensorData?.phosphorusLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData?.phosphorusLevel || 0) / 100 },
+          { name: 'K Level', value: `${sensorData?.potassiumLevel}`, unit: 'ppm', icon: 'flask', percentage: (sensorData?.potassiumLevel || 0) / 100 },
         ];
     setGrowDataItems(formattedData);
     setLoading(false);
