@@ -5,6 +5,7 @@ import Devices from "./components/devices/Devices";
 import AdminProfile from "./components/profile/AdminProfile";
 import AdminDashboard from "./components/dashboard/AdminDashboard";
 import Users from "./components/users/Users";
+import Plants from "./components/plants/Plants";
 import Settings from "./components/setting/Settings";
 import LoginPage from "./components/login/Login";
 import NotFound from "./components/NotFound";
@@ -107,6 +108,17 @@ function App() {
             <ProtectedRoute>
               <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
                 <Settings />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/plants"
+          element={
+            <ProtectedRoute>
+              <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+                <Plants />
               </Layout>
             </ProtectedRoute>
           }
