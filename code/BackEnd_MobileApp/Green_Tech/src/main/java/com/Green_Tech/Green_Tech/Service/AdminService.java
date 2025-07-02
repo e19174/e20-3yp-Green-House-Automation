@@ -2,13 +2,13 @@ package com.Green_Tech.Green_Tech.Service;
 
 import com.Green_Tech.Green_Tech.Config.JwtService;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
+import com.Green_Tech.Green_Tech.CustomException.PlantNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
 import com.Green_Tech.Green_Tech.DTO.UserResponseDTO;
 import com.Green_Tech.Green_Tech.Entity.*;
 import com.Green_Tech.Green_Tech.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +37,9 @@ public class AdminService {
     private AwsIotCredentialsRepo awsIotCredentialsRepo;
     @Autowired
     private SensorDataRepository sensorDataRepo;
+    @Autowired
+    private PlantRepo plantRepo;
+
 
 
     public String registerAdmin(Map<String, String> adminData) {
@@ -199,4 +202,51 @@ public class AdminService {
 
         return adminRepo.save(admin);
     }
+
+
+    // plants //
+
+//    public List<Plant> getAllPlants(String auth) throws UserNotFoundException {
+//        Admin admin = extractUserService.extractAdminFromJwt(auth);
+//        if(admin.isEnabled()){
+//            return plantRepo.findAll();
+//        }
+//        return Collections.emptyList();
+//    }
+//
+//    public List<Plant> addNewPlant(String auth, Plant plantData) throws UserNotFoundException {
+//        Admin admin = extractUserService.extractAdminFromJwt(auth);
+//        if(admin.isEnabled()){
+//            plantRepo.save(plantData);
+//            return plantRepo.findAll();
+//        }
+//        return Collections.emptyList();
+//    }
+//
+//
+//    public List<Plant> updatePlant(String auth, Plant plantData) throws UserNotFoundException, PlantNotFoundException {
+//        Admin admin = extractUserService.extractAdminFromJwt(auth);
+//
+//        Plant plant = plantRepo.findById((plantData.getId())).orElseThrow(
+//                () -> new PlantNotFoundException("plant not found with id:"+ plantData.getId())
+//        );
+//
+//        plant.setName(plant.getImageName());
+//        plantRepo.save(plant);
+//
+//        return plantRepo.findAll();
+//    }
+//
+//    public List<Plant> deletePlant(String auth, Long id) throws UserNotFoundException {
+//        Admin admin = extractUserService.extractAdminFromJwt(auth);
+//
+//        Plant plant = plantRepo.findById((id)).orElseThrow(
+//                () -> new PlantNotFoundException("plant not found with id:"+ plantData.getId())
+//        );
+//
+//        plantRepo.delete(plant);
+//        return plantRepo.findAll();
+//    }
+//
+//
 }
