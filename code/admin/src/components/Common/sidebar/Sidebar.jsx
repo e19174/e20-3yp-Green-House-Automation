@@ -5,6 +5,7 @@ import logo from "../../../assets/logopng.png";
 import LoginPage from '../../login/Login';
 import { UserAuth } from '../../../Context/UserContext';
 
+
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const navigate = useNavigate();
   const {setUser} = UserAuth();
@@ -56,6 +57,13 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         >
           Settings
         </div>
+        <div
+          className={`sidebar-item ${activeTab === 'plants' ? 'active' : ''}`}
+          onClick={() => handleTabClick('plants')}
+        >
+          Plants
+        </div>
+
       </div>
 
       <button type='button' className='logout' onClick={handleLogout}>Logout</button>
