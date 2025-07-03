@@ -206,47 +206,70 @@ public class AdminService {
 
     // plants //
 
-//    public List<Plant> getAllPlants(String auth) throws UserNotFoundException {
-//        Admin admin = extractUserService.extractAdminFromJwt(auth);
-//        if(admin.isEnabled()){
-//            return plantRepo.findAll();
-//        }
-//        return Collections.emptyList();
-//    }
-//
-//    public List<Plant> addNewPlant(String auth, Plant plantData) throws UserNotFoundException {
-//        Admin admin = extractUserService.extractAdminFromJwt(auth);
-//        if(admin.isEnabled()){
-//            plantRepo.save(plantData);
-//            return plantRepo.findAll();
-//        }
-//        return Collections.emptyList();
-//    }
-//
-//
-//    public List<Plant> updatePlant(String auth, Plant plantData) throws UserNotFoundException, PlantNotFoundException {
-//        Admin admin = extractUserService.extractAdminFromJwt(auth);
-//
-//        Plant plant = plantRepo.findById((plantData.getId())).orElseThrow(
-//                () -> new PlantNotFoundException("plant not found with id:"+ plantData.getId())
-//        );
-//
-//        plant.setName(plant.getImageName());
-//        plantRepo.save(plant);
-//
-//        return plantRepo.findAll();
-//    }
-//
-//    public List<Plant> deletePlant(String auth, Long id) throws UserNotFoundException {
-//        Admin admin = extractUserService.extractAdminFromJwt(auth);
-//
-//        Plant plant = plantRepo.findById((id)).orElseThrow(
-//                () -> new PlantNotFoundException("plant not found with id:"+ plantData.getId())
-//        );
-//
-//        plantRepo.delete(plant);
-//        return plantRepo.findAll();
-//    }
-//
-//
+    public List<Plant> getAllPlants(String auth) throws UserNotFoundException {
+        Admin admin = extractUserService.extractAdminFromJwt(auth);
+        if(admin.isEnabled()){
+            return plantRepo.findAll();
+        }
+        return Collections.emptyList();
+    }
+
+    public List<Plant> addNewPlant(String auth, Plant plantData) throws UserNotFoundException {
+        Admin admin = extractUserService.extractAdminFromJwt(auth);
+        if(admin.isEnabled()){
+            decodeBase64Image(plantData);
+            plantRepo.save(plantData);
+            return plantRepo.findAll();
+        }
+        return Collections.emptyList();
+    }
+
+
+    public List<Plant> updatePlant(String auth, Map<String, String> plantData) throws UserNotFoundException, PlantNotFoundException {
+        Admin admin = extractUserService.extractAdminFromJwt(auth);
+
+        Long id = Long.valueOf(plantData.get("id"));
+        Plant existing = plantRepo.findById(id)
+                .orElseThrow(() -> new PlantNotFoundException("plant not found with id:" + id));
+
+        existing.setName(plantData.get("name"));
+        existing.setDescription(plantData.get("description"));
+        existing.setTemperature(Integer.valueOf(plantData.get("temperature")));
+        existing.setHumidity(Integer.valueOf(plantData.get("humidity")));
+        existing.setMoisture(Integer.valueOf(plantData.get("moisture")));
+        existing.setNitrogen(Integer.valueOf(plantData.get("nitrogen")));
+        existing.setPhosphorus(Integer.valueOf(plantData.get("phosphorus")));
+        existing.setPotassium(Integer.valueOf(plantData.get("potassium")));
+
+        plantRepo.save(existing);
+        return plantRepo.findAll();
+    }
+
+
+
+    public List<Plant> deletePlant(String auth, Long id) throws UserNotFoundException, PlantNotFoundException {
+        Admin admin = extractUserService.extractAdminFromJwt(auth);
+
+        Plant plant = plantRepo.findById(id).orElseThrow(
+                () -> new PlantNotFoundException("plant not found with id:"+ id )
+        );
+
+        plantRepo.delete(plant);
+        return plantRepo.findAll();
+    }
+
+
+    private void decodeBase64Image(Plant plant) {
+        try {
+            String imageDataString = new String(plant.getImageData());
+            if (imageDataString.startsWith("data")) {
+                String base64 = imageDataString.split(",")[1];
+                plant.setImageData(Base64.getDecoder().decode(base64));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
