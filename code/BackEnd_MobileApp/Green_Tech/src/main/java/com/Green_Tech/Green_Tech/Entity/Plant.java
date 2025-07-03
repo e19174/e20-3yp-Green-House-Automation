@@ -1,8 +1,8 @@
 package com.Green_Tech.Green_Tech.Entity;
 
-import io.micrometer.common.util.internal.logging.InternalLogger;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,18 +10,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 public class Plant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String Description;
-    private String temperature;
-    private String humidity;
-    private String moisture;
-    private String nitrogenLevel;
-    private String phosphorusLevel;
-    private String potassiumLevel;
+    private String description;
+    private Integer temperature;
+    private Integer humidity;
+    private Integer moisture;
+    private Integer nitrogen;
+    private Integer phosphorus;
+    private Integer potassium;
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] imageData;
