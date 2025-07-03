@@ -3,19 +3,18 @@ import AddPlant from './AddPlant'; // Adjust path if needed
 import UpdatePlant from './UpdatePlant'; // Import your UpdateUser component
 import './plants.css';
 import { Axios } from '../../AxiosBuilder';
+import DeletePlant from './DeletePlant';
+
 
 const Plants = ({ activeTab }) => {
   //const [plants, setPlants] = useState([]);
   const [isAddPlantModalOpen, setIsAddPlantModalOpen] = useState(false);
   const [isUpdatePlantModalOpen, setIsUpdatePlantModalOpen] = useState(false);
+  const [isDeletePlantModalOpen, setIsDeletePlantModalOpen] = useState(false);
+
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [plants, setPlants] = useState([
-    { id: 1, name: 'Tomato',description: 'Tomato is a warm-season crop.', temperature: '20-25°C', humidity: '60%',moisture: 'Medium',nitrogen: 'High',phosphorus: 'Medium', potassium: 'High',image: 'https://via.placeholder.com/100?text=Tomato',},
-    { id: 2, name: 'Rice' },
-    { id: 3, name: 'Ginger' },
-    { id: 4, name: 'Orchid' },
-  ]);  
+  const [plants, setPlants] = useState([]);  
 
   const handleAddPlantClick = () => {
     setIsAddPlantModalOpen(true);
@@ -30,28 +29,22 @@ const Plants = ({ activeTab }) => {
      setIsDetailModalOpen(true);
     }; 
     
-  const handleUpdatePlant = () => {
-      setPlants(prev =>
-        prev.map(p => (p.id === selectedPlant.id ? selectedPlant : p))
-      );
-      setIsUpdatePlantModalOpen(false);
-      setSelectedPlant(null);
-  };
-  
+
 
 const handleCloseDetailModal = () => {
     setSelectedPlant(null);
     setIsDetailModalOpen(false);
     };
 
-//   const handleSavePlant = async (userDetails) => {
-//     try {
-//       const response = await Axios.post(`/addPlant`, plantDetails)
-//       setPlants(response.data);
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
+  const handleSavePlant = async (plantDetails) => {
+    try {
+      const response = await Axios.post(`/addPlant`, plantDetails)
+      setPlants(response.data);
+    } catch (error) {
+      console.log(error);
+      alert('Failed to add plant');
+    }
+  };
 
 const handleEditClick = (plantId) => {
   const plant = plants.find(p => p.id === plantId);
@@ -66,36 +59,56 @@ const handleEditClick = (plantId) => {
     setSelectedPlant(null);
   };
 
-//   const handleUpdatePlant = async () => {
-//     try {
-//       const response = await Axios.put(`/updatePlant`, selectedPlant)
-//       setPlants(response.data);
-//     } catch (error) {
-//       console.log(error);
-//     }
-//     handleCloseUpdatePlantModal();
-//   };
-
+  const handleUpdatePlant = async () => {
+    try {
+      const response = await Axios.put('/admin/updatePlant', selectedPlant);
+      setPlants(response.data);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to update plant');
+    }
+    setIsUpdatePlantModalOpen(false);
+    setSelectedPlant(null);
+  };
+  
 
 const handleDeleteClick = (plantId) => {
-    alert(`Delete clicked for plant ID: ${plantId}`);
-    // Add your delete logic here
-  };
+  const plant = plants.find(p => p.id === plantId);
+  if (plant) {
+    setSelectedPlant(plant);
+    setIsDeletePlantModalOpen(true);
+  }
+};
 
-//   useEffect(() => {
-//     const fetchPlants = async () => {
-//       try {
-//         const response = await Axios.get("/getAllPlants");
-//         setPlants(response.data);
-//       } catch (error) {
-//         console.log(error);
-//         if(error.response?.data?.message){
-//           alert(error.response.data.message);
-//         }
-//       }
-//     }
-//     fetchPlants();
-//   }, []);
+const handleConfirmDelete = async (id) => {
+  try {
+    const response = await Axios.delete(`/deletePlant/${id}`);
+    setPlants(response.data);
+  } catch (error) {
+    console.error(error);
+    alert('Failed to delete plant');
+  }
+  setIsDeletePlantModalOpen(false);
+};
+
+  
+
+  
+
+  useEffect(() => {
+    const fetchPlants = async () => {
+      try {
+        const response = await Axios.get("/getAllPlants");
+        setPlants(response.data);
+      } catch (error) {
+        console.log(error);
+        if(error.response?.data?.message){
+          alert(error.response.data.message);
+        }
+      }
+    }
+    fetchPlants();
+  }, []);
 
   return (
     <div className="plants-container">
@@ -110,7 +123,7 @@ const handleDeleteClick = (plantId) => {
           {plants.map((plant) => (
             <li key={plant.id} className="plant-item">
             <div className="plant-info" onClick={() => handlePlantClick(plant)}>
-             <div className="plant-img-placeholder" />
+             <img className="plant-img-placeholder" src={`data:${plant.imageData};base64,${plant.imageName}`} alt='plantImage' />
              <div className="plant-name">{plant.name}</div>
            </div>
              <div className="plant-buttons">
@@ -126,7 +139,7 @@ const handleDeleteClick = (plantId) => {
       <AddPlant
         isOpen={isAddPlantModalOpen}
         onClose={handleCloseAddPlantModal}
-        //onSave={handleSavePlant}
+        onSave={handleSavePlant}
       />
 
       <UpdatePlant
@@ -137,7 +150,14 @@ const handleDeleteClick = (plantId) => {
         setUser={setSelectedPlant}
           />
           
-
+      
+        <DeletePlant
+          isOpen={isDeletePlantModalOpen}
+          onClose={() => setIsDeletePlantModalOpen(false)}
+          onDelete={handleConfirmDelete}
+          plant={selectedPlant}
+        />
+        
 
 
 

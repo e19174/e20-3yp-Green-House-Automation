@@ -29,17 +29,17 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse> registerUser(@RequestBody AuthDTO authDTO) throws UserAlreadyFoundException {
-        try {
-            User user = userService.createNewUser(authDTO);
+    public ResponseEntity<User> registerUser(@RequestBody AuthDTO authDTO) throws UserAlreadyFoundException {
+//        try {
+            return ResponseEntity.ok(userService.createNewUser(authDTO));
 
-            return ResponseEntity.ok(new ApiResponse(
-                    "Authentication successful",
-                    user
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiResponse("Authentication failed", null));
-        }
+//            return ResponseEntity.ok(new ApiResponse(
+//                    "Authentication successful",
+//                    user
+//            ));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body(new ApiResponse("Authentication failed", null));
+//        }
     }
 
     @PostMapping("/google-auth")

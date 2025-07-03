@@ -4,14 +4,14 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    temperature: '',
-    humidity: '',
-    moisture: '',
-    nitrogen: '',
-    phosphorus: '',
-    potassium: '',
-    imageData: '',
+    temperature: 0,
+    humidity: 0,
+    moisture: 0,
+    nitrogen: 0,
+    phosphorus: 0,
+    potassium: 0,
   });
+  const [image, setImage] = useState(null);
 
   if (!isOpen) return null;
 
@@ -23,6 +23,7 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
+    setImage(file);
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -38,7 +39,15 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
   };
 
   const handleSave = () => {
-    if(onSave) onSave(formData);
+    const form = new FormData();
+    Object.keys(formData).forEach((key) => {
+        form.append(key, formData[key]);
+    });
+    if (image) {
+      form.append('Image', image);
+    }
+
+    onSave(form);
     onClose();
   };
 
@@ -74,7 +83,7 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
           Temperature 🌡️:
           <input
             name="temperature"
-            type="text"
+            type="number"
             value={formData.temperature}
             onChange={handleChange}
             style={styles.input}
@@ -85,7 +94,7 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
           Humidity 💧:
           <input
             name="humidity"
-            type="text"
+            type="number"
             value={formData.humidity}
             onChange={handleChange}
             style={styles.input}
@@ -96,7 +105,7 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
           Moisture 🌿:
           <input
             name="moisture"
-            type="text"
+            type="number"
             value={formData.moisture}
             onChange={handleChange}
             style={styles.input}
@@ -107,7 +116,7 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
           Nitrogen:
           <input
             name="nitrogen"
-            type="text"
+            type="number"
             value={formData.nitrogen}
             onChange={handleChange}
             style={styles.input}
@@ -118,7 +127,7 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
           Phosphorus:
           <input
             name="phosphorus"
-            type="text"
+            type="number"
             value={formData.phosphorus}
             onChange={handleChange}
             style={styles.input}
@@ -129,7 +138,7 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
           Potassium:
           <input
             name="potassium"
-            type="text"
+            type="number"
             value={formData.potassium}
             onChange={handleChange}
             style={styles.input}
@@ -140,6 +149,7 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
           Upload Image:
           <input
             type="file"
+            name="Image"
             accept="image/*"
             onChange={handleImageUpload}
             style={styles.input}
