@@ -13,8 +13,8 @@ public class NotificationsRestController {
     public String sendMessage(Notifications request) throws InterruptedException, ExecutionException {
 
         Message message = getPreconfiguredMessageToTopic(request);
-        String response = sendAndGetResponse(message);
-        return response;
+        return sendAndGetResponse(message);
+
     }
 
     private Message getPreconfiguredMessageToTopic(Notifications request) {
@@ -31,9 +31,8 @@ public class NotificationsRestController {
 
     public String sendMessageToSpecificDevice(String deviceToken, Notifications request) throws InterruptedException, ExecutionException {
         Message message = getPreConfiguredMessageToDevice(deviceToken, request);
-        String response = sendAndGetResponse(message);
 
-        return response;
+        return sendAndGetResponse(message);
     }
 
     private Message getPreConfiguredMessageToDevice(String deviceToken, Notifications request) {
@@ -47,7 +46,6 @@ public class NotificationsRestController {
     }
 
     private String sendAndGetResponse(Message message) throws InterruptedException, ExecutionException  {
-        String response = FirebaseMessaging.getInstance().sendAsync(message).get();
-        return response;
+        return FirebaseMessaging.getInstance().sendAsync(message).get();
     }
 }
