@@ -39,6 +39,16 @@ const Footer: React.FC = () => {
         </TouchableOpacity>
         <Text style={styles.footerText}>Statistics</Text>
       </View>
+
+      <View style={active == "Plant" ? styles.footerElementActive : styles.footerElement}>
+        <TouchableOpacity onPress={() => {
+          router.push("Components/Plant/Plant");
+          setActive("Plant");
+        }}>
+          <Ionicons name="planet" size={24} color={"#fff"} style={styles.footerIcon}/>
+        </TouchableOpacity>
+        <Text style={styles.footerText}>Plant</Text>
+      </View>
     </View>
   );
 };

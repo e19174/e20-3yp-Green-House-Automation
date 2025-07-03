@@ -147,8 +147,8 @@ const Login:React.FC = () => {
             <View style={[styles.formContainer, {backgroundColor: theme.colors.primary}]}>
                 <Text style={[styles.title, {color: theme.colors.text}]}>Login</Text>
                 <View style={styles.form}>
-                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Email' placeholderTextColor="rgb(173, 173, 173)" value={email} onChangeText={(value) => setEmail(value)}/>
-                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Password' placeholderTextColor="rgb(173, 173, 173)" value={password} onChangeText={(value) => setPassword(value)}/>
+                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Email' placeholderTextColor="rgb(173, 173, 173)" value={email} onChangeText={(value) => setEmail(value.trim())}/>
+                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Password' placeholderTextColor="rgb(173, 173, 173)" value={password} onChangeText={(value) => setPassword(value.trim())}/>
                     <TouchableOpacity onPress={handleLogin} style={styles.login}>
                         <Text style={styles.text}>LOGIN</Text>
                     </TouchableOpacity>
