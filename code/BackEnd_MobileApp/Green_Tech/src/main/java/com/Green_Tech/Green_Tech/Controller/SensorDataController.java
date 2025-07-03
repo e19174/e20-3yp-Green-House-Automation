@@ -1,12 +1,14 @@
 package com.Green_Tech.Green_Tech.Controller;
 
+import com.Green_Tech.Green_Tech.DTO.ControlSignalRequestDTO;
+import com.Green_Tech.Green_Tech.Entity.Admin;
 import com.Green_Tech.Green_Tech.Entity.SensorData;
 import com.Green_Tech.Green_Tech.Service.MQTT.MQTTService;
 import com.Green_Tech.Green_Tech.Service.SensorDataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,38 +23,22 @@ public class SensorDataController {
     private MQTTService mqttService;
 
 
-    @GetMapping(value = "/currentData")
-    public SensorData getAllSensorData() {
-        return sensorDataService.getAllSensorData();
+    @GetMapping(value = "/currentData/{id}")
+    public ResponseEntity<Map<String, Object>> getSensorData(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(sensorDataService.getSensorData(id));
     }
 
 
-    @PostMapping(value = "/controlsignal")
-    public String sendControlSignal(@RequestBody Map<String, Object> payload) {
-        int deviceIndex = (int) payload.get("device");
-        boolean turnOn = (boolean) payload.get("turnOn");
+    @PostMapping(value = "/controlSignal")
+    public String sendControlSignal(@RequestBody ControlSignalRequestDTO payload) {
+        int deviceIndex = payload.getIndex();
+        boolean turnOn = payload.isStatus();
+        Long deviceId = payload.getDeviceId();
 
-        String deviceName;
-        switch (deviceIndex) {
-            case 0:
-                deviceName = "FAN";
-                break;
-            case 1:
-                deviceName = "NUTRIENTS";
-                break;
-            case 2:
-                deviceName = "WATER";
-                break;
-            case 3:
-                deviceName = "LIGHT";
-                break;
-            default:
-                return "Invalid device index!";
-        }
-
-        String command = turnOn ? deviceName + "_ON" : deviceName + "_OFF";
-        mqttService.publishControlSignal("{message:\""+command+"\"}");
-        return "Command Sent: " + command;
+        mqttService.publishControlSignal("{\"index\":" + deviceIndex + ", \"status\":"+ turnOn + "}",
+                deviceId);
+        String[] actuators = {"fan", "nitrogen", "phosphorus", "potassium", "water"};
+        return "Command Sent: " + actuators[deviceIndex] + " - " + turnOn;
     }
 
 }

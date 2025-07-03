@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "Green-Tech",
-    "slug": "Routing",
+    "name": "GreenTech",
+    "slug": "GreenTech",
     "version": "1.0.0",
-    "scheme": "Routing",
+    "scheme": "myapp",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,14 +20,14 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/logopng.png"
+      "favicon": "./assets/favicon.png"
     },
-    "platforms": ["ios", "android", "web"],
-    "extra": {
-      "redirectUri": "https://auth.expo.io/@vithustennysan/Routing"
-    }
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

@@ -1,0 +1,82 @@
+.admin-profile-container {
+  display: flex;
+  height: calc(100vh - 90px);
+  width: calc(100vw - 240px);
+  margin-left: 240px;
+  background-color: white;
+  border-radius: 15px 0 0 15px;
+}
+
+.admin-profile-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 20px;
+  padding: 30px 20px;
+  flex: 1;
+  overflow-x: auto;
+  
+}
+
+.admin-profile-title {
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: #40916c;
+}
+
+.admin-profile-card {
+  background-color: #e6f0ea;
+  padding: 20px;
+  border-radius: 10px;
+  color: #40916c;
+  width: 500px;
+  margin: auto;
+  text-align: center;
+}
+
+.admin-profile-image {
+  width: 100px;
+  /* Adjust the width as needed */
+  height: 100px;
+  /* Adjust the height as needed */
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  overflow: hidden;
+}
+
+.admin-profile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Ensures the image covers the area without distortion */
+}
+
+.admin-profile-field {
+  margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.field-label {
+  font-size: 16px;
+  font-weight: bold;
+  width: 40%;
+  text-align: right;
+}
+
+.field-value {
+  margin-left: 10px;
+  width: 50%;
+  text-align: left;
+}
+
+.edit-profile-button {
+  background-color: hsl(136, 63%, 25%);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 30px;
+}

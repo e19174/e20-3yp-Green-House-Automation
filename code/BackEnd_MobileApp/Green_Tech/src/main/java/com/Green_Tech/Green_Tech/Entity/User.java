@@ -22,12 +22,15 @@ public class User implements UserDetails {
     private Long id;
     private String name;
     private String email;
+    @Column(nullable = true)
     private String password;
     private Long phoneNumber;
     private Role role;
     private Date createdAt;
     private Date updatedAt;
-
+    @Enumerated(EnumType.STRING)
+    private AuthMethod authMethod;
+    private String clerkUserId;
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] imageData;

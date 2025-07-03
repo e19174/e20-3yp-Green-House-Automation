@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { 
   View, 
   Text, 
@@ -6,79 +6,141 @@ import {
   TouchableOpacity, 
   StyleSheet, 
   Dimensions, 
+  FlatList,
+  RefreshControl,
   ScrollView
 } from "react-native";
-import Footer from "../common/Footer";
-import Header from "../common/Header";
 import { router } from "expo-router";
+import { Axios } from "../../AxiosRequestBuilder";
+import { themeAuth } from "../../../Contexts/ThemeContext";
 
 const { width, height } = Dimensions.get("window");
 
+type Device = {
+  id: number;
+  mac: string;
+  name: string;
+  zoneName: string;
+  location: string;
+  addedAt: string;
+  user: User;
+};
+
+interface User {
+  name: string;
+  email: string;
+  phoneNumber: number;
+  imageData: string;
+  imageType: string;
+  imageName: string;
+  authMethod: string;
+}
+
 const Home = () => {
+  
+  const [zones, setZones] = useState<any>({});
+  const [refreshing, setRefreshing] = useState(false);
+  const { theme } = themeAuth();
 
-  const zones = ["ZONE 1", "ZONE 2", "ZONE 3", "ZONE 4", "ZONE 5", "ZONE 6"];
 
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1500);
+  };
+  
+  useEffect(()=>{
+    const fetchDevices = async () => {
+      try {
+        const response = await Axios.get('/device/activeByZones');
+        setZones(response.data);
+      } catch (error) {
+        console.error('Error fetching devices:', error);
+      }
+    }
+    fetchDevices();
+  },[refreshing])
+
+  const directToDetail = (item: Device[]) => {
+    router.push({ pathname: '/Components/zone/Zone', params: { zone: JSON.stringify(item) } })
+  };
+  
   return (
-    <>
-      <Header viewZone={false} selectedZone={''} setSelectedZone={() => {}}/>
+      <ScrollView contentContainerStyle={[styles.container, {backgroundColor: theme.colors.background}]}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
 
-      <View style={styles.container}>
-        <Text style={styles.heading}>Green Tech</Text>
+        <Text style={[styles.heading, {color: theme.colors.text}]}>Home</Text>
 
-        <Image source={require("../../../assets/download.jpeg")} style={styles.image} />
+        <Image source={require("../../../assets/greenHouse.jpg")} style={styles.image} />
 
-        <ScrollView style={styles.optionsContainer}>
-            {zones.map((option, index) => (
-              <TouchableOpacity key={index} style={styles.optionButton} onPress={() => router.push("/Components/zone/Zone")}>
-                <Text style={styles.optionText}>{option}</Text>
-              </TouchableOpacity>
-            ))}
-        </ScrollView>
-      </View>
+        <View style={styles.optionsContainer}>
+          {Object.keys(zones).map((zoneName, index) => (
+            <TouchableOpacity key={index} onPress={() => directToDetail(zones[zoneName])}>
+              <View style={[styles.card, {backgroundColor: theme.colors.cardBackground}]}>
+                <Text style={styles.deviceName}>{zoneName}</Text>
+                <Text style={styles.deviceDetails}>Devices: {zones[zoneName].length}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      <Footer />
-    </>
+      </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "rgb(4,38,28)",
     alignItems: "center",
+    paddingTop: 10,
   },
   heading:{
     color: "white",
     fontSize: 30,
     fontWeight: "bold",
-    marginTop: "20%",
   },
   image: {
     width: width * 0.9,
     height: height * 0.25,
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: 20,
     marginBottom: 15,
   },
   optionsContainer: {
+    flex: 1,
     width: "90%",
-    backgroundColor: "#01694D",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: "20%",
+    paddingBottom: 20,
   },
-  optionButton: {
-    width: "100%",
-    padding: 15,
-    marginVertical: 5,
-    backgroundColor: "#04261C",
-    borderRadius: 10,
-    alignItems: "center",
+   card: {
+    backgroundColor: '#01694D',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    elevation: 2,
   },
-  optionText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+  deviceName: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 6,
+    color: '#fff',
+  },
+  deviceDetails: {
+    fontSize: 14,
+    color: '#eee',
+    marginBottom: 4,
+  },
+  timeContainer: {
+    width: '100%',
+  }, 
+  time: {
+    fontSize: 12,
+    color: 'rgb(200, 200, 200)',
+    textAlign: 'right',
   },
 });
 

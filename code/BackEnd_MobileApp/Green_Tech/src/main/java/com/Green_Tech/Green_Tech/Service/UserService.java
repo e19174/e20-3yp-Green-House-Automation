@@ -4,11 +4,14 @@ import com.Green_Tech.Green_Tech.Config.JwtService;
 import com.Green_Tech.Green_Tech.CustomException.UserAlreadyFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
 import com.Green_Tech.Green_Tech.DTO.AuthDTO;
+import com.Green_Tech.Green_Tech.DTO.GoogleAuthDto;
 import com.Green_Tech.Green_Tech.DTO.UserDTO;
 import com.Green_Tech.Green_Tech.DTO.UserResponseDTO;
+import com.Green_Tech.Green_Tech.Entity.AuthMethod;
 import com.Green_Tech.Green_Tech.Entity.Role;
 import com.Green_Tech.Green_Tech.Entity.User;
 import com.Green_Tech.Green_Tech.Repository.UserRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,11 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
+@Slf4j
 public class UserService {
 
     @Autowired
@@ -32,9 +34,13 @@ public class UserService {
     private JwtService jwtService;
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private ExtractUserService extractUserService;
 
 
     public User createNewUser(AuthDTO authDTO) throws UserAlreadyFoundException {
+
+        log.info(String.format("email: %s", authDTO.getEmail()));
         // verify user already exists
         if (userRepo.existsByEmail(authDTO.getEmail())) {
             throw new UserAlreadyFoundException("User already exists");
@@ -46,7 +52,7 @@ public class UserService {
         }
 
         // validate email format
-        if (!authDTO.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+        if (!authDTO.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
             throw new IllegalArgumentException("Invalid email format");
         }
 
@@ -57,13 +63,15 @@ public class UserService {
                 .password(password)
                 .createdAt(new Date())
                 .updatedAt(new Date())
+                .authMethod(AuthMethod.EMAIL_PASSWORD)
+                .clerkUserId(null)
                 .role(Role.USER)
                 .build();
 
         return userRepo.save(user);
     }
 
-    public String loginUser(AuthDTO authDTO) throws UserNotFoundException {
+    public Map<String, Object> loginUser(AuthDTO authDTO) throws UserNotFoundException {
         try{
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -84,23 +92,37 @@ public class UserService {
             throw new IllegalArgumentException("Invalid password");
         }
 
-        return jwtService.generateToken(user, user.getRole());
+        Map<String, Object> userData = new HashMap<>();
+
+        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+                .name(user.getName())
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .imageType(user.getImageType())
+                .imageName(user.getImageName())
+                .imageData(user.getImageData())
+                .build();
+
+        String token = jwtService.generateToken(user, user.getRole());
+
+        userData.put("user", userResponseDTO);
+        userData.put("token", token);
+
+        return userData;
     }
 
-    public String updateUser(String auth, UserDTO userDTO, MultipartFile file) throws UserNotFoundException, IOException {
+    public User updateUser(String auth, UserDTO userDTO, MultipartFile file) throws UserNotFoundException, IOException {
 
-        User user = extractUserFromJwt(auth);
+        User user = extractUserService.extractUserFromJwt(auth);
 
         user.setName(userDTO.getName());
-        user.setEmail(userDTO.getEmail());
         user.setPhoneNumber(userDTO.getPhoneNumber());
         if (file != null && !file.isEmpty()) {
             user.setImageName(file.getOriginalFilename());
             user.setImageData(file.getBytes());
             user.setImageType(file.getContentType());
         }
-        userRepo.save(user);
-        return "upadted sucessfully";
+        return userRepo.save(user);
     }
 
     public void updateProfilePicture(Long userId, MultipartFile file) throws IOException {
@@ -115,7 +137,8 @@ public class UserService {
     }
 
     public UserResponseDTO getUser(String auth) throws UserNotFoundException {
-        User user = extractUserFromJwt(auth);
+        User user = extractUserService.extractUserFromJwt(auth);
+
         String base64Image = null;
         if (user.getImageData() != null) {
             base64Image = Base64.getEncoder().encodeToString(user.getImageData());
@@ -126,16 +149,9 @@ public class UserService {
                 .email(user.getEmail())
                 .imageType(user.getImageType())
                 .imageName(user.getImageName())
-                .imageData(base64Image)
+                .imageData(user.getImageData())
+                .authMethod(user.getAuthMethod())
                 .build();
-    }
-
-    public User extractUserFromJwt(String auth) throws UserNotFoundException{
-        String token = auth.substring('7');
-        String email = jwtService.extractUserEmail(token);
-        return userRepo.findByEmail(email).orElseThrow(()->
-            new UserNotFoundException("There is no user with "+ email)
-        );
     }
 
     public void saveUserWithImage(User user, MultipartFile file) throws IOException {
@@ -145,5 +161,77 @@ public class UserService {
             user.setImageName(file.getOriginalFilename());
         }
         userRepo.save(user);
+    }
+
+    // Google OAuth registration/login
+    public Map<String, Object> handleGoogleAuth(GoogleAuthDto dto) {
+        Optional<User> existingUser = userRepo.findByEmail(dto.getEmail());
+        System.out.println(existingUser.toString());
+        Map<String, Object> userData = new HashMap<>();
+
+        if (existingUser.isPresent()) {
+            // Existing user - update info if needed
+            User user = existingUser.get();
+            updateUserFromGoogle(user, dto);
+            userRepo.save(user);
+            String token = jwtService.generateToken(user, user.getRole());
+
+            userData.put("user", user);
+            userData.put("token", token);
+            System.out.println("uuuuuuuuuuuuuuuuuuuuuu");
+            return userData;
+
+        } else {
+            // New user - register via Google
+            User newUser = User.builder()
+                    .email(dto.getEmail())
+                    .name(dto.getName())
+                    .imageData(null)
+                    .imageName(null)
+                    .imageType(null)
+                    .clerkUserId(dto.getClerkUserId())
+                    .authMethod(AuthMethod.GOOGLE_OAUTH)
+                    .role(Role.USER)
+                    .createdAt(new Date())
+                    .password(null)
+                    .build();
+
+            System.out.println("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+            userRepo.save(newUser);
+            String token = jwtService.generateToken(newUser, newUser.getRole());
+
+            userData.put("user", newUser);
+            userData.put("token", token);
+
+            return userData;
+        }
+    }
+
+    private void updateUserFromGoogle(User user, GoogleAuthDto dto) {
+        // Update profile image and other info if changed
+//        if (dto.getProfileImage() != null) {
+//            user.setImageData(dto.getProfileImage().getBytes());
+//        }
+        if (user.getClerkUserId() == null) {
+            user.setClerkUserId(dto.getClerkUserId());
+        }
+    }
+
+    public String changePassword(String auth, Map<String, String> authData) throws UserNotFoundException {
+        User user = extractUserService.extractUserFromJwt(auth);
+
+        String currentPassword = authData.get("currentPassword");
+        String newPassword = authData.get("newPassword");
+
+        if(passwordEncoder.matches(currentPassword, user.getPassword())){
+           if(!currentPassword.equals(newPassword)){
+               user.setPassword(passwordEncoder.encode(newPassword));
+               user.setUpdatedAt(new Date());
+               userRepo.save(user);
+               return "Success";
+           }
+           return "New password is same";
+        }
+        return "password not match";
     }
 }

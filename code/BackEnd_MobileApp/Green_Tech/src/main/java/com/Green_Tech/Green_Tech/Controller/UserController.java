@@ -1,22 +1,19 @@
 package com.Green_Tech.Green_Tech.Controller;
 
-import com.Green_Tech.Green_Tech.Config.JwtService;
 import com.Green_Tech.Green_Tech.CustomException.UserAlreadyFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
-import com.Green_Tech.Green_Tech.DTO.AuthDTO;
-import com.Green_Tech.Green_Tech.DTO.UserDTO;
-import com.Green_Tech.Green_Tech.DTO.UserResponseDTO;
+import com.Green_Tech.Green_Tech.DTO.*;
 import com.Green_Tech.Green_Tech.Entity.User;
 import com.Green_Tech.Green_Tech.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.Date;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -33,30 +30,78 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody AuthDTO authDTO) throws UserAlreadyFoundException {
-        return ResponseEntity.ok(userService.createNewUser(authDTO));
+//        try {
+            return ResponseEntity.ok(userService.createNewUser(authDTO));
+
+//            return ResponseEntity.ok(new ApiResponse(
+//                    "Authentication successful",
+//                    user
+//            ));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body(new ApiResponse("Authentication failed", null));
+//        }
+    }
+
+    @PostMapping("/google-auth")
+    public ResponseEntity<ApiResponse> googleAuth(@RequestBody GoogleAuthDto googleAuthDto) {
+        try {
+            Map<String, Object> obj = userService.handleGoogleAuth(googleAuthDto);
+            User user = (User) obj.get("user");
+            Date fiveSecondsAgo = new Date(System.currentTimeMillis() - 5000);
+            boolean isNewUser = user.getCreatedAt().after(fiveSecondsAgo);
+
+            return ResponseEntity.ok(new GoogleAuthResponse(
+                    "Authentication successful",
+                    obj,
+                    isNewUser ? "REGISTERED" : "LOGIN"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse("Authentication failed", null));
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody AuthDTO authDTO) throws UserNotFoundException {
+    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody AuthDTO authDTO) throws UserNotFoundException {
+//        try {
+//            Map<String, Object> obj = userService.loginUser(authDTO);
+//
+//            return ResponseEntity.ok(new ApiResponse(
+//                    "Authentication successful",
+//                    obj
+//            ));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body(new ApiResponse("Authentication failed", null));
+//        }
         return ResponseEntity.ok(userService.loginUser(authDTO));
     }
 
     @GetMapping("/getUser")
     public ResponseEntity<UserResponseDTO> getUser(@RequestHeader("Authorization") String auth) throws UserNotFoundException {
-        return ResponseEntity.ok(userService.getUser(auth));
+            return ResponseEntity.ok(userService.getUser(auth));
     }
 
-    @PostMapping("/upload-image")
-    public ResponseEntity<String> uploadUserImage(
-            @RequestHeader("Authorization") String auth,
-            @RequestParam("file") MultipartFile file,
-            @RequestBody UserDTO userDto) throws UserNotFoundException, IOException {
-
-            if (file.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File is empty. Please upload a valid image.");
-            }
-
+    @PutMapping("/update")
+    public ResponseEntity<User> uploadUserImage(@RequestHeader("Authorization") String auth,
+                                                @RequestParam(value = "file", required = false) MultipartFile file,
+                                                @ModelAttribute UserDTO userDto)
+                                                throws UserNotFoundException, IOException {
         return ResponseEntity.ok(userService.updateUser(auth, userDto, file));
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<String> changePassword(@RequestHeader("Authorization") String auth,
+                                                 @RequestBody Map<String, String> authData)
+                                                 throws UserNotFoundException {
+
+        String response = userService.changePassword(auth, authData);
+
+        if(response.equals("Success")){
+            return ResponseEntity.ok(response);
+        } else if (response.equals("New password is same")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("New password is same");
+        }else{
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Password not match");
+        }
     }
 
 }

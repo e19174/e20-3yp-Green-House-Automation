@@ -1,7 +1,10 @@
 package com.Green_Tech.Green_Tech.Service;
 
+import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
 import com.Green_Tech.Green_Tech.DTO.SensorDataDTO;
+import com.Green_Tech.Green_Tech.Entity.Device;
 import com.Green_Tech.Green_Tech.Entity.SensorData;
+import com.Green_Tech.Green_Tech.Repository.DeviceRepo;
 import com.Green_Tech.Green_Tech.Repository.SensorDataRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,16 +13,31 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SensorDataService {
 
     @Autowired
     private SensorDataRepository sensorDataRepository;
+    @Autowired
+    private DeviceRepo deviceRepo;
 
-    public SensorData getAllSensorData() {
-        return sensorDataRepository.findFirstByOrderByIdDesc();
+    public Map<String, Object> getSensorData(Long id) {
+        SensorData data = sensorDataRepository.findFirstByDeviceIdOrderByIdDesc(id);
+        Map<String, Object> sensorData = new HashMap<>();
+        sensorData.put("temperature", data.getTemperature());
+        sensorData.put("humidity", data.getHumidity());
+        sensorData.put("soilMoisture", data.getSoilMoisture());
+        sensorData.put("nitrogenLevel", data.getNitrogenLevel());
+        sensorData.put("phosphorusLevel", data.getPhosphorusLevel());
+        sensorData.put("potassiumLevel", data.getPotassiumLevel());
+        sensorData.put("actuatorStatus", data.getActuatorStatus());
+
+        return sensorData;
     }
+
     public HashMap convertByteArrayToHashMap(byte[] jsonData) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -29,34 +47,38 @@ public class SensorDataService {
             return null;
         }
     }
-    public void getDataFromAWS(byte[] data){
+    public void getDataFromAWS(byte[] data) throws DeviceNotFoundException {
         HashMap awsData = convertByteArrayToHashMap(data);
         assert awsData != null;
+
+        Device device = deviceRepo.findByMac((String) awsData.get("mac"));
+
         SensorData sensorData = SensorData.builder()
-                .humidity(awsData.get("humidity") instanceof Integer ? Double.valueOf((Integer) awsData.get("humidity"))
-                        : (Double) awsData.get("humidity"))
-                .soilMoisture(awsData.get("moisture") instanceof Integer ? Double.valueOf((Integer) awsData.get("moisture"))
-                        : (Double) awsData.get("moisture"))
-                .temperature(awsData.get("temperature") instanceof Integer ? Double.valueOf((Integer) awsData.get("temperature"))
-                        : (Double) awsData.get("temperature"))
-                .nitrogenLevel(0.001)
-                .phosphorusLevel(0.001)
-                .potassiumLevel(0.001)
+                .device(device)
+                .humidity( awsData.get("humidity") != null ? awsData.get("humidity") instanceof Integer ? Double.valueOf((Integer) awsData.get("humidity"))
+                        : (Double) awsData.get("humidity"): 0)
+                .soilMoisture( awsData.get("moisture") != null ? awsData.get("moisture") instanceof Integer ? Double.valueOf((Integer) awsData.get("moisture"))
+                        : (Double) awsData.get("moisture"): 0)
+                .temperature( awsData.get("temperature") != null ? awsData.get("temperature") instanceof Integer ? Double.valueOf((Integer) awsData.get("temperature"))
+                        : (Double) awsData.get("temperature"): 0)
+                .nitrogenLevel( awsData.get("nitrogenLevel") != null ? awsData.get("nitrogenLevel") instanceof Integer ? Double.valueOf((Integer) awsData.get("nitrogenLevel"))
+                        : (Double) awsData.get("nitrogenLevel"): 0)
+                .phosphorusLevel( awsData.get("phosphorusLevel") != null ? awsData.get("phosphorusLevel") instanceof Integer ? Double.valueOf((Integer) awsData.get("phosphorusLevel"))
+                        : (Double) awsData.get("phosphorusLevel"): 0)
+                .potassiumLevel( awsData.get("potassiumLevel") != null ? awsData.get("potassiumLevel") instanceof Integer ? Double.valueOf((Integer) awsData.get("potassiumLevel"))
+                        : (Double) awsData.get("potassiumLevel"): 0)
+                .actuatorStatus( convertListToBoolArray((List<Boolean>) awsData.get("actuatorState")))
                 .updatedAt(new Date())
                 .build();
 
         sensorDataRepository.save(sensorData);
     }
 
-
-    private SensorDataDTO convertToDTO(SensorData sensorData) {
-        return new SensorDataDTO(
-                sensorData.getTemperature(),
-                sensorData.getHumidity(),
-                sensorData.getSoilMoisture(),
-                sensorData.getNitrogenLevel(),
-                sensorData.getPhosphorusLevel(),
-                sensorData.getPotassiumLevel()
-        );
+    private boolean[] convertListToBoolArray(List<Boolean> list) {
+        boolean[] result = new boolean[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            result[i] = list.get(i);
+        }
+        return result;
     }
 }

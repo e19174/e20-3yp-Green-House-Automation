@@ -1,13 +1,13 @@
 #include "secrets.h"
+#include "register.h"
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
+extern int deviceId;
 
-#define AWS_IOT_PUBLISH_TOPIC "ESP32/PUB"
-#define AWS_IOT_SUBSCRIBE_TOPIC "ESP32/SUB"
-
-const char *command = "NULL";
+extern int commandIndex;
+extern bool status;
 
 WiFiClientSecure net = WiFiClientSecure();
 PubSubClient client(net);
@@ -17,17 +17,6 @@ void messageHandler(char *topic, byte *payload, unsigned int length);
 
 void connectAWS()
 {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-
-  Serial.println("Connecting to Wi-Fi");
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-
   // Configure WiFiClientSecure to use the AWS IoT device credentials
   net.setCACert(AWS_CERT_CA);
   net.setCertificate(AWS_CERT_CRT);
@@ -54,31 +43,70 @@ void connectAWS()
   }
 
   // Subscribe to a topic
-  client.subscribe(AWS_IOT_SUBSCRIBE_TOPIC);
+  String SubscribeTopic = "esp32/" + String(deviceId) + "/command";
+  client.subscribe(SubscribeTopic.c_str());
 
   Serial.println("AWS IoT Connected!");
 }
 
-void publishMessage(float h, float t, int m)
+void publishMessage(float h, float t, int m, bool actuatorState[])
 {
   JsonDocument doc;
+  doc["mac"] = WiFi.macAddress();
   doc["humidity"] = h;
   doc["temperature"] = t;
   doc["moisture"] = m;
-  char jsonBuffer[512];
-  serializeJson(doc, jsonBuffer); // print to client
+  doc["nitrogenLevel"] = random(40, 75);
+  doc["phosphorusLevel"] = random(35, 70);
+  doc["potassiumLevel"] = random(37, 80);
+   // Create actuatorState array in JSON
+  JsonArray stateArray = doc["actuatorState"].to<JsonArray>();
+  for (int i = 0; i < 5; i++) {
+    stateArray.add(actuatorState[i]);
+  }
 
-  client.publish(AWS_IOT_PUBLISH_TOPIC, jsonBuffer);
+  // Serialize and publish
+  char jsonBuffer[512];
+  serializeJson(doc, jsonBuffer);
+  String topic = "esp32/" + String(deviceId) + "/data";
+  bool result = client.publish(topic.c_str(), jsonBuffer);
+
 }
 
 void messageHandler(char *topic, byte *payload, unsigned int length)
 {
-  Serial.print("incoming: ");
+  Serial.print("Incoming topic: ");
   Serial.println(topic);
 
+  // Create a temporary char buffer to hold the payload as a string
+  char messageBuffer[length + 1];
+  memcpy(messageBuffer, payload, length);
+  messageBuffer[length] = '\0'; // Null-terminate the string
+
+  Serial.print("Payload: ");
+  Serial.println(messageBuffer);
+
+  // Parse the JSON
   JsonDocument doc;
-  deserializeJson(doc, payload);
-  const char *message = doc["message"];
-  Serial.println(message);
-  command = message;
+  DeserializationError error = deserializeJson(doc, messageBuffer);
+  if (error) {
+    Serial.print("deserializeJson() failed: ");
+    Serial.println(error.c_str());
+    return;
+  }
+
+  if (doc["index"].is<int>() && doc["status"].is<bool>()) {
+    int localIndex = doc["index"];
+    bool localStatus = doc["status"];
+
+    Serial.print("Index: ");
+    Serial.print(localIndex);
+    Serial.print(", Status: ");
+    Serial.println(localStatus ? "true" : "false");
+    commandIndex = localIndex;
+    status = localStatus;
+
+  } else {
+    Serial.println("Missing fields in JSON");
+  }
 }
