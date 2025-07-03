@@ -84,14 +84,14 @@ const Register:React.FC = () => {
       if (password !== confirmPassword) {
         alert('Password and Confirm Password not match');
         return;
-      }
+        }
 
       try {
         const response = await Axios.post("/auth/user/register", {email, password, confirmPassword});
         console.log(response.data);
         router.push("/Authentication/login");
       } catch (error) {
-        console.log(error)
+        console.log(error.response.data)
       }
     }
 
@@ -130,9 +130,9 @@ const Register:React.FC = () => {
             <View style={[styles.formContainer, {backgroundColor: theme.colors.primary}]}>
                 <Text style={[styles.title, {color: theme.colors.text}]}>Register</Text>
                 <View style={styles.form}>
-                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Email' placeholderTextColor="rgb(173, 173, 173)" value={email} onChangeText={(value) => setEmail(value)}/>
-                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Password' placeholderTextColor="rgb(173, 173, 173)" value={password} onChangeText={(value) => setPassword(value)}/>
-                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='ConfirmPassword' placeholderTextColor="rgb(173, 173, 173)" value={confirmPassword} onChangeText={(value) => setConfirmPassword(value)}/>
+                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Email' placeholderTextColor="rgb(173, 173, 173)" value={email} onChangeText={(value) => setEmail(value.trim())}/>
+                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='Password' placeholderTextColor="rgb(173, 173, 173)" value={password} onChangeText={(value) => setPassword(value.trim())}/>
+                    <TextInput style={[styles.inputs, {color: theme.colors.text}]} placeholder='ConfirmPassword' placeholderTextColor="rgb(173, 173, 173)" value={confirmPassword} onChangeText={(value) => setConfirmPassword(value.trim())}/>
                     <TouchableOpacity onPress={handleRegister} style={styles.register}>
                         <Text style={styles.text}>REGISTER</Text>
                     </TouchableOpacity>
