@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { userAuth } from '../../Contexts/UserContext';
 import { themeAuth } from '../../Contexts/ThemeContext';
 import { get, remove } from '../../Storage/secureStorage';
-import { useAuth } from '@clerk/clerk-expo';
+// import { useAuth } from '@clerk/clerk-expo';
 
 interface USER {
   name: string;
@@ -20,7 +20,7 @@ interface USER {
 const Header: React.FC = () => {
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const { theme, toggleTheme } = themeAuth();
-  const {isSignedIn, signOut} = useAuth();
+  // const {isSignedIn, signOut} = useAuth();
 
   const{user, setUser} = userAuth();
   const imageUri = `data:${user?.imageType};base64,${(user?.imageData)}`;
@@ -43,13 +43,13 @@ const Header: React.FC = () => {
     router.push('/Authentication/login');
   }
 
-  const googleSignout = async () => {
-    await signOut();
-    remove("token");
-    setUser({} as USER);
-    setSidebarVisible(false);
-    router.push('/Authentication/login');
-  }
+  // const googleSignout = async () => {
+  //   await signOut();
+  //   remove("token");
+  //   setUser({} as USER);
+  //   setSidebarVisible(false);
+  //   router.push('/Authentication/login');
+  // }
 
   return (
     <>
@@ -123,7 +123,8 @@ const Header: React.FC = () => {
 
             <View style={[styles.divider, {backgroundColor: theme.dark? 'rgba(255, 255, 255, 0.2)' : '#aaa'}]} />
             <Text style={[styles.versionText, {color: theme.colors.text}]}>App Version 10.2.1</Text>
-            <TouchableOpacity style={[styles.logoutButton, {backgroundColor: theme.colors.primary}]} onPress={isSignedIn? googleSignout :handleLogout}>
+            {/* <TouchableOpacity style={[styles.logoutButton, {backgroundColor: theme.colors.primary}]} onPress={isSignedIn? googleSignout :handleLogout}> */}
+            <TouchableOpacity style={[styles.logoutButton, {backgroundColor: theme.colors.primary}]} onPress={handleLogout}>
               <Text style={styles.logoutText}>Log Out</Text>
             </TouchableOpacity>
           </View>

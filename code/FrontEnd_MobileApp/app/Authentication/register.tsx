@@ -3,25 +3,25 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Link, router } from 'expo-router'
 import { Axios } from '../../app/AxiosRequestBuilder';
 import { themeAuth } from '../../Contexts/ThemeContext';
-import * as WebBrowser from 'expo-web-browser'
-import * as AuthSession from 'expo-auth-session'
-import { useAuth, useSSO, useUser } from '@clerk/clerk-expo'
+// import * as WebBrowser from 'expo-web-browser'
+// import * as AuthSession from 'expo-auth-session'
+// import { useAuth, useSSO, useUser } from '@clerk/clerk-expo'
 import { save } from '../../Storage/secureStorage';
 import { userAuth } from '../../Contexts/UserContext';
 import { Ionicons } from '@expo/vector-icons';
 
-export const useWarmUpBrowser = () => {
-useEffect(() => {
-  // Preloads the browser for Android devices to reduce authentication load time
-  // See: https://docs.expo.dev/guides/authentication/#improving-user-experience
-  void WebBrowser.warmUpAsync()
-  return () => {
-    // Cleanup: closes browser when component unmounts
-    void WebBrowser.coolDownAsync()
-  }
-}, [])
-}
-WebBrowser.maybeCompleteAuthSession()
+// export const useWarmUpBrowser = () => {
+// useEffect(() => {
+//   // Preloads the browser for Android devices to reduce authentication load time
+//   // See: https://docs.expo.dev/guides/authentication/#improving-user-experience
+//   void WebBrowser.warmUpAsync()
+//   return () => {
+//     // Cleanup: closes browser when component unmounts
+//     void WebBrowser.coolDownAsync()
+//   }
+// }, [])
+// }
+// WebBrowser.maybeCompleteAuthSession()
 
 const Register:React.FC = () => {
     const [email, setEmail] = useState<string>('')
@@ -30,49 +30,49 @@ const Register:React.FC = () => {
     const {theme} = themeAuth();
     const { setUser } = userAuth();
 
-    useWarmUpBrowser()
+    // useWarmUpBrowser()
 
-    // Use the `useSSO()` hook to access the `startSSOFlow()` method
-    const { startSSOFlow } = useSSO()
+    // // Use the `useSSO()` hook to access the `startSSOFlow()` method
+    // const { startSSOFlow } = useSSO()
 
-    const onPress = useCallback(async () => {
-    try {
-        // Start the authentication process by calling `startSSOFlow()`
-        const { createdSessionId, setActive, signIn, signUp } = await startSSOFlow({
-        strategy: 'oauth_google',
-        // For web, defaults to current path
-        // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
-        // For more info, see https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturioptions
-        redirectUrl: AuthSession.makeRedirectUri({ scheme: 'myapp', path: '/' }),
-        })
+    // const onPress = useCallback(async () => {
+    // try {
+    //     // Start the authentication process by calling `startSSOFlow()`
+    //     const { createdSessionId, setActive, signIn, signUp } = await startSSOFlow({
+    //     strategy: 'oauth_google',
+    //     // For web, defaults to current path
+    //     // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
+    //     // For more info, see https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturioptions
+    //     redirectUrl: AuthSession.makeRedirectUri({ scheme: 'myapp', path: '/' }),
+    //     })
 
-        // If sign in was successful, set the active session
-        if (createdSessionId) {
-          setActive!({ session: createdSessionId });
-        } else {
-        // If there is no `createdSessionId`,
-        // there are missing requirements, such as MFA
-        // Use the `signIn` or `signUp` returned from `startSSOFlow`
-        // to handle next steps
-          Alert.alert('Sign in or sign up is required to complete the authentication process.');
-        }
-    } catch (err) {
-        // See https://clerk.com/docs/custom-flows/error-handling
-        // for more info on error handling
-        console.error(JSON.stringify(err, null, 2))
-    }
-    }, [])
+    //     // If sign in was successful, set the active session
+    //     if (createdSessionId) {
+    //       setActive!({ session: createdSessionId });
+    //     } else {
+    //     // If there is no `createdSessionId`,
+    //     // there are missing requirements, such as MFA
+    //     // Use the `signIn` or `signUp` returned from `startSSOFlow`
+    //     // to handle next steps
+    //       Alert.alert('Sign in or sign up is required to complete the authentication process.');
+    //     }
+    // } catch (err) {
+    //     // See https://clerk.com/docs/custom-flows/error-handling
+    //     // for more info on error handling
+    //     console.error(JSON.stringify(err, null, 2))
+    // }
+    // }, [])
 
-    const {user} = useUser();
-    const {isSignedIn, signOut} = useAuth();
+    // const {user} = useUser();
+    // const {isSignedIn, signOut} = useAuth();
 
-    useEffect(() => {
-      if (isSignedIn) {
-        handleGoogleSignIn();
-      } else {
-          console.log('No user is signed in')
-      }
-    }, [signOut, isSignedIn, user])
+    // useEffect(() => {
+    //   if (isSignedIn) {
+    //     handleGoogleSignIn();
+    //   } else {
+    //       console.log('No user is signed in')
+    //   }
+    // }, [signOut, isSignedIn, user])
     
 
     const handleRegister = async () => {
@@ -96,34 +96,34 @@ const Register:React.FC = () => {
     }
 
     // For Google OAuth registration
-  const handleGoogleSignIn = async () => {
-    try {
-      // After successful Clerk Google sign-in
-      const googleAuthData = {
-        email: user?.primaryEmailAddress?.emailAddress,
-        name: user?.fullName,
-        profileImage: user?.imageUrl,
-        clerkUserId: user?.id
-      };
+  // const handleGoogleSignIn = async () => {
+  //   try {
+  //     // After successful Clerk Google sign-in
+  //     const googleAuthData = {
+  //       email: user?.primaryEmailAddress?.emailAddress,
+  //       name: user?.fullName,
+  //       profileImage: user?.imageUrl,
+  //       clerkUserId: user?.id
+  //     };
       
-      const response = await Axios.post("auth/user/google-auth", googleAuthData);
-        console.log('Google Sign-In Response:', response.data);
-        if (response.data.action === 'REGISTERED') {
-          // New user registered via Google
-          Alert.alert('Welcome! Your account has been created.');
-        } else {
-          // Existing user logged in
-          Alert.alert('Welcome back!');
-        }
-        setUser(response.data.data.user);  
-        await save("token", response.data.data.token);
-        router.replace("/Components/Home/Home");
-    } catch (error) {
-      Alert.alert('Error', 'Failed to sign in with Google. Please try again.')
-      console.error('Google Sign-In Error:', error);
-    }
+  //     const response = await Axios.post("auth/user/google-auth", googleAuthData);
+  //       console.log('Google Sign-In Response:', response.data);
+  //       if (response.data.action === 'REGISTERED') {
+  //         // New user registered via Google
+  //         Alert.alert('Welcome! Your account has been created.');
+  //       } else {
+  //         // Existing user logged in
+  //         Alert.alert('Welcome back!');
+  //       }
+  //       setUser(response.data.data.user);  
+  //       await save("token", response.data.data.token);
+  //       router.replace("/Components/Home/Home");
+  //   } catch (error) {
+  //     Alert.alert('Error', 'Failed to sign in with Google. Please try again.')
+  //     console.error('Google Sign-In Error:', error);
+  //   }
       
-  };
+  // };
     
     return (
         <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
@@ -140,12 +140,12 @@ const Register:React.FC = () => {
                 <Text style={styles.already}>Already have an one?</Text>
                 <Link href={"/Authentication/login"} style={styles.login}>LOGIN</Link>
 
-                <View>
+                {/* <View>
                     <TouchableOpacity style={styles.googleLogin}>
                         <Ionicons name="logo-google" size={18} color="black" />
                         <Text onPress={onPress} style={styles.googleLoginText}>Sign in with Google</Text>
                     </TouchableOpacity>
-                </View>
+                </View> */}
             </View>
         </View>
   )
