@@ -1,15 +1,13 @@
 package com.Green_Tech.Green_Tech.Service;
 
-import com.Green_Tech.Green_Tech.CustomException.DeviceAlreadyFoundException;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
+import com.Green_Tech.Green_Tech.CustomException.PlantNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
 import com.Green_Tech.Green_Tech.Entity.AwsIotCredentials;
 import com.Green_Tech.Green_Tech.Entity.Device;
+import com.Green_Tech.Green_Tech.Entity.Plant;
 import com.Green_Tech.Green_Tech.Entity.User;
-import com.Green_Tech.Green_Tech.Repository.AwsIotCredentialsRepo;
-import com.Green_Tech.Green_Tech.Repository.DeviceRepo;
-import com.Green_Tech.Green_Tech.Repository.SensorDataRepository;
-import com.Green_Tech.Green_Tech.Repository.UserRepo;
+import com.Green_Tech.Green_Tech.Repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +29,8 @@ public class DeviceService {
     private AwsIotCredentialsRepo awsIotCredentialsRepo;
     @Autowired
     private SensorDataRepository sensorDataRepository;
+    @Autowired
+    private PlantRepo plantRepo;
 
 
     // Get all devices
@@ -95,13 +95,19 @@ public class DeviceService {
     }
 
     // Update an existing device
-    public Device updateDevice(Long id, Map<String, String> updatedDevice) throws DeviceNotFoundException {
+    public Device updateDevice(Long id, Map<String, String> updatedDevice)
+            throws DeviceNotFoundException, PlantNotFoundException {
         Device device = deviceRepository.findById(id).orElseThrow(
                 () -> new DeviceNotFoundException("Device not found!!"));
+
+        Plant plant = plantRepo.findById(Long.valueOf(updatedDevice.get("plantId"))).orElseThrow(() ->
+                new PlantNotFoundException("Plant not found!"));
 
         device.setZoneName(updatedDevice.get("zoneName"));
         device.setName(updatedDevice.get("name"));
         device.setLocation(updatedDevice.get("location"));
+        device.setPlant(plant);
+
         return deviceRepository.save(device);
     }
 
@@ -117,11 +123,15 @@ public class DeviceService {
         throw new DeviceNotFoundException("device not Found!");
     }
 
-    public Device activateDevice(Long id) throws DeviceNotFoundException {
+    public Device activateDevice(Long id, Map<String, Long> plantData) throws DeviceNotFoundException, PlantNotFoundException {
         Device device = deviceRepository.findById(id).orElseThrow(
                 () -> new DeviceNotFoundException("Device not found!!"));
 
+        Plant plant = plantRepo.findById(plantData.get("plantId")).orElseThrow(() ->
+                new PlantNotFoundException("Plant not found!"));
+
         device.setActive(true);
+        device.setPlant(plant);
         return deviceRepository.save(device);
     }
 

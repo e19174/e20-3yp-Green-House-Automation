@@ -23,7 +23,10 @@ public class Device {
     private String name;
     private String location;
     @ManyToOne
-    @JoinColumn(name = "user_id")  // creates a foreign key column 'user_id' in Device table
+    @JoinColumn(name = "user_id")
     private User user;
     private boolean active;
+    @OneToOne
+    @JoinColumn(name = "plant_id")
+    private Plant plant;
 }

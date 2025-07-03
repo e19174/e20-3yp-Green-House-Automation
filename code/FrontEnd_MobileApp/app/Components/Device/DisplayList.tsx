@@ -12,6 +12,23 @@ type Device = {
   location: string;
   addedAt: string;
   user: User;
+  plant: Plant;
+  active: boolean;
+};
+
+type Plant = {
+  id: number;
+  name: string;
+  description: string;
+  temperature: number;
+  moisture: number;
+  humidity: number;
+  phosphorus: number;
+  nitrogen: number;
+  potassium: number;
+  imageData?: string;
+  imageType?: string;
+  imageName?: string;
 };
 
 interface User {
@@ -48,7 +65,7 @@ const DeviceListScreen: React.FC = () => {
     const fetchDevices = async () => {
       try {
         // const response = filter === "active" ?await Axios.get('device/active') : await Axios.get('/device/by-user')
-        const response = await Axios.get(filter === "active" ? '/device/active': '/device/getByUser')
+        const response = await Axios.get(filter === "active" ? '/device/active': '/device/nonActive')
         setDevices(response.data);
       } catch (error) {
         console.error('Error fetching devices:', error);

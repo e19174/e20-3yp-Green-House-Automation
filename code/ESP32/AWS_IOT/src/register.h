@@ -224,7 +224,7 @@ bool sendRegistrationToBackend() {
 
   http.setTimeout(10000);
   
-  http.begin(client, "http://192.168.129.83:8080/api/v1/device/addDevice");
+  http.begin(client, "http://192.168.155.83:8080/api/v1/device/addDevice");
   http.addHeader("Content-Type", "application/json");
 
   JsonDocument doc;

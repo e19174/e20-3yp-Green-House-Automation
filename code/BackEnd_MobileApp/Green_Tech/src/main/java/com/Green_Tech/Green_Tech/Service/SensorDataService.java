@@ -81,16 +81,4 @@ public class SensorDataService {
         }
         return result;
     }
-
-
-    private SensorDataDTO convertToDTO(SensorData sensorData) {
-        return new SensorDataDTO(
-                sensorData.getTemperature(),
-                sensorData.getHumidity(),
-                sensorData.getSoilMoisture(),
-                sensorData.getNitrogenLevel(),
-                sensorData.getPhosphorusLevel(),
-                sensorData.getPotassiumLevel()
-        );
-    }
 }

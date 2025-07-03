@@ -56,9 +56,9 @@ void publishMessage(float h, float t, int m, bool actuatorState[])
   doc["humidity"] = h;
   doc["temperature"] = t;
   doc["moisture"] = m;
-  doc["nitrogenLevel"] = 200;
-  doc["phosphorusLevel"] = 136;
-  doc["potassiumLevel"] = 556;
+  doc["nitrogenLevel"] = random(40, 75);
+  doc["phosphorusLevel"] = random(35, 70);
+  doc["potassiumLevel"] = random(37, 80);
    // Create actuatorState array in JSON
   JsonArray stateArray = doc["actuatorState"].to<JsonArray>();
   for (int i = 0; i < 5; i++) {

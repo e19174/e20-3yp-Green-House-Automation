@@ -2,6 +2,7 @@ package com.Green_Tech.Green_Tech.Controller;
 
 import com.Green_Tech.Green_Tech.CustomException.DeviceAlreadyFoundException;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
+import com.Green_Tech.Green_Tech.CustomException.PlantNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
 import com.Green_Tech.Green_Tech.Entity.AwsIotCredentials;
 import com.Green_Tech.Green_Tech.Entity.Device;
@@ -32,7 +33,7 @@ public class DeviceController {
         return deviceService.getAllDevices(auth);
     }
 
-    @GetMapping("/getByUser")
+    @GetMapping("/nonActive")
     public ResponseEntity<List<Device>> getDevicesByUser(@RequestHeader("Authorization") String auth)
                                                         throws UserNotFoundException {
         return ResponseEntity.ok(deviceService.getDevicesByUser(auth));
@@ -92,13 +93,15 @@ public class DeviceController {
     }
 
     @PutMapping("activate/{id}")
-    public ResponseEntity<Device> activateDevice(@PathVariable("id") Long id) throws DeviceNotFoundException {
-        return ResponseEntity.ok(deviceService.activateDevice(id));
+    public ResponseEntity<Device> activateDevice(@PathVariable("id") Long id,
+                                                 @RequestBody Map<String, Long> plantData)
+                                                throws DeviceNotFoundException, PlantNotFoundException {
+        return ResponseEntity.ok(deviceService.activateDevice(id, plantData));
     }
 
     @PutMapping("update/{id}")
     public ResponseEntity<Device> updateDevice(@PathVariable("id") Long id, @RequestBody Map<String, String> updatedDevice)
-            throws DeviceNotFoundException {
+            throws DeviceNotFoundException, PlantNotFoundException {
         return ResponseEntity.ok(deviceService.updateDevice(id, updatedDevice));
     }
 

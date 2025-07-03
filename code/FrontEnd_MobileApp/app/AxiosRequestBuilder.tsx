@@ -3,7 +3,8 @@ import { get, remove } from "../Storage/secureStorage";
 import { router } from "expo-router";
 
 export const Axios = axios.create({
-    baseURL: "http://192.168.129.83:8080/api/v1/",
+    // baseURL: "http://192.168.129.239:8080/api/v1/",
+    baseURL: "http://192.168.155.83:8080/api/v1/",
     // baseURL: "http://10.30.10.242:8080/api/v1/",
 })
 

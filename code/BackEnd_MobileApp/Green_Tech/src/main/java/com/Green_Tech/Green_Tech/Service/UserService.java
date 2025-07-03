@@ -212,4 +212,22 @@ public class UserService {
             user.setClerkUserId(dto.getClerkUserId());
         }
     }
+
+    public String changePassword(String auth, Map<String, String> authData) throws UserNotFoundException {
+        User user = extractUserService.extractUserFromJwt(auth);
+
+        String currentPassword = authData.get("currentPassword");
+        String newPassword = authData.get("newPassword");
+
+        if(passwordEncoder.matches(currentPassword, user.getPassword())){
+           if(!currentPassword.equals(newPassword)){
+               user.setPassword(passwordEncoder.encode(newPassword));
+               user.setUpdatedAt(new Date());
+               userRepo.save(user);
+               return "Success";
+           }
+           return "New password is same";
+        }
+        return "password not match";
+    }
 }

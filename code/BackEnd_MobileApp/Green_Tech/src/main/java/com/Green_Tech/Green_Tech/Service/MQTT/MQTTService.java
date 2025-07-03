@@ -14,7 +14,6 @@ import software.amazon.awssdk.iot.AwsIotMqttConnectionBuilder;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -37,12 +36,12 @@ public class MQTTService {
 //        new Thread(this::connectAllDevices).start();
 //    }
 
-    public void connectAllDevices() {
-        List<AwsIotCredentials> credentials = awsIotCredentialsRepo.findAllByActiveDevices(true);
-        for (AwsIotCredentials aws : credentials) {
-            connectAndSubscribe(aws);
-        }
-    }
+//    public void connectAllDevices() {
+//        List<AwsIotCredentials> credentials = awsIotCredentialsRepo.findAllByActiveDevices(true);
+//        for (AwsIotCredentials aws : credentials) {
+//            connectAndSubscribe(aws);
+//        }
+//    }
 
 //    @Scheduled(fixedDelay = 10000)
 //    public void checkAndReconnectDevices() {

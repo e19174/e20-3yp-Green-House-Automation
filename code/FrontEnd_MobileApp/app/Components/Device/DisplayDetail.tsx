@@ -8,11 +8,13 @@ import {
   ScrollView,
   RefreshControl,
   Alert,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { Axios } from "../../AxiosRequestBuilder";
 import { themeAuth } from "../../../Contexts/ThemeContext";
+import SelectPlant from "./SelectPlant";
 
 type Device = {
   id: number;
@@ -21,8 +23,25 @@ type Device = {
   zoneName: string;
   location: string;
   addedAt: string;
+  active: boolean;
   user: User;
+  plant: Plant;
 };
+
+interface Plant {
+  id: number;
+  name: string;
+  description: string;
+  temperature: number;
+  moisture: number;
+  humidity: number;
+  phosphorus: number;
+  nitrogen: number;
+  potassium: number;
+  imageData: string;
+  imageType: string;
+  imageName: string;
+}
 
 interface User {
   name: string;
@@ -44,6 +63,7 @@ const DisplayDetail: React.FC = () => {
     zoneName: "",
     location: "",
     addedAt: "",
+    active:false,
     user: {
       name: "",
       email: "",
@@ -52,8 +72,24 @@ const DisplayDetail: React.FC = () => {
       imageType: "",
       imageName: "",
     },
+    plant: {
+      id: 0,
+      name: "",
+      description: "",
+      temperature: 0,
+      moisture: 0,
+      humidity: 0,
+      phosphorus: 0,
+      nitrogen: 0,
+      potassium: 0,
+      imageData: "",
+      imageType: "",
+      imageName: "",
+    },
   });
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
     setRefreshing(true);
@@ -68,6 +104,7 @@ const DisplayDetail: React.FC = () => {
         name: device.name.trim(),
         zoneName: device.zoneName.trim(),
         location: device.location.trim(),
+        plantId: selectedPlant ? selectedPlant.id : null,
       });
       setDevice(response.data);
     } catch (error) {
@@ -77,8 +114,17 @@ const DisplayDetail: React.FC = () => {
   };
 
   const handleAddDevice = async () => {
+    if (!selectedPlant) {
+      Alert.alert("Error", "Please select a plant before adding the device.");
+      return;
+    }
+    if(device.name.trim() === "" || device.zoneName.trim() === "" || device.location.trim() === "") {
+      Alert.alert("Error", "Please fill in all fields before adding the device.");
+      return;
+    }
+
     try {
-      const response = await Axios.put(`/device/activate/${device.id}`);
+      const response = await Axios.put(`/device/activate/${device.id}`, { plantId: selectedPlant ? selectedPlant.id : null });
       Alert.alert("Success", "Device added successfully");
     } catch (error) {
       console.error("Error adding device:", error);
@@ -102,6 +148,7 @@ const DisplayDetail: React.FC = () => {
       try {
         const deviceObject = JSON.parse(params.device as string);
         setDevice(deviceObject);
+        setSelectedPlant(deviceObject.plant);
       } catch (error) {
         console.error("Error parsing device data:", error);
       }
@@ -121,8 +168,8 @@ const DisplayDetail: React.FC = () => {
         }
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={handleAddDevice}>
-            <Text style={[styles.saveButton, {color: theme.colors.text}]}>Add</Text>
+          <TouchableOpacity style={styles.deleteBtn} onPress={() => {handleDeleteDevice(device.id)}}>
+            <Ionicons name="trash" size={22} color="white" style={{marginTop: 20}}/>
           </TouchableOpacity>
 
           <Text style={[styles.headerTitle, {color: theme.colors.text}]}>Device Details</Text>
@@ -136,7 +183,7 @@ const DisplayDetail: React.FC = () => {
                 name="create-outline"
                 size={24}
                 color={theme.colors.text}
-                fontSize="bold"
+                style={{marginTop: 20}}
               />
             </TouchableOpacity>
           )}
@@ -210,20 +257,33 @@ const DisplayDetail: React.FC = () => {
           </View>
         </View>
 
+        
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>User Information</Text>
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Assigned User</Text>
-            <Text style={styles.fieldValue}>{device.user.name}</Text>
-          </View>
-        </View>
+            <View style={styles.plantSelectionContainer}>
+              <Text style={styles.sectionTitle}>{isEditing ? "Select plant" : "Plant"}</Text>
+              {isEditing && (
+                <TouchableOpacity onPress={() => setShowModal(true)}>
+                  <Ionicons name="create-outline" size={16} />
+                </TouchableOpacity>
+              )}
+            </View>
+            <View>
+              <View style={styles.plantView}>
+                  <Image source={selectedPlant?.imageData ? { uri: `data:${selectedPlant.imageType};base64,${selectedPlant.imageData}` } :
+                   require("../../../assets/noImage.jpg")} style={styles.plantImage}/>
+                  <Text style={styles.plantName}>{selectedPlant ? selectedPlant.name : "No plant selected"}</Text>
+              </View>
+            </View>
 
-        <TouchableOpacity style={styles.deleteBtn} onPress={() => {handleDeleteDevice(device.id)}}>
-          <Ionicons name="trash" size={16} color="#fff" />
-          <Text style={styles.deleteText}>
-            Delete Device
-          </Text>
-        </TouchableOpacity>
+        </View>
+        
+        { !device.active &&
+          <TouchableOpacity onPress={handleAddDevice} style={styles.addButton}>
+              <Text style={[styles.addText, {color: theme.colors.text}]}>Add</Text>
+            </TouchableOpacity>
+        }
+
+        <SelectPlant modalVisible={showModal} setModalVisible={setShowModal} setSelectedPlant={setSelectedPlant} />
 
       </ScrollView>
     </View>
@@ -253,13 +313,28 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   saveButton: {
-    color: "white",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 5,
+    marginTop: 20,
+    fontSize: 18,
+  },
+  addButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginTop: -5,
+    fontSize: 16,
+    backgroundColor: "#01694D"
+  },
+  addText: {
+    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-    paddingRight: 10,
   },
   section: {
-    backgroundColor: "#fff",
+    backgroundColor: '#f0fdf4',
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
@@ -294,23 +369,35 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     fontSize: 16,
-    backgroundColor: "#fff",
+    backgroundColor: '#f0fdf4',
   },
   deleteBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f44336",
-    paddingVertical: 10,
-    borderRadius: 5,
-    marginTop: -5,
-  },
-  deleteText: {
-    color: "#fff",
+    color: "white",
     fontSize: 16,
     fontWeight: "bold",
-    marginLeft: 10,
+    paddingRight: 10,
   },
+  plantSelectionContainer:{
+    flexDirection: 'row',
+    justifyContent: "space-between"
+  },
+    plantView:{
+    backgroundColor: '#f0fdf4',
+    marginTop: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  plantName:{
+    fontSize: 16,
+    marginLeft: 20
+  },
+  plantImage:{
+    width: 50,
+    height: 50,
+    borderRadius: 8
+  }
 });
 
 export default DisplayDetail;

@@ -6,6 +6,7 @@ import com.Green_Tech.Green_Tech.DTO.*;
 import com.Green_Tech.Green_Tech.Entity.User;
 import com.Green_Tech.Green_Tech.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,9 +82,26 @@ public class UserController {
 
     @PutMapping("/update")
     public ResponseEntity<User> uploadUserImage(@RequestHeader("Authorization") String auth,
-                                                  @RequestParam(value = "file", required = false) MultipartFile file,
-                                                  @ModelAttribute UserDTO userDto) throws UserNotFoundException, IOException {
+                                                @RequestParam(value = "file", required = false) MultipartFile file,
+                                                @ModelAttribute UserDTO userDto)
+                                                throws UserNotFoundException, IOException {
         return ResponseEntity.ok(userService.updateUser(auth, userDto, file));
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<String> changePassword(@RequestHeader("Authorization") String auth,
+                                                 @RequestBody Map<String, String> authData)
+                                                 throws UserNotFoundException {
+
+        String response = userService.changePassword(auth, authData);
+
+        if(response.equals("Success")){
+            return ResponseEntity.ok(response);
+        } else if (response.equals("New password is same")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("New password is same");
+        }else{
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Password not match");
+        }
     }
 
 }
