@@ -4,6 +4,7 @@ import com.Green_Tech.Green_Tech.Config.JwtService;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.PlantNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
+import com.Green_Tech.Green_Tech.DTO.PlantDTO;
 import com.Green_Tech.Green_Tech.DTO.UserResponseDTO;
 import com.Green_Tech.Green_Tech.Entity.*;
 import com.Green_Tech.Green_Tech.Repository.*;
@@ -214,14 +215,31 @@ public class AdminService {
         return Collections.emptyList();
     }
 
-    public List<Plant> addNewPlant(String auth, Plant plantData) throws UserNotFoundException {
+    public List<Plant> addNewPlant(String auth, PlantDTO plantData, MultipartFile file) throws UserNotFoundException,
+            IOException {
         Admin admin = extractUserService.extractAdminFromJwt(auth);
-        if(admin.isEnabled()){
-            decodeBase64Image(plantData);
-            plantRepo.save(plantData);
-            return plantRepo.findAll();
-        }
-        return Collections.emptyList();
+//        if(admin.isEnabled()){
+////            decodeBase64Image(plantData);
+////            plantRepo.save(plantData);
+////            return plantRepo.findAll();
+////        }
+        Plant plant = Plant.builder()
+                .name(plantData.getName())
+                .description(plantData.getDescription())
+                .humidity(plantData.getHumidity())
+                .temperature(plantData.getTemperature())
+                .nitrogen(plantData.getNitrogen())
+                .phosphorus(plantData.getPhosphorus())
+                .potassium(plantData.getPotassium())
+                .moisture(plantData.getMoisture())
+                .imageData(file == null ?null: file.getBytes())
+                .imageName(file == null ?null: file.getOriginalFilename())
+                .imageType(file == null ?null: file.getContentType())
+                .build();
+
+        plantRepo.save(plant);
+
+        return plantRepo.findAll();
     }
 
 

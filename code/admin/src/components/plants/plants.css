@@ -26,20 +26,19 @@
     background-color: #105739;
     color: #fff;
     border: none;
-    padding: 8px 20px;
+    font-size: 14px;
+    padding: 10px 14px;
     border-radius: 5px;
     cursor: pointer;
     margin: 10px 0 5px 0;
 }
 
-
-
-
 .edit-btn {
     background-color: hsl(136, 63%, 25%);
     color: #fff;
     border: none;
-    padding: 5px 10px;
+    padding: 8px 25px;
+    font-size: 14px;
     border-radius: 5px;
     cursor: pointer;
 }
@@ -48,7 +47,8 @@
     background-color: #e74c3c;
     color: #fff;
     border: none;
-    padding: 5px 10px;
+    padding: 8px 25px;
+    font-size: 14px;
     border-radius: 5px;
     cursor: pointer;
     margin-left: 10px;
@@ -64,77 +64,69 @@
 .plant-item {
     display: flex;
     justify-content: space-between;
-    /* pushes name to left, buttons to right */
     align-items: center;
-    /* vertically align center */
     padding: 16px 24px;
     margin-bottom: 12px;
     background-color: #f1f1f1;
     border-radius: 10px;
-    width: 100%;
+    width: 200%;
+    height: 65px;
     font-size: 18px;
-    /* make it expand full width */
-    max-width: 600px;
+    max-width: 1150px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     transition: background-color 0.2s ease;
-
-    /* optional: set a max width */ }
+ }
     
 
 
 .plant-buttons {
     display: flex;
-    gap: 10px;     }
-
-
-
-
-        .plant-detail-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
+    gap: 10px; 
     
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 300px;     }
+    }
 
 
 
 
-                        .plant-info {
-                            display: flex;
-                            align-items: center;
-                            cursor: pointer;
-                            flex: 1;
-                            gap: 12px;
-                        }
-            
-                        .plant-img-placeholder {
-                            width: 40px;
-                            height: 40px;
-                            min-width: 40px;
-                            border-radius: 6px;
-                            background-color: #c8e6c9;
-                            background-image: url('https://cdn-icons-png.flaticon.com/512/2909/2909767.png');
-                            background-size: 60%;
-                            background-repeat: no-repeat;
-                            background-position: center;
-                        }
-            
-                        .plant-name {
-                            font-weight: 600;
-                            font-size: 18px;
-                            color: #2e7d32;
-                        }
+.plant-detail-modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 999;
+}
+
+.modal-content {
+background-color: white;
+padding: 10px 20px;
+border-radius: 10px;
+width: 300px;     
+}
+
+.plant-info {
+display: flex;
+align-items: center;
+cursor: pointer;
+flex: 1;
+gap: 12px;
+}
+
+.plant-img-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.plant-name {
+font-weight: 700;
+font-size: 20px;
+color: #2e7d32;
+}
 
 

@@ -84,14 +84,14 @@ const Register:React.FC = () => {
       if (password !== confirmPassword) {
         alert('Password and Confirm Password not match');
         return;
-      }
+        }
 
       try {
         const response = await Axios.post("/auth/user/register", {email, password, confirmPassword});
         console.log(response.data);
         router.push("/Authentication/login");
       } catch (error) {
-        console.log(error)
+        console.log(error.response.data)
       }
     }
 

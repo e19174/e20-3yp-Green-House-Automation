@@ -11,6 +11,7 @@ import com.Green_Tech.Green_Tech.Entity.AuthMethod;
 import com.Green_Tech.Green_Tech.Entity.Role;
 import com.Green_Tech.Green_Tech.Entity.User;
 import com.Green_Tech.Green_Tech.Repository.UserRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
+@Slf4j
 public class UserService {
 
     @Autowired
@@ -37,6 +39,8 @@ public class UserService {
 
 
     public User createNewUser(AuthDTO authDTO) throws UserAlreadyFoundException {
+
+        log.info(String.format("email: %s", authDTO.getEmail()));
         // verify user already exists
         if (userRepo.existsByEmail(authDTO.getEmail())) {
             throw new UserAlreadyFoundException("User already exists");
@@ -48,7 +52,7 @@ public class UserService {
         }
 
         // validate email format
-        if (!authDTO.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+        if (!authDTO.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
             throw new IllegalArgumentException("Invalid email format");
         }
 
