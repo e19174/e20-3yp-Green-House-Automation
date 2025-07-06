@@ -29,30 +29,33 @@ const Plants = ({ activeTab }) => {
      setIsDetailModalOpen(true);
     }; 
     
-
-
-const handleCloseDetailModal = () => {
+  const handleCloseDetailModal = () => {
     setSelectedPlant(null);
     setIsDetailModalOpen(false);
     };
 
-  const handleSavePlant = async (plantDetails) => {
-    try {
-      const response = await Axios.post(`/addPlant`, plantDetails)
-      setPlants(response.data);
-    } catch (error) {
-      console.log(error);
-      alert('Failed to add plant');
+  // const handleSavePlant = async (plantDetails) => {
+  //   try {
+  //     const response = await Axios.post('/addPlant', plantDetails, {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //           'Content-Type': 'multipart/form-data'
+  //         }
+  //     });
+  //     setPlants(response.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //     alert('Failed to add plant');
+  //   }
+  // };
+
+  const handleEditClick = (plantId) => {
+    const plant = plants.find(p => p.id === plantId);
+    if (plant) {
+      setSelectedPlant({ ...plant }); // make a copy
+      setIsUpdatePlantModalOpen(true);
     }
   };
-
-const handleEditClick = (plantId) => {
-  const plant = plants.find(p => p.id === plantId);
-  if (plant) {
-    setSelectedPlant({ ...plant }); // make a copy
-    setIsUpdatePlantModalOpen(true);
-  }
-};
 
   const handleCloseUpdatePlantModal = () => {
     setIsUpdatePlantModalOpen(false);
@@ -61,7 +64,7 @@ const handleEditClick = (plantId) => {
 
   const handleUpdatePlant = async () => {
     try {
-      const response = await Axios.put('/admin/updatePlant', selectedPlant);
+      const response = await Axios.put(`/updatePlant/${selectedPlant.id}`, selectedPlant);
       setPlants(response.data);
     } catch (error) {
       console.error(error);
@@ -72,48 +75,46 @@ const handleEditClick = (plantId) => {
   };
   
 
-const handleDeleteClick = (plantId) => {
-  const plant = plants.find(p => p.id === plantId);
-  if (plant) {
-    setSelectedPlant(plant);
-    setIsDeletePlantModalOpen(true);
-  }
-};
+  const handleDeleteClick = (plantId) => {
+    const plant = plants.find(p => p.id === plantId);
+    if (plant) {
+      setSelectedPlant(plant);
+      setIsDeletePlantModalOpen(true);
+    }
+  };
 
-const handleConfirmDelete = async (id) => {
-  try {
-    const response = await Axios.delete(`/deletePlant/${id}`);
-    setPlants(response.data);
-  } catch (error) {
-    console.error(error);
-    alert('Failed to delete plant');
-  }
-  setIsDeletePlantModalOpen(false);
-};
+  const handleConfirmDelete = async (id) => {
+    try {
+      const response = await Axios.delete(`/deletePlant/${id}`);
+      setPlants(response.data);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to delete plant');
+    }
+    setIsDeletePlantModalOpen(false);
+  };
 
-  
-
-  
-
-  useEffect(() => {
-    const fetchPlants = async () => {
-      try {
-        const response = await Axios.get("/getAllPlants");
-        setPlants(response.data);
-      } catch (error) {
-        console.log(error);
-        if(error.response?.data?.message){
-          alert(error.response.data.message);
-        }
+  const fetchPlants = async () => {
+    try {
+      const response = await Axios.get("/getAllPlants");
+      setPlants(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+      if(error.response?.data?.message){
+        alert(error.response.data.message);
       }
     }
+  };
+
+  useEffect(() => {
     fetchPlants();
   }, []);
 
   return (
     <div className="plants-container">
       <div className="plants-main-content">
-        <h2 className="plants-header">Plant Management</h2>
+        <h2 className='plant-heading'>Plant Management</h2>
 
         <button onClick={handleAddPlantClick} className="add-plant-btn">
           Add Plant
@@ -122,14 +123,14 @@ const handleConfirmDelete = async (id) => {
         <ul className="plant-list">
           {plants.map((plant) => (
             <li key={plant.id} className="plant-item">
-            <div className="plant-info" onClick={() => handlePlantClick(plant)}>
-             <img className="plant-img-placeholder" src={`data:${plant.imageData};base64,${plant.imageName}`} alt='plantImage' />
-             <div className="plant-name">{plant.name}</div>
-           </div>
-             <div className="plant-buttons">
-               <button className="edit-btn" onClick={() => handleEditClick(plant.id)}>Edit</button>
-               <button className="delete-btn" onClick={() => handleDeleteClick(plant.id)}>Delete</button>
-             </div>
+              <div className="plant-info" onClick={() => handlePlantClick(plant)}>
+              <img className="plant-img-placeholder" src={`data:${plant.imageType};base64,${plant.imageData}`} alt='plantImage' />
+              <div className="plant-name">{plant.name}</div>
+              </div>
+              <div className="plant-buttons">
+                <button className="edit-btn" onClick={() => handleEditClick(plant.id)}>Edit</button>
+                <button className="delete-btn" onClick={() => handleDeleteClick(plant.id)}>Delete</button>
+              </div>
            </li>
           ))}
         </ul>
@@ -139,7 +140,7 @@ const handleConfirmDelete = async (id) => {
       <AddPlant
         isOpen={isAddPlantModalOpen}
         onClose={handleCloseAddPlantModal}
-        onSave={handleSavePlant}
+        setPlants={setPlants}
       />
 
       <UpdatePlant
@@ -150,18 +151,13 @@ const handleConfirmDelete = async (id) => {
         setUser={setSelectedPlant}
           />
           
-      
         <DeletePlant
           isOpen={isDeletePlantModalOpen}
           onClose={() => setIsDeletePlantModalOpen(false)}
           onDelete={handleConfirmDelete}
           plant={selectedPlant}
         />
-        
-
-
-
-
+      
        {isDetailModalOpen && selectedPlant && (
             <div className="plant-detail-modal">
               <div className="modal-content">

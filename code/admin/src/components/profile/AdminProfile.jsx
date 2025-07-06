@@ -7,10 +7,11 @@ const AdminProfile = () => {
   const { user } = UserAuth();
   const [showEditProfile, setShowEditProfile] = useState(false); // Manage modal visibility
 
-  const handleEditProfileSave = (updatedUser) => {
+  const handleEditProfileSave = async (updatedUser) => {
     // Logic to update user profile (could be API call or local update)
     console.log(updatedUser);
     setShowEditProfile(false); // Close modal after saving
+   
   };
 
   return (
@@ -20,7 +21,7 @@ const AdminProfile = () => {
           <h2 className="admin-profile-title">Admin Profile</h2>
           <div className="admin-profile-image">
             <img
-              src={user?.profileImage || require('../../assets/profile_picture.webp')} // Fallback to default image if user has no profile image
+              src={ user?.profileImageData ? `data:${user?.profileImageType};base64,${user?.profileImageData}` : require('../../assets/profile_picture.webp')} // Fallback to default image if user has no profile image
               alt="Profile"
             />
           </div>
@@ -45,7 +46,7 @@ const AdminProfile = () => {
       </div>
 
       {/* Conditionally render the EditProfile modal */}
-      {showEditProfile && <EditProfile user={user} onSave={handleEditProfileSave} />}
+      {showEditProfile && <EditProfile onSave={handleEditProfileSave} />}
     </div>
   );
 };

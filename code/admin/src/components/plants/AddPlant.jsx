@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { Axios } from '../../AxiosBuilder';
 
-const AddPlant = ({ isOpen, onClose, onSave }) => {
+const AddPlant = ({ isOpen, onClose, setPlants }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -11,7 +12,9 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
     phosphorus: 0,
     potassium: 0,
   });
+
   const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
 
   if (!isOpen) return null;
 
@@ -20,34 +23,44 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    setImage(file);
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({
-          ...prev,
-          imageData: reader.result,
-          imageName: file.name,
-          imageType: file.type,
-        }));
-      };
-      reader.readAsDataURL(file);
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const form = new FormData();
-    Object.keys(formData).forEach((key) => {
-        form.append(key, formData[key]);
+
+    Object.keys(formData).forEach(key => {
+      form.append(key, formData[key]);
     });
+
     if (image) {
-      form.append('Image', image);
+      if(image.size > 1 * 1024 * 1024) { // Check if image is larger than 2MB
+        alert('Image size exceeds 2MB limit. Please upload a smaller image.');
+        return;
+      }
+      form.append('image', image);
     }
 
-    onSave(form);
+    try {
+      const res = await Axios.post('/addPlant', form, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+        }
+      });
+      setPlants(res.data)
+      console.log('Upload successful:', res.data);
+      alert('Plant added successfully!');
+    } catch (err) {
+      console.error('Upload failed:', err.response?.data || err.message);
+      alert('Failed to add plant.');
+    }
+
     onClose();
   };
 
@@ -60,112 +73,47 @@ const AddPlant = ({ isOpen, onClose, onSave }) => {
 
         <label style={styles.label}>
           Plant Name:
-          <input
-            name="name"
-            type="text"
-            value={formData.name}
-            onChange={handleChange}
-            style={styles.input}
-          />
+          <input name="name" type="text" value={formData.name} onChange={handleChange} style={styles.input} />
         </label>
 
         <label style={styles.label}>
           Description:
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            style={styles.textarea}
-          />
+          <textarea name="description" value={formData.description} onChange={handleChange} style={styles.textarea} />
         </label>
 
-        <label style={styles.label}>
-          Temperature 🌡️:
-          <input
-            name="temperature"
-            type="number"
-            value={formData.temperature}
-            onChange={handleChange}
-            style={styles.input}
-          />
+        <label style={styles.label}>Temperature 🌡️:
+          <input name="temperature" type="number" value={formData.temperature} onChange={handleChange} style={styles.input} />
         </label>
 
-        <label style={styles.label}>
-          Humidity 💧:
-          <input
-            name="humidity"
-            type="number"
-            value={formData.humidity}
-            onChange={handleChange}
-            style={styles.input}
-          />
+        <label style={styles.label}>Humidity 💧:
+          <input name="humidity" type="number" value={formData.humidity} onChange={handleChange} style={styles.input} />
         </label>
 
-        <label style={styles.label}>
-          Moisture 🌿:
-          <input
-            name="moisture"
-            type="number"
-            value={formData.moisture}
-            onChange={handleChange}
-            style={styles.input}
-          />
+        <label style={styles.label}>Moisture 🌿:
+          <input name="moisture" type="number" value={formData.moisture} onChange={handleChange} style={styles.input} />
         </label>
 
-        <label style={styles.label}>
-          Nitrogen:
-          <input
-            name="nitrogen"
-            type="number"
-            value={formData.nitrogen}
-            onChange={handleChange}
-            style={styles.input}
-          />
+        <label style={styles.label}>Nitrogen:
+          <input name="nitrogen" type="number" value={formData.nitrogen} onChange={handleChange} style={styles.input} />
         </label>
 
-        <label style={styles.label}>
-          Phosphorus:
-          <input
-            name="phosphorus"
-            type="number"
-            value={formData.phosphorus}
-            onChange={handleChange}
-            style={styles.input}
-          />
+        <label style={styles.label}>Phosphorus:
+          <input name="phosphorus" type="number" value={formData.phosphorus} onChange={handleChange} style={styles.input} />
         </label>
 
-        <label style={styles.label}>
-          Potassium:
-          <input
-            name="potassium"
-            type="number"
-            value={formData.potassium}
-            onChange={handleChange}
-            style={styles.input}
-          />
+        <label style={styles.label}>Potassium:
+          <input name="potassium" type="number" value={formData.potassium} onChange={handleChange} style={styles.input} />
         </label>
 
-        <label style={styles.label}>
-          Upload Image:
-          <input
-            type="file"
-            name="Image"
-            accept="image/*"
-            onChange={handleImageUpload}
-            style={styles.input}
-          />
+        <label style={styles.label}>Upload Image:
+          <input type="file" accept="image/*" onChange={handleImageUpload} style={styles.input} />
         </label>
 
-        {formData.imageData && (
+        {preview && (
           <div style={{ textAlign: 'center', marginTop: '10px' }}>
-            <img
-              src={formData.imageData}
-              alt="Preview"
-              style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '6px' }}
-            />
+            <img src={preview} alt="Preview" style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '6px' }} />
           </div>
         )}
-
 
         <div style={styles.buttonRow}>
           <button onClick={onClose} style={styles.cancelButton}>Cancel</button>
@@ -229,7 +177,7 @@ const styles = {
     fontSize: '14px',
     outline: 'none',
     resize: 'vertical',
-    minHeight: '20px',
+    minHeight: '40px',
   },
   buttonRow: {
     display: 'flex',

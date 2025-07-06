@@ -1,26 +1,45 @@
 import React, { useState } from 'react';
 import './editProfile.css';
+import { UserAuth } from '../../Context/UserContext';
+import { Axios } from '../../AxiosBuilder';
 
-const EditProfile = ({ user, onSave }) => {
+const EditProfile = ({ onSave }) => {
+  const { user, setUser } = UserAuth();
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [contactNo, setContactNo] = useState(user?.phoneNumber || '');
-  const [profileImage, setProfileImage] = useState(user?.profileImage || null);
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(user?.profileImage || require('../../assets/profile_picture.webp'));
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Handle the save functionality, passing the updated data back
-    onSave({ name, email, contactNo, profileImage });
+    onSave({ name, email, phoneNumber, profileImage: image });
+    const form = new FormData();
+    form.append('name', name);
+    form.append('email', email);
+    form.append('phoneNumber', phoneNumber);
+    if (image) {
+      form.append('image', image);
+    }
+
+    try {
+      const response = await Axios.put("/update/", form, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+          // 'Content-Type': "multipart/form-data"
+        }
+      });
+      console.log(response.data);
+      setUser(response.data);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result); // Update the profile image preview
-      };
-      reader.readAsDataURL(file);
-    }
+    setImage(file);
+    setImagePreview(URL.createObjectURL(file))
   };
 
   return (
@@ -30,7 +49,7 @@ const EditProfile = ({ user, onSave }) => {
           <div className="edit-profile-image-container">
           <h2>Edit Profile</h2>
             <img
-              src={profileImage || require('../../assets/profile_picture.webp')}
+              src={imagePreview || require('../../assets/profile_picture.webp')}
               alt="Profile"
               className="edit-profile-image"
               onClick={() => document.getElementById('image-upload').click()} // Trigger file input on image click
@@ -42,7 +61,7 @@ const EditProfile = ({ user, onSave }) => {
               onChange={handleImageChange}
               style={{ display: 'none' }} // Hide file input
             />
-            
+
           </div>
           
         </div>
@@ -69,8 +88,8 @@ const EditProfile = ({ user, onSave }) => {
           <label>Contact No</label>
           <input
             type="text"
-            value={contactNo}
-            onChange={(e) => setContactNo(e.target.value)}
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
           />
         </div>
 
