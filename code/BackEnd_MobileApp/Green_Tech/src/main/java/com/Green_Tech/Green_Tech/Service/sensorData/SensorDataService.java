@@ -1,7 +1,6 @@
-package com.Green_Tech.Green_Tech.Service;
+package com.Green_Tech.Green_Tech.Service.sensorData;
 
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
-import com.Green_Tech.Green_Tech.DTO.SensorDataDTO;
 import com.Green_Tech.Green_Tech.Entity.Device;
 import com.Green_Tech.Green_Tech.Entity.SensorData;
 import com.Green_Tech.Green_Tech.Repository.DeviceRepo;
@@ -23,19 +22,13 @@ public class SensorDataService {
     private SensorDataRepository sensorDataRepository;
     @Autowired
     private DeviceRepo deviceRepo;
+    @Autowired
+    private SensorWebSocketService sensorWebSocketService;
 
     public Map<String, Object> getSensorData(Long id) {
         SensorData data = sensorDataRepository.findFirstByDeviceIdOrderByIdDesc(id);
-        Map<String, Object> sensorData = new HashMap<>();
-        sensorData.put("temperature", data.getTemperature());
-        sensorData.put("humidity", data.getHumidity());
-        sensorData.put("soilMoisture", data.getSoilMoisture());
-        sensorData.put("nitrogenLevel", data.getNitrogenLevel());
-        sensorData.put("phosphorusLevel", data.getPhosphorusLevel());
-        sensorData.put("potassiumLevel", data.getPotassiumLevel());
-        sensorData.put("actuatorStatus", data.getActuatorStatus());
 
-        return sensorData;
+        return getSensorDataFormat(data);
     }
 
     public HashMap convertByteArrayToHashMap(byte[] jsonData) {
@@ -47,31 +40,65 @@ public class SensorDataService {
             return null;
         }
     }
+
     public void getDataFromAWS(byte[] data) throws DeviceNotFoundException {
         HashMap awsData = convertByteArrayToHashMap(data);
-        assert awsData != null;
+        if (awsData == null) {
+            throw new IllegalArgumentException("Failed to parse AWS data");
+        }
 
-        Device device = deviceRepo.findByMac((String) awsData.get("mac"));
+        String mac = (String) awsData.get("mac");
+        if (mac == null) {
+            throw new IllegalArgumentException("MAC address is missing in AWS data");
+        }
+
+        Device device = deviceRepo.findByMac(mac);
+        if (device == null) {
+            throw new DeviceNotFoundException("Device not found for MAC: " + mac);
+        }
 
         SensorData sensorData = SensorData.builder()
                 .device(device)
-                .humidity( awsData.get("humidity") != null ? awsData.get("humidity") instanceof Integer ? Double.valueOf((Integer) awsData.get("humidity"))
-                        : (Double) awsData.get("humidity"): 0)
-                .soilMoisture( awsData.get("moisture") != null ? awsData.get("moisture") instanceof Integer ? Double.valueOf((Integer) awsData.get("moisture"))
-                        : (Double) awsData.get("moisture"): 0)
-                .temperature( awsData.get("temperature") != null ? awsData.get("temperature") instanceof Integer ? Double.valueOf((Integer) awsData.get("temperature"))
-                        : (Double) awsData.get("temperature"): 0)
-                .nitrogenLevel( awsData.get("nitrogenLevel") != null ? awsData.get("nitrogenLevel") instanceof Integer ? Double.valueOf((Integer) awsData.get("nitrogenLevel"))
-                        : (Double) awsData.get("nitrogenLevel"): 0)
-                .phosphorusLevel( awsData.get("phosphorusLevel") != null ? awsData.get("phosphorusLevel") instanceof Integer ? Double.valueOf((Integer) awsData.get("phosphorusLevel"))
-                        : (Double) awsData.get("phosphorusLevel"): 0)
-                .potassiumLevel( awsData.get("potassiumLevel") != null ? awsData.get("potassiumLevel") instanceof Integer ? Double.valueOf((Integer) awsData.get("potassiumLevel"))
-                        : (Double) awsData.get("potassiumLevel"): 0)
-                .actuatorStatus( convertListToBoolArray((List<Boolean>) awsData.get("actuatorState")))
+                .humidity(parseDouble(awsData.get("humidity")))
+                .soilMoisture(parseDouble(awsData.get("moisture")))
+                .temperature(parseDouble(awsData.get("temperature")))
+                .nitrogenLevel(parseDouble(awsData.get("nitrogenLevel")))
+                .phosphorusLevel(parseDouble(awsData.get("phosphorusLevel")))
+                .potassiumLevel(parseDouble(awsData.get("potassiumLevel")))
+                .actuatorStatus(convertListToBoolArray((List<Boolean>) awsData.get("actuatorState")))
                 .updatedAt(new Date())
                 .build();
 
         sensorDataRepository.save(sensorData);
+
+        // send the data through the websocket
+        sensorWebSocketService.sendSensorData(device.getId(), getSensorDataFormat(sensorData));
+    }
+
+    private double parseDouble(Object value) {
+        if (value == null) return 0.0;
+        if (value instanceof Integer) return ((Integer) value).doubleValue();
+        if (value instanceof Double) return (Double) value;
+        if (value instanceof Float) return ((Float) value).doubleValue();
+        try {
+            return Double.parseDouble(value.toString());
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+
+
+    public Map<String, Object> getSensorDataFormat(SensorData data){
+        Map<String, Object> sensorData = new HashMap<>();
+        sensorData.put("temperature", data.getTemperature());
+        sensorData.put("humidity", data.getHumidity());
+        sensorData.put("soilMoisture", data.getSoilMoisture());
+        sensorData.put("nitrogenLevel", data.getNitrogenLevel());
+        sensorData.put("phosphorusLevel", data.getPhosphorusLevel());
+        sensorData.put("potassiumLevel", data.getPotassiumLevel());
+        sensorData.put("actuatorStatus", data.getActuatorStatus());
+
+        return sensorData;
     }
 
     private boolean[] convertListToBoolArray(List<Boolean> list) {

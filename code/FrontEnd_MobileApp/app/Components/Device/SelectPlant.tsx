@@ -25,92 +25,21 @@ interface SelectPlantProps {
 }
 
 const SelectPlant = ({ modalVisible, setModalVisible, setSelectedPlant }: SelectPlantProps) => {
-  const [plants, setPlants] = useState<Plant[]>([
-    {
-      id: 1,
-      name: "plant1",
-      description: "Description 1",
-      temperature: 0,
-      moisture: 0,
-      humidity: 0,
-      phosphorus: 0,
-      nitrogen: 0,
-      potassium: 0,
-      imageData: "",
-      imageType: "",
-      imageName: "",
-    },
-    {
-      id: 2,
-      name: "plant2",
-      description: "Description 2",
-      temperature: 0,
-      moisture: 0,
-      humidity: 0,
-      phosphorus: 0,
-      nitrogen: 0,
-      potassium: 0,
-      imageData: "",
-      imageType: "",
-      imageName: "",
-    },
-    {
-      id: 3,
-      name: "plant3",
-      description: "Description 3",
-      temperature: 0,
-      moisture: 0,
-      humidity: 0,
-      phosphorus: 0,
-      nitrogen: 0,
-      potassium: 0,
-      imageData: "",
-      imageType: "",
-      imageName: "",
-    },
-    {
-      id: 4,
-      name: "plant4",
-      description: "Description 4",
-      temperature: 0,
-      moisture: 0,
-      humidity: 0,
-      phosphorus: 0,
-      nitrogen: 0,
-      potassium: 0,
-      imageData: "",
-      imageType: "",
-      imageName: "",
-    },
-    {
-      id: 5,
-      name: "plant5",
-      description: "Description 5",
-      temperature: 0,
-      moisture: 0,
-      humidity: 0,
-      phosphorus: 0,
-      nitrogen: 0,
-      potassium: 0,
-      imageData: "",
-      imageType: "",
-      imageName: "",
-    },
-  ]);
+  const [plants, setPlants] = useState<Plant[]>([]);
   
   useEffect(() => {
     const fetchPlants = async () => {
       try {
-        const response = await Axios.get("/");
+        const response = await Axios.get("/plant/getAll");
         setPlants(response.data);
       } catch (error) {
         console.log(error);
       }
     }
+    fetchPlants();
   },[]);
 
   const handlePlantSelect = (plant : Plant) => {
-    console.log("Selected plant:", plant);
     setModalVisible(false);
     setSelectedPlant(plant);
   }
@@ -170,8 +99,8 @@ const styles = StyleSheet.create({
   plantView:{
     backgroundColor: "white",
     marginTop: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
     borderRadius: 8,
     flexDirection: "row",
     alignItems: "center"
@@ -181,8 +110,8 @@ const styles = StyleSheet.create({
     marginLeft: 20
   },
   plantImage:{
-    width: 50,
-    height: 50,
+    width: 80,
+    height: 80,
     borderRadius: 8
   }
 })

@@ -15,6 +15,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Axios } from "../../AxiosRequestBuilder";
 import { themeAuth } from "../../../Contexts/ThemeContext";
 import SelectPlant from "./SelectPlant";
+import { useDeviceContext } from "../../../Contexts/DeviceContext";
 
 type Device = {
   id: number;
@@ -54,6 +55,7 @@ interface User {
 }
 
 const DisplayDetail: React.FC = () => {
+  const {devices} = useDeviceContext();
   const {theme} = themeAuth();
   const params = useLocalSearchParams();
   const [device, setDevice] = useState<Device>({
@@ -99,12 +101,17 @@ const DisplayDetail: React.FC = () => {
   }
 
   const handleSave = async () => {
+    if (!selectedPlant) {
+      Alert.alert("Error", "Please select a plant before adding the device.");
+      return;
+    }
+    
     try {
       const response = await Axios.put(`/device/update/${device.id}`, {
         name: device.name.trim(),
         zoneName: device.zoneName.trim(),
         location: device.location.trim(),
-        plantId: selectedPlant ? selectedPlant.id : null,
+        plantId: selectedPlant?.id,
       });
       setDevice(response.data);
     } catch (error) {
@@ -132,23 +139,79 @@ const DisplayDetail: React.FC = () => {
   };
 
   const handleDeleteDevice = async (id: number) => {
-    try {
-      const response = await Axios.delete(`/device/delete/${id}`);
-      if (response.data == true) {
-        Alert.alert("Success", "Device deleted successfully");
-        router.push("Components/Device/DisplayList");
-      }
-    } catch (error) {
-      console.error("Error deleting device:", error);
-    }
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this device?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => {},
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const response = await Axios.delete(`/device/delete/${id}`);
+              if (response.data == true) {
+                Alert.alert("Success", "Device deleted successfully");
+                router.push("Components/Device/DisplayList");
+              }
+            } catch (error) {
+              console.error("Error deleting device:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+
+    return;
   };
 
   useEffect(() => {
-    if (params.device) {
+    if (params.deviceId) {
       try {
-        const deviceObject = JSON.parse(params.device as string);
-        setDevice(deviceObject);
-        setSelectedPlant(deviceObject.plant);
+        const deviceId = JSON.parse(params.deviceId as string);
+        const foundDevice = devices?.find(device => device.id == deviceId);
+        if (foundDevice) {
+          setDevice(foundDevice);
+          setSelectedPlant(foundDevice.plant);
+        } else {
+          setDevice({
+            id: 0,
+            mac: "",
+            name: "",
+            zoneName: "",
+            location: "",
+            addedAt: "",
+            active: false,
+            user: {
+              name: "",
+              email: "",
+              phoneNumber: 0,
+              imageData: "",
+              imageType: "",
+              imageName: "",
+            },
+            plant: {
+              id: 0,
+              name: "",
+              description: "",
+              temperature: 0,
+              moisture: 0,
+              humidity: 0,
+              phosphorus: 0,
+              nitrogen: 0,
+              potassium: 0,
+              imageData: "",
+              imageType: "",
+              imageName: "",
+            },
+          });
+          setSelectedPlant(null);
+        }
       } catch (error) {
         console.error("Error parsing device data:", error);
       }

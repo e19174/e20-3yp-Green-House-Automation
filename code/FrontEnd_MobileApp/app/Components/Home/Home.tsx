@@ -23,18 +23,8 @@ type Device = {
   zoneName: string;
   location: string;
   addedAt: string;
-  user: User;
+  userId: number;
 };
-
-interface User {
-  name: string;
-  email: string;
-  phoneNumber: number;
-  imageData: string;
-  imageType: string;
-  imageName: string;
-  authMethod: string;
-}
 
 const Home = () => {
   

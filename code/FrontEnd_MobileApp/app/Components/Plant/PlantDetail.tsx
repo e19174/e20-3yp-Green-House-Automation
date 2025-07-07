@@ -1,9 +1,11 @@
 // PlantDetailsScreen.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, RefreshControl } from 'react-native';
+import { Text, Image, ScrollView, StyleSheet, RefreshControl } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { usePlantContext } from '../../../Contexts/PlantContext';
 
 interface Plant {
+    id: number;
     name: string;
     description: string;
     temperature: number;
@@ -18,7 +20,9 @@ interface Plant {
 }
 
 const PlantDetail = () => {
-    const [plant, setPlant] = React.useState<Plant>({
+    const {plants} = usePlantContext();
+    const [plant, setPlant] = useState<Plant>({
+        id: 0,
         name: '',
         description: '',
         temperature: 0,
@@ -35,14 +39,32 @@ const PlantDetail = () => {
     const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
-    if (params.plant) {
-        try {
-        const plantObject = JSON.parse(params.plant as string);
-        setPlant(plantObject);
-        } catch (error) {
-        console.error("Error parsing plant data:", error);
+        if (params.plantId) {
+            try {
+                const plantId = JSON.parse(params.plantId as string);
+                const foundPlant = plants?.find(plant => plant.id == plantId);
+                if (foundPlant) {
+                    setPlant(foundPlant);
+                } else {
+                    setPlant({
+                        id: 0,
+                        name: '',
+                        description: '',
+                        temperature: 0,
+                        humidity: 0,
+                        moisture: 0,
+                        nitrogen: 0,
+                        phosphorus: 0,
+                        potassium: 0,
+                        imageData: '',
+                        imageType: '',
+                        imageName: ''
+                    });
+                }
+            } catch (error) {
+                console.error("Error parsing plant data:", error);
+            }
         }
-    }
     }, [params.plant, refreshing]);
 
     const onRefresh = () => {
@@ -92,8 +114,6 @@ container: {
     backgroundColor: '#012A1C',
     flex: 1,
     padding: 20,
-    marginTop: 20,
-    borderRadius: 12,
 },
 title: {
     fontSize: 26,

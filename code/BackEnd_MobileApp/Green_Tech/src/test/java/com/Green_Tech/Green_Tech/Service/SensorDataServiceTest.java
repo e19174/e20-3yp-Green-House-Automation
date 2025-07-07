@@ -5,6 +5,7 @@ import com.Green_Tech.Green_Tech.Entity.Device;
 import com.Green_Tech.Green_Tech.Entity.SensorData;
 import com.Green_Tech.Green_Tech.Repository.DeviceRepo;
 import com.Green_Tech.Green_Tech.Repository.SensorDataRepository;
+import com.Green_Tech.Green_Tech.Service.sensorData.SensorDataService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;

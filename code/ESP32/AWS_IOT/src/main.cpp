@@ -103,7 +103,7 @@ void loop() {
   server.handleClient();
 
   // Wi-Fi Recovery
-  if (WiFi.status() != WL_CONNECTED) {
+  if (WiFi.status() != WL_CONNECTED && registered) {
     Serial.println("WiFi lost. Attempting reconnect...");
     connectToWifi();
   }

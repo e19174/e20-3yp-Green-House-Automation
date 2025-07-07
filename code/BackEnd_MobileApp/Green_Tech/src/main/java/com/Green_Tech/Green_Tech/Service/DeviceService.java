@@ -3,6 +3,7 @@ package com.Green_Tech.Green_Tech.Service;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.PlantNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
+import com.Green_Tech.Green_Tech.DTO.DeviceDTO;
 import com.Green_Tech.Green_Tech.Entity.AwsIotCredentials;
 import com.Green_Tech.Green_Tech.Entity.Device;
 import com.Green_Tech.Green_Tech.Entity.Plant;
@@ -135,30 +136,39 @@ public class DeviceService {
         return deviceRepository.save(device);
     }
 
-    public Map<String, List<Device>> getActiveDevicesByZone(String auth) throws UserNotFoundException {
+    public Map<String, List<DeviceDTO>> getActiveDevicesByZone(String auth) throws UserNotFoundException {
         User user = extractUserService.extractUserFromJwt(auth);
         List<Device> devices = deviceRepository.findByUserAndActive(user, true);
 
-        Map<String, List<Device>> zoneDevices = new HashMap<>();
+        Map<String, List<DeviceDTO>> zoneDevices = new HashMap<>();
 
         for( Device device: devices){
-            if (!zoneDevices.containsKey(device.getZoneName())){
-                List<Device> deviceList = new ArrayList<>();
-                deviceList.add(getDeviceDetails(device));
-                zoneDevices.put(device.getZoneName(), deviceList);
+            DeviceDTO deviceDTO = getDeviceDtoFormat(device);
+            if (!zoneDevices.containsKey(deviceDTO.getZoneName())){
+                List<DeviceDTO> deviceList = new ArrayList<>();
+                deviceList.add(deviceDTO);
+                zoneDevices.put(deviceDTO.getZoneName(), deviceList);
                 continue;
             }
-            zoneDevices.get(device.getZoneName()).add(device);
+            zoneDevices.get(deviceDTO.getZoneName()).add(deviceDTO);
         }
 
         return zoneDevices;
     }
 
-    private Device getDeviceDetails(Device device) {
-        device.getUser().setImageData(null);
-        device.getUser().setImageName(null);
-        device.getUser().setImageType(null);
-        return device;
+    public DeviceDTO getDeviceDtoFormat(Device device){
+
+        return DeviceDTO.builder()
+                .id(device.getId())
+                .mac(device.getMac())
+                .addedAt(device.getAddedAt())
+                .zoneName(device.getZoneName())
+                .name(device.getZoneName())
+                .location(device.getLocation())
+                .userId(device.getUser().getId())
+                .active(device.isActive())
+                .plantId(device.getPlant() != null ?device.getPlant().getId(): 0)
+                .build();
     }
 
 }

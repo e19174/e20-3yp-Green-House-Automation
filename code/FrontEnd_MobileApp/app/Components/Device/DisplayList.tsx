@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, RefreshC
 import { router } from 'expo-router';
 import { Axios } from '../../AxiosRequestBuilder';
 import { themeAuth } from '../../../Contexts/ThemeContext';
+import { useDeviceContext } from '../../../Contexts/DeviceContext';
 
 type Device = {
   id: number;
@@ -38,34 +39,33 @@ interface User {
   imageData: string;
   imageType: string;
   imageName: string;
-  authMethod: string;
+  authMethod?: string;
 }
 
 const DeviceListScreen: React.FC = () => {
-  const [devices, setDevices] = useState<Device[]>([]);
+  // const [devices, setDevices] = useState<Device[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [refreshing, setRefreshing] = useState(false);
   const {theme} = themeAuth();
   const [filter, setFilter] = useState<string>("active");
+  const {devices, setDevices} = useDeviceContext();
 
   const onRefresh = () => {
     setRefreshing(true);
 
-    // Simulate fetching new data
     setTimeout(() => {
       setRefreshing(false);
     }, 1500);
   };
 
   const directToDetail = (item: Device) => {
-    router.push({ pathname: 'Components/Device/DisplayDetail', params: { device: JSON.stringify(item) } })
+    router.push({ pathname: 'Components/Device/DisplayDetail', params: { deviceId: JSON.stringify(item.id) } })
   };
 
   useEffect(()=>{
     const fetchDevices = async () => {
       try {
-        // const response = filter === "active" ?await Axios.get('device/active') : await Axios.get('/device/by-user')
-        const response = await Axios.get(filter === "active" ? '/device/active': '/device/nonActive')
+        const response = await Axios.get(filter === "active" ? '/device/active': '/device/nonActive');
         setDevices(response.data);
       } catch (error) {
         console.error('Error fetching devices:', error);
@@ -75,20 +75,20 @@ const DeviceListScreen: React.FC = () => {
   },[refreshing, filter]);
 
   
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setDevices(prevDevices =>
-        prevDevices.map(device => ({
-          ...device,
-          lastUpdated: new Date().toISOString(),
-        }))
-      );
-  }, 5000);
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     setDevices(prevDevices =>
+  //       prevDevices.map(device => ({
+  //         ...device,
+  //         lastUpdated: new Date().toISOString(),
+  //       }))
+  //     );
+  // }, 5000);
 
-    return () => clearInterval(intervalId);
-  }, []);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
-  const filteredDevices = devices.filter(device =>
+  const filteredDevices = (devices ?? []).filter(device =>
     device.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     device.mac?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     device.zoneName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -96,7 +96,7 @@ const DeviceListScreen: React.FC = () => {
   );
 
   const renderItem = ({ item }: { item: Device }) => (
-    devices.length > 0 ? (
+    (devices?.length ?? 0) > 0 ? (
       <TouchableOpacity onPress={() => directToDetail(item)}>
         <View style={[styles.card, {backgroundColor: theme.colors.cardBackground}]}>
           <Text style={styles.deviceName}>{item.name}</Text>

@@ -12,8 +12,10 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { Axios } from "../../AxiosRequestBuilder";
+import { usePlantContext } from "../../../Contexts/PlantContext";
 
 interface Plant {
+  id: number;
   name: string;
   description: string;
   temperature: number;
@@ -28,81 +30,28 @@ interface Plant {
 }
 
 const Plant = () => {
-  const [plants, setPlants] = useState<Plant[]>([
-    {
-      name: "Tomat",
-      description: "A sun-loving plant...",
-      temperature: 25,
-      humidity: 60,
-      moisture: 40,
-      nitrogen: 15,
-      phosphorus: 10,
-      potassium: 20,
-      imageData: "",
-      imageType: "image/jpeg",
-      imageName: "tomato.jpg",
-    },
-    {
-      name: "Tomao",
-      description: "A sun-loving plant...",
-      temperature: 25,
-      humidity: 60,
-      moisture: 40,
-      nitrogen: 15,
-      phosphorus: 10,
-      potassium: 20,
-      imageData: "",
-      imageType: "image/jpeg",
-      imageName: "tomato.jpg",
-    },
-    {
-      name: "Tomto",
-      description: "A sun-loving plant...",
-      temperature: 25,
-      humidity: 60,
-      moisture: 40,
-      nitrogen: 15,
-      phosphorus: 10,
-      potassium: 20,
-      imageData: "",
-      imageType: "image/jpeg",
-      imageName: "tomato.jpg",
-    },
-    {
-      name: "Toato",
-      description: "A sun-loving plant...",
-      temperature: 25,
-      humidity: 60,
-      moisture: 40,
-      nitrogen: 15,
-      phosphorus: 10,
-      potassium: 20,
-      imageData: "",
-      imageType: "image/jpeg",
-      imageName: "tomato.jpg",
-    },
-  ]);
+  const {plants, setPlants} = usePlantContext();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchPlants = async () => {
       try {
-        const response = await Axios.get("/plant/getAllPlants");
+        const response = await Axios.get("/plant/getAll");
         setPlants(response.data);
       } catch (error) {
         console.log(error);
       }
     };
     fetchPlants();
-  }, []);
+  }, [refreshing]);
 
   const renderItem = ({ item }: { item: Plant }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() =>
         router.push({
-          pathname: "Components/Statics/PlantDetail",
-          params: { plant: JSON.stringify(item) },
+          pathname: "Components/Plant/PlantDetail",
+          params: { plantId: JSON.stringify(item.id) },
         })
       }
     >
@@ -130,7 +79,7 @@ const Plant = () => {
       <Text style={styles.title}>Available Plants</Text>
       <FlatList
         data={plants}
-        keyExtractor={(item) => item.name}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 20 }}
         refreshControl={

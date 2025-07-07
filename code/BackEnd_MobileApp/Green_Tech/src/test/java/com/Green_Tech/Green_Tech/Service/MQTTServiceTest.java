@@ -3,7 +3,7 @@
 //import com.Green_Tech.Green_Tech.Entity.AwsIotCredentials;
 //import com.Green_Tech.Green_Tech.Entity.Device;
 //import com.Green_Tech.Green_Tech.Repository.AwsIotCredentialsRepo;
-//import com.Green_Tech.Green_Tech.Service.SensorDataService;
+//import com.Green_Tech.Green_Tech.Service.sensorData.SensorDataService;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import org.mockito.*;

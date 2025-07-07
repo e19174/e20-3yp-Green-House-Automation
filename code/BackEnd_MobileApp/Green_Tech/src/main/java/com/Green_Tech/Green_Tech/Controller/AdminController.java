@@ -38,9 +38,10 @@ public class AdminController {
     }
 
     @PutMapping("admin/update")
-    public ResponseEntity<Admin> updateAdmin(@RequestBody Map<String, Object> adminData,
+    public ResponseEntity<Admin> updateAdmin(@ModelAttribute Map<String, Object> adminData,
                                              @RequestHeader("Authorization") String auth,
-                                             @RequestParam(value = "image", required = false) MultipartFile image) throws UserNotFoundException, IOException {
+                                             @RequestParam(value = "image", required = false) MultipartFile image)
+            throws UserNotFoundException, IOException {
         return ResponseEntity.ok(adminService.updateAdmin(adminData, auth, image));
     }
 
@@ -95,16 +96,18 @@ public class AdminController {
 
     @PostMapping("admin/addPlant")
     public ResponseEntity<List<Plant>> addNewPlant(@RequestHeader("Authorization") String auth,
-                                                   @RequestBody PlantDTO plantData,
-                                                   @RequestParam(value = "Image", required = false) MultipartFile file)
+                                                   @ModelAttribute PlantDTO plantData)
             throws UserNotFoundException, IOException {
+        MultipartFile file = plantData.getImage();
         return ResponseEntity.ok(adminService.addNewPlant(auth, plantData, file));
     }
 
-    @PutMapping("admin/updatePlant")
+    @PutMapping("admin/updatePlant/{id}")
     public ResponseEntity<List<Plant>> updatePlant(@RequestHeader("Authorization") String auth,
-                                                 @RequestBody Map<String, String> plantData) throws UserNotFoundException, PlantNotFoundException {
-        return ResponseEntity.ok(adminService.updatePlant(auth, plantData));
+                                                   @ModelAttribute PlantDTO plantData,
+                                                   @PathVariable("id") Long id)
+            throws UserNotFoundException, PlantNotFoundException, IOException {
+        return ResponseEntity.ok(adminService.updatePlant(auth, plantData, id));
     }
 
     @DeleteMapping("admin/deletePlant/{id}")

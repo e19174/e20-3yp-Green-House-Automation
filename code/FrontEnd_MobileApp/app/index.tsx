@@ -8,7 +8,7 @@ import { ActivityIndicator } from "react-native";
 import { userAuth } from "../Contexts/UserContext";
 import { Axios } from "./AxiosRequestBuilder";
 
-// SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync();
 
 const Page:React.FC = () => {
   const { theme } = themeAuth();
@@ -37,7 +37,7 @@ const Page:React.FC = () => {
                 router.push("/Authentication/login");
             }
           }
-          // await SplashScreen.hideAsync();
+          await SplashScreen.hideAsync();
         }, 2000);
       };
       checkToken();
@@ -49,7 +49,7 @@ const Page:React.FC = () => {
     <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
       <Image source={theme.dark ? require('../assets/logopng_dark.png') : require('../assets/logopng_light.png')} style={styles.logo} />
       <Text style={[styles.title, {color: theme.dark? "#fff" : "#01694D"}]}>Green Tech</Text>
-      {/* <ActivityIndicator size="large" color={theme.dark ? "#fff" : "#01694D"} style={{marginTop: 20}} /> */}
+      <ActivityIndicator size="large" color={theme.dark ? "#fff" : "#01694D"} style={{marginTop: 20}} />
     </View>
   );
 }

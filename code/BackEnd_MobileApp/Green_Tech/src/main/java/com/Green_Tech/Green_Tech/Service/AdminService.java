@@ -134,7 +134,7 @@ public class AdminService {
         User user = User.builder()
                 .name( (String) userData.get("name"))
                 .email( (String) userData.get("email"))
-                .phoneNumber((Long) userData.get("phoneNumber"))
+                .phoneNumber((Integer) userData.get("phoneNumber"))
                 .authMethod(AuthMethod.EMAIL_PASSWORD)
                 .role(Role.USER)
                 .createdAt(new Date())
@@ -152,7 +152,7 @@ public class AdminService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with "+ (String) userData.get("email")));
 
         user.setName((String) userData.get("name"));
-        user.setPhoneNumber((Long) userData.get("phoneNumber"));
+        user.setPhoneNumber((Integer) userData.get("phoneNumber"));
         user.setUpdatedAt(new Date());
         userRepo.save(user);
 
@@ -194,8 +194,10 @@ public class AdminService {
     public Admin updateAdmin(Map<String, Object> adminData, String auth, MultipartFile image) throws UserNotFoundException, IOException {
         Admin admin = extractUserService.extractAdminFromJwt(auth);
 
+        System.out.println(adminData.get("name"));
+
         admin.setName((String) adminData.get("name"));
-        admin.setPhoneNumber((Long) adminData.get("phoneNumber"));
+        admin.setPhoneNumber((Integer) adminData.get("phoneNumber"));
         admin.setImageName(image != null ? image.getName() : null);
         admin.setImageType(image != null ? image.getContentType() : null);
         admin.setImageData(image != null ? image.getBytes(): null);
@@ -218,11 +220,7 @@ public class AdminService {
     public List<Plant> addNewPlant(String auth, PlantDTO plantData, MultipartFile file) throws UserNotFoundException,
             IOException {
         Admin admin = extractUserService.extractAdminFromJwt(auth);
-//        if(admin.isEnabled()){
-////            decodeBase64Image(plantData);
-////            plantRepo.save(plantData);
-////            return plantRepo.findAll();
-////        }
+
         Plant plant = Plant.builder()
                 .name(plantData.getName())
                 .description(plantData.getDescription())
@@ -243,21 +241,28 @@ public class AdminService {
     }
 
 
-    public List<Plant> updatePlant(String auth, Map<String, String> plantData) throws UserNotFoundException, PlantNotFoundException {
+    public List<Plant> updatePlant(String auth, PlantDTO plantData, Long id) throws UserNotFoundException, PlantNotFoundException, IOException {
         Admin admin = extractUserService.extractAdminFromJwt(auth);
 
-        Long id = Long.valueOf(plantData.get("id"));
         Plant existing = plantRepo.findById(id)
                 .orElseThrow(() -> new PlantNotFoundException("plant not found with id:" + id));
 
-        existing.setName(plantData.get("name"));
-        existing.setDescription(plantData.get("description"));
-        existing.setTemperature(Integer.valueOf(plantData.get("temperature")));
-        existing.setHumidity(Integer.valueOf(plantData.get("humidity")));
-        existing.setMoisture(Integer.valueOf(plantData.get("moisture")));
-        existing.setNitrogen(Integer.valueOf(plantData.get("nitrogen")));
-        existing.setPhosphorus(Integer.valueOf(plantData.get("phosphorus")));
-        existing.setPotassium(Integer.valueOf(plantData.get("potassium")));
+        MultipartFile file = plantData.getImage();
+        if(file != null){
+            existing.setImageData(file.getBytes());
+            existing.setImageName(file.getOriginalFilename());
+            existing.setImageType(file.getContentType());
+        }
+
+        existing.setName(plantData.getName());
+        existing.setDescription(plantData.getDescription());
+        existing.setTemperature(plantData.getTemperature());
+        existing.setHumidity(plantData.getPhosphorus());
+        existing.setMoisture(plantData.getTemperature());
+        existing.setNitrogen(plantData.getPhosphorus());
+        existing.setPhosphorus(plantData.getTemperature());
+        existing.setPotassium(plantData.getPhosphorus());
+
 
         plantRepo.save(existing);
         return plantRepo.findAll();

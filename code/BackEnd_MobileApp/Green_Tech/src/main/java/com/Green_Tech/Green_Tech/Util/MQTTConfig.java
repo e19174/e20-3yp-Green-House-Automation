@@ -1,6 +1,6 @@
 //package com.Green_Tech.Green_Tech.Util;
 //
-//import com.Green_Tech.Green_Tech.Service.SensorDataService;
+//import com.Green_Tech.Green_Tech.Service.sensorData.SensorDataService;
 //import jakarta.annotation.PostConstruct;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Component;

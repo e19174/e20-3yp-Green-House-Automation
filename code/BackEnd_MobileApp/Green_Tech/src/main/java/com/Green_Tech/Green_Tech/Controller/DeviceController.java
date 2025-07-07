@@ -4,6 +4,7 @@ import com.Green_Tech.Green_Tech.CustomException.DeviceAlreadyFoundException;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.PlantNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
+import com.Green_Tech.Green_Tech.DTO.DeviceDTO;
 import com.Green_Tech.Green_Tech.Entity.AwsIotCredentials;
 import com.Green_Tech.Green_Tech.Entity.Device;
 import com.Green_Tech.Green_Tech.Service.AwsIotProvisioningService;
@@ -46,7 +47,7 @@ public class DeviceController {
     }
 
     @GetMapping("/activeByZones")
-    public ResponseEntity<Map<String, List<Device>>> getActiveDevicesByZone(@RequestHeader("Authorization") String auth)
+    public ResponseEntity<Map<String, List<DeviceDTO>>> getActiveDevicesByZone(@RequestHeader("Authorization") String auth)
                                                         throws UserNotFoundException {
         return ResponseEntity.ok(deviceService.getActiveDevicesByZone(auth));
     }

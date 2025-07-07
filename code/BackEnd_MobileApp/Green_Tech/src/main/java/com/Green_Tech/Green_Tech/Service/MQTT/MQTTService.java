@@ -3,8 +3,7 @@ package com.Green_Tech.Green_Tech.Service.MQTT;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
 import com.Green_Tech.Green_Tech.Entity.AwsIotCredentials;
 import com.Green_Tech.Green_Tech.Repository.AwsIotCredentialsRepo;
-import com.Green_Tech.Green_Tech.Service.SensorDataService;
-import jakarta.annotation.PostConstruct;
+import com.Green_Tech.Green_Tech.Service.sensorData.SensorDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Component;
 import software.amazon.awssdk.crt.mqtt.*;
 import software.amazon.awssdk.iot.AwsIotMqttConnectionBuilder;
 
+import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,32 +31,32 @@ public class MQTTService {
     private final ConcurrentHashMap<String, MqttClientConnection> deviceConnections = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Boolean> connectionStatus = new ConcurrentHashMap<>();
 
-//    @PostConstruct
-//    public void init() {
-//        new Thread(this::connectAllDevices).start();
-//    }
+    @PostConstruct
+    public void init() {
+        new Thread(this::connectAllDevices).start();
+    }
 
-//    public void connectAllDevices() {
-//        List<AwsIotCredentials> credentials = awsIotCredentialsRepo.findAllByActiveDevices(true);
-//        for (AwsIotCredentials aws : credentials) {
-//            connectAndSubscribe(aws);
-//        }
-//    }
+    public void connectAllDevices() {
+        List<AwsIotCredentials> credentials = awsIotCredentialsRepo.findAllByActiveDevices(true);
+        for (AwsIotCredentials aws : credentials) {
+            connectAndSubscribe(aws);
+        }
+    }
 
-//    @Scheduled(fixedDelay = 10000)
-//    public void checkAndReconnectDevices() {
-//        List<AwsIotCredentials> credentials = awsIotCredentialsRepo.findAllByActiveDevices(true);
-//
-//        for (AwsIotCredentials aws : credentials) {
-//            String deviceId = aws.getDevice().getId().toString();
-//
-//            Boolean isConnected = connectionStatus.getOrDefault(deviceId, false);
-//            if (!isConnected) {
-//                System.out.println("🔁 Reconnecting to deviceId: " + deviceId);
-//                connectAndSubscribe(aws);
-//            }
-//        }
-//    }
+    @Scheduled(fixedDelay = 10000)
+    public void checkAndReconnectDevices() {
+        List<AwsIotCredentials> credentials = awsIotCredentialsRepo.findAllByActiveDevices(true);
+
+        for (AwsIotCredentials aws : credentials) {
+            String deviceId = aws.getDevice().getId().toString();
+
+            Boolean isConnected = connectionStatus.getOrDefault(deviceId, false);
+            if (!isConnected) {
+                System.out.println("🔁 Reconnecting to deviceId: " + deviceId);
+                connectAndSubscribe(aws);
+            }
+        }
+    }
 
     private void connectAndSubscribe(AwsIotCredentials aws) {
         String deviceId = aws.getDevice().getId().toString();

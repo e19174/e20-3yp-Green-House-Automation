@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class UserResponseDTO {
     String name;
     String email;
-    Long phoneNumber;
+    Integer phoneNumber;
     byte[] imageData;
     String imageType;
     String imageName;

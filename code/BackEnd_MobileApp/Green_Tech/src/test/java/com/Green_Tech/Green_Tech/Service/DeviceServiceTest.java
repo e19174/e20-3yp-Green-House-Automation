@@ -3,6 +3,7 @@ package com.Green_Tech.Green_Tech.Service;
 import com.Green_Tech.Green_Tech.CustomException.DeviceAlreadyFoundException;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
+import com.Green_Tech.Green_Tech.DTO.DeviceDTO;
 import com.Green_Tech.Green_Tech.Entity.AwsIotCredentials;
 import com.Green_Tech.Green_Tech.Entity.Device;
 import com.Green_Tech.Green_Tech.Entity.User;
@@ -85,7 +86,7 @@ class DeviceServiceTest {
       when(extractUserService.extractUserFromJwt("auth-token")).thenReturn(user);
       when(deviceRepository.findByUserAndActive(user, true)).thenReturn(devices);
 
-      List<Device> result = deviceService.getActiveDevicesByUser("auth-token");
+      List<DeviceDTO> result = deviceService.getActiveDevicesByUser("auth-token");
 
       assertEquals(devices, result);
       verify(deviceRepository).findByUserAndActive(user, true);
