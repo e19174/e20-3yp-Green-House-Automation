@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './login.css';
 import { UserAuth } from '../../Context/UserContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import {Axios} from '../../AxiosBuilder';
 
 
 const LoginPage = () => {
@@ -25,12 +25,12 @@ const LoginPage = () => {
         return;
     }
     try {
-        const response = await axios.post("http://localhost:8080/api/v1/admin-login", {email, password});
+        const response = await Axios.post("/login", {email, password});
         setUser(response.data.user);
         localStorage.setItem("token", response.data.token);
         navigate("/");
     } catch (error) {
-        alert(error.response.data.message);
+        alert(error.response?.data.message || "Login failed. Please try again.");
     }
   };
 
@@ -43,10 +43,11 @@ const LoginPage = () => {
     }
 
     try {
-        const response = await axios.post("http://localhost:8080/api/v1/admin-register", {email, password});
-        alert(response.data);
+        const response = await Axios.post("/register", {email, password});
+        alert(response.data.message || "Registration successful.");
     } catch (error) {
         console.log(error);
+        alert(error.response?.data.message || "Registration failed. Please try again.");
     }
   };
 

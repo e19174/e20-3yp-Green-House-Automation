@@ -5,9 +5,12 @@ const AddPlant = ({ isOpen, onClose, setPlants }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    temperature: 0,
-    humidity: 0,
-    moisture: 0,
+    temperatureLow: 0,
+    temperatureHigh: 0,
+    humidityLow: 0,
+    humidityHigh: 0,
+    moistureLow: 0,
+    moistureHigh: 0,
     nitrogen: 0,
     phosphorus: 0,
     potassium: 0,
@@ -73,24 +76,39 @@ const AddPlant = ({ isOpen, onClose, setPlants }) => {
 
         <label style={styles.label}>
           Plant Name:
-          <input name="name" type="text" value={formData.name} onChange={handleChange} style={styles.input} />
+          <input name="name" type="text" value={formData.name || ''} onChange={handleChange} style={styles.input} />
         </label>
 
         <label style={styles.label}>
           Description:
-          <textarea name="description" value={formData.description} onChange={handleChange} style={styles.textarea} />
+          <textarea name="description" value={formData.description || ''} onChange={handleChange} style={styles.textarea} />
         </label>
 
         <label style={styles.label}>Temperature 🌡️:
-          <input name="temperature" type="number" value={formData.temperature} onChange={handleChange} style={styles.input} />
+          <div style={styles.doubleInputRow}>
+            <label htmlFor="temperatureLow">Low: </label>
+            <input name="temperatureLow" type="number" value={formData.temperatureLow} onChange={handleChange} style={styles.input} />
+            <label htmlFor="temperatureHigh">High: </label>
+            <input name="temperatureHigh" type="number" value={formData.temperatureHigh} onChange={handleChange} style={styles.input} />
+          </div>
         </label>
 
         <label style={styles.label}>Humidity 💧:
-          <input name="humidity" type="number" value={formData.humidity} onChange={handleChange} style={styles.input} />
+          <div style={styles.doubleInputRow}>
+            <label htmlFor="humidityLow">Low: </label>
+            <input name="humidityLow" type="number" value={formData.humidityLow} onChange={handleChange} style={styles.input} />
+            <label htmlFor="humidityHigh">High: </label>
+            <input name="humidityHigh" type="number" value={formData.humidityHigh} onChange={handleChange} style={styles.input} />
+          </div>
         </label>
 
         <label style={styles.label}>Moisture 🌿:
-          <input name="moisture" type="number" value={formData.moisture} onChange={handleChange} style={styles.input} />
+          <div style={styles.doubleInputRow}>
+            <label htmlFor="moistureLow">Low: </label>
+            <input name="moistureLow" type="number" value={formData.moistureLow} onChange={handleChange} style={styles.input} />
+            <label htmlFor="moistureHigh">High: </label>
+            <input name="moistureHigh" type="number" value={formData.moistureHigh} onChange={handleChange} style={styles.input} />
+          </div>
         </label>
 
         <label style={styles.label}>Nitrogen:
@@ -158,6 +176,12 @@ const styles = {
     marginBottom: '12px',
     color: '#555',
     fontWeight: '600',
+  },
+  doubleInputRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: "center",
+    gap: '10px',
   },
   input: {
     width: '100%',

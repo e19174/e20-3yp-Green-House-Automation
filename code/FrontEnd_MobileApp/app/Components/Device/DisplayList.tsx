@@ -15,6 +15,7 @@ type Device = {
   user: User;
   plant: Plant;
   active: boolean;
+  isThresholdAssigned?: boolean;
 };
 
 type Plant = {
@@ -43,7 +44,6 @@ interface User {
 }
 
 const DeviceListScreen: React.FC = () => {
-  // const [devices, setDevices] = useState<Device[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [refreshing, setRefreshing] = useState(false);
   const {theme} = themeAuth();
@@ -73,20 +73,6 @@ const DeviceListScreen: React.FC = () => {
     }
     fetchDevices();
   },[refreshing, filter]);
-
-  
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     setDevices(prevDevices =>
-  //       prevDevices.map(device => ({
-  //         ...device,
-  //         lastUpdated: new Date().toISOString(),
-  //       }))
-  //     );
-  // }, 5000);
-
-  //   return () => clearInterval(intervalId);
-  // }, []);
 
   const filteredDevices = (devices ?? []).filter(device =>
     device.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||

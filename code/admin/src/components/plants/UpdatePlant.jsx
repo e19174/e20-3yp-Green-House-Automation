@@ -1,11 +1,11 @@
 import React from 'react';
 
-const UpdatePlant = ({ isOpen, onClose, onSave, user, setUser }) => {
-  if (!isOpen || !user) return null;
+const UpdatePlant = ({ isOpen, onClose, onSave, plant, setPlant }) => {
+  if (!isOpen || !plant) return null;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser({ ...user, [name]: value });
+    setPlant({ ...plant, [name]: value });
   };
 
   const handleImageUpload = (e) => {
@@ -13,7 +13,7 @@ const UpdatePlant = ({ isOpen, onClose, onSave, user, setUser }) => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setUser((prev) => ({
+        setPlant((prev) => ({
           ...prev,
           imageData: reader.result,
           imageName: file.name,
@@ -36,7 +36,7 @@ const UpdatePlant = ({ isOpen, onClose, onSave, user, setUser }) => {
           <input
             type="text"
             name="name"
-            value={user.name || ''}
+            value={plant.name || ''}
             onChange={handleChange}
             style={styles.input}
           />
@@ -46,43 +46,37 @@ const UpdatePlant = ({ isOpen, onClose, onSave, user, setUser }) => {
           Description:
           <textarea
             name="description"
-            value={user.description || ''}
+            value={plant.description || ''}
             onChange={handleChange}
             style={styles.textarea}
           />
         </label>
 
-        <label style={styles.label}>
-          Temperature 🌡️:
-          <input
-            type="text"
-            name="temperature"
-            value={user.temperature || ''}
-            onChange={handleChange}
-            style={styles.input}
-          />
+        <label style={styles.label}>Temperature 🌡️:
+          <div style={styles.doubleInputRow}>
+            <label htmlFor="temperatureLow">Low: </label>
+            <input name="temperatureLow" type="number" value={plant.temperatureLow || 0} onChange={handleChange} style={styles.input} />
+            <label htmlFor="temperatureHigh">High: </label>
+            <input name="temperatureHigh" type="number" value={plant.temperatureHigh || 0} onChange={handleChange} style={styles.input} />
+          </div>
         </label>
 
-        <label style={styles.label}>
-          Humidity 💧:
-          <input
-            type="text"
-            name="humidity"
-            value={user.humidity || ''}
-            onChange={handleChange}
-            style={styles.input}
-          />
+        <label style={styles.label}>Humidity 💧:
+          <div style={styles.doubleInputRow}>
+            <label htmlFor="humidityLow">Low: </label>
+            <input name="humidityLow" type="number" value={plant.humidityLow || 0} onChange={handleChange} style={styles.input} />
+            <label htmlFor="humidityHigh">High: </label>
+            <input name="humidityHigh" type="number" value={plant.humidityHigh || 0} onChange={handleChange} style={styles.input} />
+          </div>
         </label>
 
-        <label style={styles.label}>
-          Moisture 🌿:
-          <input
-            type="text"
-            name="moisture"
-            value={user.moisture || ''}
-            onChange={handleChange}
-            style={styles.input}
-          />
+        <label style={styles.label}>Moisture 🌿:
+          <div style={styles.doubleInputRow}>
+            <label htmlFor="moistureLow">Low: </label>
+            <input name="moistureLow" type="number" value={plant.moistureLow || 0} onChange={handleChange} style={styles.input} />
+            <label htmlFor="moistureHigh">High: </label>
+            <input name="moistureHigh" type="number" value={plant.moistureHigh || 0} onChange={handleChange} style={styles.input} />
+          </div>
         </label>
 
         <label style={styles.label}>
@@ -90,7 +84,7 @@ const UpdatePlant = ({ isOpen, onClose, onSave, user, setUser }) => {
           <input
             type="text"
             name="nitrogen"
-            value={user.nitrogen || ''}
+            value={plant.nitrogen || ''}
             onChange={handleChange}
             style={styles.input}
           />
@@ -101,7 +95,7 @@ const UpdatePlant = ({ isOpen, onClose, onSave, user, setUser }) => {
           <input
             type="text"
             name="phosphorus"
-            value={user.phosphorus || ''}
+            value={plant.phosphorus || ''}
             onChange={handleChange}
             style={styles.input}
           />
@@ -112,7 +106,7 @@ const UpdatePlant = ({ isOpen, onClose, onSave, user, setUser }) => {
           <input
             type="text"
             name="potassium"
-            value={user.potassium || ''}
+            value={plant.potassium || ''}
             onChange={handleChange}
             style={styles.input}
           />
@@ -128,10 +122,10 @@ const UpdatePlant = ({ isOpen, onClose, onSave, user, setUser }) => {
           />
         </label>
 
-        {user.imageData && (
+        {plant.imageData && (
           <div style={{ textAlign: 'center', marginTop: '10px' }}>
             <img
-              src={user.imageData}
+              src={plant.imageData}
               alt="Preview"
               style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '6px' }}
             />
@@ -180,6 +174,12 @@ const styles = {
     marginBottom: '12px',
     color: '#555',
     fontWeight: '600',
+  },
+    doubleInputRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: "center",
+    gap: '10px',
   },
   input: {
     width: '100%',

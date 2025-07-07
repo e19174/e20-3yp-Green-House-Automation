@@ -28,6 +28,7 @@ WebServer server(80);
 String ssid = "", password = "", email = "";
 int deviceId = -1;
 bool registered = false;
+bool hasThresholds = false;
 const char* AWS_CERT_CRT = nullptr;
 const char* AWS_CERT_PRIVATE = nullptr;
 const char* THINGNAME = nullptr;
@@ -36,6 +37,10 @@ int commandIndex = -1;
 bool status;
 bool actuatorState[5] = {false, false, false, false, false};
 float h, t;
+float moistureThreshold[2];
+float temperatureThreshold[2];
+float humidityThreshold[2];
+float nutrientThreshold[3];
 DHT dht(DHTPIN, DHTTYPE);
 
 // --- Function declarations ---
@@ -123,6 +128,7 @@ void loop() {
   //   Serial.println("DHT sensor failed. Skipping this cycle.");
   //   return;
   // }
+  
 
   // Read Moisture Sensors
   int moisture_1 = analogRead(MOISTURE_SENSOR_PIN_1);

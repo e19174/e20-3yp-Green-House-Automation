@@ -13,11 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class PlantDTO {
     private String name;
     private String description;
-    private Integer temperature;
-    private Integer humidity;
-    private Integer moisture;
-    private Integer nitrogen;
-    private Integer phosphorus;
-    private Integer potassium;
+    private Double temperatureLow;
+    private Double temperatureHigh;
+    private Double humidityLow;
+    private Double humidityHigh;
+    private Double moistureLow;
+    private Double moistureHigh;
+    private Double nitrogen;
+    private Double phosphorus;
+    private Double potassium;
     private MultipartFile image;
 }

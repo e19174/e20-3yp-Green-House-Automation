@@ -21,23 +21,24 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/admin")
 public class AdminController {
 
     @Autowired
     private AdminService adminService;
 
-    @PostMapping("/admin-register")
+    @PostMapping("/register")
     public ResponseEntity<String> registerAdmin(@RequestBody Map<String, String> adminData){
         return ResponseEntity.ok(adminService.registerAdmin(adminData));
     }
 
-    @PostMapping("/admin-login")
-    public ResponseEntity<Map<String, Object>> loginAdmin(@RequestBody Map<String, String> adminData) throws UserNotFoundException {
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> loginAdmin(@RequestBody Map<String, String> adminData)
+            throws UserNotFoundException {
         return ResponseEntity.ok(adminService.loginAdmin(adminData));
     }
 
-    @PutMapping("admin/update")
+    @PutMapping("/update")
     public ResponseEntity<Admin> updateAdmin(@ModelAttribute Map<String, Object> adminData,
                                              @RequestHeader("Authorization") String auth,
                                              @RequestParam(value = "image", required = false) MultipartFile image)
@@ -45,47 +46,47 @@ public class AdminController {
         return ResponseEntity.ok(adminService.updateAdmin(adminData, auth, image));
     }
 
-    @GetMapping("admin/adminData")
+    @GetMapping("/adminData")
     public ResponseEntity<Admin> getAdminData(@RequestHeader("Authorization") String auth) throws UserNotFoundException {
         return ResponseEntity.ok(adminService.getAdminData(auth));
     }
 
-    @GetMapping("admin/getAllUsers")
+    @GetMapping("/getAllUsers")
     public ResponseEntity<List<User>> getAllUsers(@RequestHeader("Authorization") String auth) throws UserNotFoundException {
         return ResponseEntity.ok(adminService.getAllUsers(auth));
     }
 
-    @GetMapping("admin/getAllDevices")
+    @GetMapping("/getAllDevices")
     public ResponseEntity<List<Device>> getAllDevices(@RequestHeader("Authorization") String auth) throws UserNotFoundException {
         return ResponseEntity.ok(adminService.getAllDevices(auth));
     }
 
-    @PostMapping("admin/addUser")
+    @PostMapping("/addUser")
     public ResponseEntity<List<User>> addNewUser(@RequestHeader("Authorization") String auth,
                                                  @RequestBody Map<String, Object> userData) throws UserNotFoundException {
         return ResponseEntity.ok(adminService.addNewUser(auth, userData));
     }
 
-    @PutMapping("admin/updateUser")
+    @PutMapping("/updateUser")
     public ResponseEntity<List<User>> updateUser(@RequestHeader("Authorization") String auth,
                                                  @RequestBody Map<String, Object> userData) throws UserNotFoundException {
         return ResponseEntity.ok(adminService.updateUser(auth, userData));
     }
 
-    @DeleteMapping("admin/deleteUser/{id}")
+    @DeleteMapping("/deleteUser/{id}")
     public ResponseEntity<List<User>> deleteUser(@RequestHeader("Authorization") String auth,
                                                  @PathVariable("id") Long id) throws UserNotFoundException {
         return ResponseEntity.ok(adminService.deleteUser(auth, id));
     }
 
-    @PutMapping("admin/updateDevice/{id}")
+    @PutMapping("/updateDevice/{id}")
     public ResponseEntity<List<Device>> updateDevice(@RequestHeader("Authorization") String auth,
                                                      @RequestBody Map<String, Object> userData,
                                                      @PathVariable("id") Long id) throws UserNotFoundException, DeviceNotFoundException {
         return ResponseEntity.ok(adminService.updateDevice(auth, userData, id));
     }
 
-    @DeleteMapping("admin/deleteDevice/{id}")
+    @DeleteMapping("/deleteDevice/{id}")
     public ResponseEntity<List<Device>> deleteDevice(@RequestHeader("Authorization") String auth,
                                                  @PathVariable("id") Long id) throws UserNotFoundException {
         return ResponseEntity.ok(adminService.deleteDevice(auth, id));
@@ -94,7 +95,7 @@ public class AdminController {
 
     // plants //
 
-    @PostMapping("admin/addPlant")
+    @PostMapping("/addPlant")
     public ResponseEntity<List<Plant>> addNewPlant(@RequestHeader("Authorization") String auth,
                                                    @ModelAttribute PlantDTO plantData)
             throws UserNotFoundException, IOException {
@@ -102,7 +103,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.addNewPlant(auth, plantData, file));
     }
 
-    @PutMapping("admin/updatePlant/{id}")
+    @PutMapping("/updatePlant/{id}")
     public ResponseEntity<List<Plant>> updatePlant(@RequestHeader("Authorization") String auth,
                                                    @ModelAttribute PlantDTO plantData,
                                                    @PathVariable("id") Long id)
@@ -110,13 +111,13 @@ public class AdminController {
         return ResponseEntity.ok(adminService.updatePlant(auth, plantData, id));
     }
 
-    @DeleteMapping("admin/deletePlant/{id}")
+    @DeleteMapping("/deletePlant/{id}")
     public ResponseEntity<List<Plant>> deletePlant(@RequestHeader("Authorization") String auth,
                                                    @PathVariable("id") Long id) throws UserNotFoundException, PlantNotFoundException {
         return ResponseEntity.ok(adminService.deletePlant(auth, id));
     }
 
-    @GetMapping("admin/getAllPlants")
+    @GetMapping("/getAllPlants")
     public ResponseEntity<List<Plant>> getAllPlants(@RequestHeader("Authorization") String auth) throws UserNotFoundException {
         return ResponseEntity.ok(adminService.getAllPlants(auth));
     }

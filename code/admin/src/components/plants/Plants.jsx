@@ -49,12 +49,9 @@ const Plants = ({ activeTab }) => {
   //   }
   // };
 
-  const handleEditClick = (plantId) => {
-    const plant = plants.find(p => p.id === plantId);
-    if (plant) {
-      setSelectedPlant({ ...plant }); // make a copy
-      setIsUpdatePlantModalOpen(true);
-    }
+  const handleEditClick = (plant) => {
+    setSelectedPlant(plant);
+    setIsUpdatePlantModalOpen(true);
   };
 
   const handleCloseUpdatePlantModal = () => {
@@ -75,8 +72,7 @@ const Plants = ({ activeTab }) => {
   };
   
 
-  const handleDeleteClick = (plantId) => {
-    const plant = plants.find(p => p.id === plantId);
+  const handleDeleteClick = (plant) => {
     if (plant) {
       setSelectedPlant(plant);
       setIsDeletePlantModalOpen(true);
@@ -128,8 +124,8 @@ const Plants = ({ activeTab }) => {
               <div className="plant-name">{plant.name}</div>
               </div>
               <div className="plant-buttons">
-                <button className="edit-btn" onClick={() => handleEditClick(plant.id)}>Edit</button>
-                <button className="delete-btn" onClick={() => handleDeleteClick(plant.id)}>Delete</button>
+                <button className="edit-btn" onClick={() => handleEditClick(plant)}>Edit</button>
+                <button className="delete-btn" onClick={() => handleDeleteClick(plant)}>Delete</button>
               </div>
            </li>
           ))}
@@ -147,12 +143,12 @@ const Plants = ({ activeTab }) => {
         isOpen={isUpdatePlantModalOpen}
         onClose={handleCloseUpdatePlantModal}
         onSave={handleUpdatePlant}
-        user={selectedPlant} // Pass user data to UpdateUser
-        setUser={setSelectedPlant}
-          />
-          
-        <DeletePlant
-          isOpen={isDeletePlantModalOpen}
+        plant={selectedPlant}
+        setPlant={setSelectedPlant}
+      />
+
+      <DeletePlant
+        isOpen={isDeletePlantModalOpen}
           onClose={() => setIsDeletePlantModalOpen(false)}
           onDelete={handleConfirmDelete}
           plant={selectedPlant}
@@ -162,12 +158,12 @@ const Plants = ({ activeTab }) => {
             <div className="plant-detail-modal">
               <div className="modal-content">
                 <h3>{selectedPlant.name}</h3>
-                <img src={selectedPlant.image} alt={selectedPlant.name} style={{ width: '100px' }} />
+                <img src={`data:${selectedPlant.imageType};base64,${selectedPlant.imageData}`} alt={selectedPlant.name} style={{ width: '100px' }} />
                 <p>{selectedPlant.description}</p>
                 <ul>
-                  <li>Temperature🌡️: {selectedPlant.temperature}</li>
-                  <li>Humidity💧: {selectedPlant.humidity}</li>
-                  <li>Moisture🌿: {selectedPlant.moisture}</li>
+                  <li>Temperature🌡️: {selectedPlant.temperatureLow} - {selectedPlant.temperatureHigh}</li>
+                  <li>Humidity💧: {selectedPlant.humidityLow} - {selectedPlant.humidityHigh}</li>
+                  <li>Moisture🌿: {selectedPlant.moistureLow} - {selectedPlant.moistureHigh}</li>
                   <li>Nitrogen Level: {selectedPlant.nitrogen}</li>
                   <li>Phosphorus Level: {selectedPlant.phosphorus}</li>
                   <li>Potassium Level: {selectedPlant.potassium}</li>

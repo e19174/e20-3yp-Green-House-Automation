@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
-  ScrollView,
 } from "react-native";
 import { router } from "expo-router";
 import { Axios } from "../../AxiosRequestBuilder";
@@ -18,9 +17,12 @@ interface Plant {
   id: number;
   name: string;
   description: string;
-  temperature: number;
-  humidity: number;
-  moisture: number;
+  temperatureLow: number;
+  temperatureHigh: number;
+  humidityLow: number;
+  humidityHigh: number;
+  moistureLow: number;
+  moistureHigh: number;
   nitrogen: number;
   phosphorus: number;
   potassium: number;
@@ -106,8 +108,6 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "#01694D",
-    borderColor: "#ccc",
-    borderWidth: 1,
     borderRadius: 12,
     marginBottom: 16,
     padding: 10,

@@ -8,9 +8,12 @@ interface Plant {
     id: number;
     name: string;
     description: string;
-    temperature: number;
-    humidity: number;
-    moisture: number;
+    temperatureLow: number;
+    temperatureHigh: number;
+    humidityLow: number;
+    humidityHigh: number;
+    moistureLow: number;
+    moistureHigh: number;
     nitrogen: number;
     phosphorus: number;
     potassium: number;
@@ -25,9 +28,12 @@ const PlantDetail = () => {
         id: 0,
         name: '',
         description: '',
-        temperature: 0,
-        humidity: 0,
-        moisture: 0,
+        temperatureLow: 0,
+        temperatureHigh: 0,
+        humidityLow: 0,
+        humidityHigh: 0,
+        moistureLow: 0,
+        moistureHigh: 0,
         nitrogen: 0,
         phosphorus: 0,
         potassium: 0,
@@ -43,6 +49,7 @@ const PlantDetail = () => {
             try {
                 const plantId = JSON.parse(params.plantId as string);
                 const foundPlant = plants?.find(plant => plant.id == plantId);
+                
                 if (foundPlant) {
                     setPlant(foundPlant);
                 } else {
@@ -50,9 +57,12 @@ const PlantDetail = () => {
                         id: 0,
                         name: '',
                         description: '',
-                        temperature: 0,
-                        humidity: 0,
-                        moisture: 0,
+                        temperatureLow: 0,
+                        temperatureHigh: 0,
+                        humidityLow: 0,
+                        humidityHigh: 0,
+                        moistureLow: 0,
+                        moistureHigh: 0,
                         nitrogen: 0,
                         phosphorus: 0,
                         potassium: 0,
@@ -82,20 +92,20 @@ const PlantDetail = () => {
             >
             <Text style={styles.title}>{plant.name}</Text>
             <Image
-                source={{ uri: `data:${plant.imageType};base64,${plant.imageData}` }}
+                source={{ uri: `data:${plant.imageType};base64,${plant.imageData}` } }
                 style={styles.image}
             />
             <Text style={styles.label}>Description:</Text>
             <Text style={styles.value}>{plant.description}</Text>
 
             <Text style={styles.label}>Temperature:</Text>
-            <Text style={styles.value}>{plant.temperature}°C</Text>
+            <Text style={styles.value}>{plant.temperatureLow}°C - {plant.temperatureHigh}°C</Text>
 
             <Text style={styles.label}>Humidity:</Text>
-            <Text style={styles.value}>{plant.humidity}%</Text>
+            <Text style={styles.value}>{plant.humidityLow}% - {plant.humidityHigh}%</Text>
 
             <Text style={styles.label}>Moisture:</Text>
-            <Text style={styles.value}>{plant.moisture}%</Text>
+            <Text style={styles.value}>{plant.moistureLow}% - {plant.moistureHigh}%</Text>
 
             <Text style={styles.label}>Nitrogen:</Text>
             <Text style={styles.value}>{plant.nitrogen} mg/kg</Text>
@@ -129,14 +139,14 @@ image: {
     marginBottom: 20,
 },
 label: {
-    color: '#01694D',
-    fontSize: 16,
+    color: 'rgb(3, 128, 7)',
+    fontSize: 17,
     fontWeight: '600',
     marginTop: 10,
 },
 value: {
     color: '#ccc',
-    fontSize: 16,
+    fontSize: 17,
     marginBottom: 5,
 },
 });

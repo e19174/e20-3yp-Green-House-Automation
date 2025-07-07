@@ -3,6 +3,8 @@ package com.Green_Tech.Green_Tech.Service.MQTT;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
 import com.Green_Tech.Green_Tech.Entity.AwsIotCredentials;
 import com.Green_Tech.Green_Tech.Repository.AwsIotCredentialsRepo;
+import com.Green_Tech.Green_Tech.Service.DeviceService;
+import com.Green_Tech.Green_Tech.Service.PlantService;
 import com.Green_Tech.Green_Tech.Service.sensorData.SensorDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +16,7 @@ import software.amazon.awssdk.iot.AwsIotMqttConnectionBuilder;
 import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -21,6 +24,8 @@ public class MQTTService {
 
     @Autowired
     private SensorDataService sensorDataService;
+    @Autowired
+    private PlantService plantService;
 
     @Autowired
     private AwsIotCredentialsRepo awsIotCredentialsRepo;
@@ -104,8 +109,13 @@ public class MQTTService {
             connection.subscribe(topic, QualityOfService.AT_LEAST_ONCE, message -> {
                 String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
                 System.out.println("📩 [" + topic + "] " + payload);
+                String command = topic.split("/")[2];
                 try {
-                    sensorDataService.getDataFromAWS(message.getPayload());
+                    if(Objects.equals(command, "data")){
+                        sensorDataService.getDataFromAWS(message.getPayload());
+                    } else if (Objects.equals(command, "threshold-confirmation")) {
+                        plantService.thresholdConfirmation(message.getPayload());
+                    }
                 } catch (DeviceNotFoundException e) {
                     System.err.println("❌ Device not found while processing message");
                     e.printStackTrace();
@@ -119,7 +129,7 @@ public class MQTTService {
         }
     }
 
-    public void publishControlSignal(String message, Long deviceId) {
+    public void publishControlSignal(String message, Long deviceId, String operation) {
         try {
             AwsIotCredentials aws = awsIotCredentialsRepo.findByDeviceId(deviceId);
 
@@ -138,7 +148,7 @@ public class MQTTService {
             connection.connect().get();
 
             byte[] payload = message.getBytes(StandardCharsets.UTF_8);
-            String topic = "esp32/" + deviceId + "/command";
+            String topic = "esp32/" + deviceId + operation;
 
             MqttMessage mqttMessage = new MqttMessage(topic, payload, QualityOfService.AT_LEAST_ONCE);
             connection.publish(mqttMessage).get();

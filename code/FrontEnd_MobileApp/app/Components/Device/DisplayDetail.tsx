@@ -27,6 +27,7 @@ type Device = {
   active: boolean;
   user: User;
   plant: Plant;
+  isThresholdAssigned: boolean;
 };
 
 interface Plant {
@@ -66,6 +67,7 @@ const DisplayDetail: React.FC = () => {
     location: "",
     addedAt: "",
     active:false,
+    isThresholdAssigned: false,
     user: {
       name: "",
       email: "",
@@ -105,6 +107,8 @@ const DisplayDetail: React.FC = () => {
       Alert.alert("Error", "Please select a plant before adding the device.");
       return;
     }
+    console.log("Saving device:", device);
+    
     
     try {
       const response = await Axios.put(`/device/update/${device.id}`, {
@@ -187,6 +191,7 @@ const DisplayDetail: React.FC = () => {
             location: "",
             addedAt: "",
             active: false,
+            isThresholdAssigned: false,
             user: {
               name: "",
               email: "",

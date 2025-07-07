@@ -9,10 +9,13 @@ import com.Green_Tech.Green_Tech.Entity.Device;
 import com.Green_Tech.Green_Tech.Entity.Plant;
 import com.Green_Tech.Green_Tech.Entity.User;
 import com.Green_Tech.Green_Tech.Repository.*;
+import com.Green_Tech.Green_Tech.Service.MQTT.MQTTService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -32,6 +35,8 @@ public class DeviceService {
     private SensorDataRepository sensorDataRepository;
     @Autowired
     private PlantRepo plantRepo;
+    @Autowired
+    private MQTTService mqttService;
 
 
     // Get all devices
@@ -87,6 +92,7 @@ public class DeviceService {
                 .location("undefined")
                 .user(user)
                 .active(false)
+                .isThresholdAssigned(false)
                 .build();
 
         deviceRepository.save(device);
@@ -107,7 +113,19 @@ public class DeviceService {
         device.setZoneName(updatedDevice.get("zoneName"));
         device.setName(updatedDevice.get("name"));
         device.setLocation(updatedDevice.get("location"));
-        device.setPlant(plant);
+
+        if (!Objects.equals(device.getPlant().getId(), plant.getId())){
+            device.setPlant(plant);
+            String message = "{"
+                    + "\"temperature\":" + Arrays.toString(new Double[]{plant.getTemperatureLow(), plant.getTemperatureHigh()}) + ","
+                    + "\"humidity\":" + Arrays.toString(new Double[]{plant.getHumidityLow(), plant.getHumidityHigh()}) + ","
+                    + "\"moisture\":" + Arrays.toString(new Double[]{plant.getMoistureLow(), plant.getMoistureHigh()}) + ","
+                    + "\"nitrogen\":" + plant.getNitrogen() + ","
+                    + "\"phosphorus\":" + plant.getPhosphorus() + ","
+                    + "\"potassium\":" + plant.getPotassium()
+                    + "}";
+            mqttService.publishControlSignal(message, device.getId(), "/threshold");
+        }
 
         return deviceRepository.save(device);
     }

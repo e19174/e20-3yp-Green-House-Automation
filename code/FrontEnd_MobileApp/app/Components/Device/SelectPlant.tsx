@@ -7,9 +7,12 @@ interface Plant {
   id: number;
   name: string;
   description: string;
-  temperature: number;
-  moisture: number;
-  humidity: number;
+  temperatureLow: number;
+  temperatureHigh: number;
+  humidityLow: number;
+  humidityHigh: number;
+  moistureLow: number;
+  moistureHigh: number;
   phosphorus: number;
   nitrogen: number;
   potassium: number;

@@ -26,6 +26,7 @@ public class Device {
     @JoinColumn(name = "user_id")
     private User user;
     private boolean active;
+    private boolean isThresholdAssigned;
     @OneToOne
     @JoinColumn(name = "plant_id")
     private Plant plant;

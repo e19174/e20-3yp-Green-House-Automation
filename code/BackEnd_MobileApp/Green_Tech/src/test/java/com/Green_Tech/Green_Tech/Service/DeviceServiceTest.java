@@ -2,6 +2,7 @@ package com.Green_Tech.Green_Tech.Service;
 
 import com.Green_Tech.Green_Tech.CustomException.DeviceAlreadyFoundException;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
+import com.Green_Tech.Green_Tech.CustomException.PlantNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
 import com.Green_Tech.Green_Tech.DTO.DeviceDTO;
 import com.Green_Tech.Green_Tech.Entity.AwsIotCredentials;
@@ -150,7 +151,7 @@ class DeviceServiceTest {
    }
 
    @Test
-   void testUpdateDevice_DeviceExists_UpdatesAndReturns() throws DeviceNotFoundException {
+   void testUpdateDevice_DeviceExists_UpdatesAndReturns() throws DeviceNotFoundException, PlantNotFoundException {
       Long id = 1L;
       Device existingDevice = Device.builder().id(id).zoneName("oldZone").name("oldName").location("oldLoc").build();
       Map<String, String> updatedData = Map.of("zoneName", "newZone", "name", "newName", "location", "newLoc");

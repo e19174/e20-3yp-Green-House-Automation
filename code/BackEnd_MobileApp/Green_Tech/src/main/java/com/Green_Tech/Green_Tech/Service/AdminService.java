@@ -224,12 +224,15 @@ public class AdminService {
         Plant plant = Plant.builder()
                 .name(plantData.getName())
                 .description(plantData.getDescription())
-                .humidity(plantData.getHumidity())
-                .temperature(plantData.getTemperature())
+                .humidityLow(plantData.getHumidityLow())
+                .humidityHigh(plantData.getHumidityHigh())
+                .temperatureLow(plantData.getTemperatureLow())
+                .temperatureHigh(plantData.getTemperatureHigh())
                 .nitrogen(plantData.getNitrogen())
                 .phosphorus(plantData.getPhosphorus())
                 .potassium(plantData.getPotassium())
-                .moisture(plantData.getMoisture())
+                .moistureLow(plantData.getMoistureLow())
+                .moistureHigh(plantData.getMoistureHigh())
                 .imageData(file == null ?null: file.getBytes())
                 .imageName(file == null ?null: file.getOriginalFilename())
                 .imageType(file == null ?null: file.getContentType())
@@ -256,12 +259,15 @@ public class AdminService {
 
         existing.setName(plantData.getName());
         existing.setDescription(plantData.getDescription());
-        existing.setTemperature(plantData.getTemperature());
-        existing.setHumidity(plantData.getPhosphorus());
-        existing.setMoisture(plantData.getTemperature());
-        existing.setNitrogen(plantData.getPhosphorus());
-        existing.setPhosphorus(plantData.getTemperature());
-        existing.setPotassium(plantData.getPhosphorus());
+        existing.setTemperatureLow(plantData.getTemperatureLow());
+        existing.setTemperatureHigh(plantData.getTemperatureHigh());
+        existing.setHumidityLow(plantData.getHumidityLow());
+        existing.setHumidityHigh(plantData.getHumidityHigh());
+        existing.setMoistureLow(plantData.getMoistureLow());
+        existing.setMoistureHigh(plantData.getMoistureHigh());
+        existing.setNitrogen(plantData.getNitrogen());
+        existing.setPhosphorus(plantData.getPhosphorus());
+        existing.setPotassium(plantData.getPotassium());
 
 
         plantRepo.save(existing);

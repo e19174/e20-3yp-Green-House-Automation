@@ -34,7 +34,7 @@ public class SensorDataController {
         Long deviceId = payload.getDeviceId();
 
         mqttService.publishControlSignal("{\"index\":" + deviceIndex + ", \"status\":"+ turnOn + "}",
-                deviceId);
+                deviceId, "/command");
         String[] actuators = {"fan", "nitrogen", "phosphorus", "potassium", "water"};
         return "Command Sent: " + actuators[deviceIndex] + " - " + turnOn;
     }
