@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import './devices.css';
 import { Axios } from '../../AxiosBuilder';
 import UpdateDevice from './UpdateDevice';  // Import the UpdateDevice modal component
+import DeletePlant from '../plants/DeletePlant';
   // Import the UpdateDevice modal component
 
 const Device = ({ activeTab }) => {
   const [devices, setDevices] = useState([]);
   const [isAddDeviceModalOpen, setIsAddDeviceModalOpen] = useState(false);
   const [deviceToEdit, setDeviceToEdit] = useState({}); // Store the device to be edited
+  const [isDeletePlantModalOpen, setIsDeletePlantModalOpen] = useState(false);
+  const [selectedDevice, setSelectedDevice] = useState(null);
 
   useEffect(() => {
     const fetchDevices = async () => {
@@ -82,7 +85,10 @@ const Device = ({ activeTab }) => {
                     <td>{device?.user?.name || 'Unassigned'}</td>
                     <td>
                       <button className="edit-button" onClick={() => handleEdit(device)}>Edit</button>
-                      <button className="delete-button" onClick={() => handleDelete(device.id)}>Delete</button>
+                      <button className="delete-button" onClick={() => {
+                        setSelectedDevice(device);
+                        setIsDeletePlantModalOpen(true);
+                      }}>Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -100,6 +106,13 @@ const Device = ({ activeTab }) => {
         device={deviceToEdit}
         setDevice={setDeviceToEdit}
       />
+
+      <DeletePlant
+        isOpen={isDeletePlantModalOpen}
+          onClose={() => setIsDeletePlantModalOpen(false)}
+          onDelete={handleDelete}
+          plant={selectedDevice}
+        />
     </div>
   );
 };

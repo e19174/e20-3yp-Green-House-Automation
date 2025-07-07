@@ -4,6 +4,7 @@ import com.Green_Tech.Green_Tech.Config.JwtService;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.PlantNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
+import com.Green_Tech.Green_Tech.DTO.AdminDTO;
 import com.Green_Tech.Green_Tech.DTO.PlantDTO;
 import com.Green_Tech.Green_Tech.DTO.UserResponseDTO;
 import com.Green_Tech.Green_Tech.Entity.*;
@@ -191,16 +192,16 @@ public class AdminService {
         return deviceRepo.findAll();
     }
 
-    public Admin updateAdmin(Map<String, Object> adminData, String auth, MultipartFile image) throws UserNotFoundException, IOException {
+    public Admin updateAdmin(AdminDTO adminData, String auth) throws UserNotFoundException, IOException {
         Admin admin = extractUserService.extractAdminFromJwt(auth);
 
-        System.out.println(adminData.get("name"));
+        System.out.println(adminData.getName());
 
-        admin.setName((String) adminData.get("name"));
-        admin.setPhoneNumber((Integer) adminData.get("phoneNumber"));
-        admin.setImageName(image != null ? image.getName() : null);
-        admin.setImageType(image != null ? image.getContentType() : null);
-        admin.setImageData(image != null ? image.getBytes(): null);
+        admin.setName(adminData.getName());
+        admin.setPhoneNumber(adminData.getPhoneNumber());
+        admin.setImageName(adminData.getImage() != null ? adminData.getImage().getName() : null);
+        admin.setImageType(adminData.getImage() != null ? adminData.getImage().getContentType() : null);
+        admin.setImageData(adminData.getImage() != null ? adminData.getImage().getBytes(): null);
         admin.setUpdatedAt(new Date());
 
         return adminRepo.save(admin);

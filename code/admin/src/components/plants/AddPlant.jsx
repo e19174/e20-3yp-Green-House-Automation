@@ -42,7 +42,7 @@ const AddPlant = ({ isOpen, onClose, setPlants }) => {
     });
 
     if (image) {
-      if(image.size > 1 * 1024 * 1024) { // Check if image is larger than 2MB
+      if(image.size > 1 * 1024 * 1024) {
         alert('Image size exceeds 2MB limit. Please upload a smaller image.');
         return;
       }
@@ -154,19 +154,19 @@ const styles = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    backgroundColor: '#fff',
     padding: '30px 40px',
     borderRadius: '12px',
     boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
     zIndex: 1000,
-    width: '400px',
+    width: '500px',
     maxWidth: '90%',
-    maxHeight: '90vh',
+    maxHeight: '80vh',
     overflowY: 'auto',
+    background: 'linear-gradient(to bottom right, #014d36, #012A1C)',
   },
   title: {
     marginBottom: '20px',
-    color: '#2e7d32',
+    color: '#fff',
     fontWeight: '700',
     fontSize: '24px',
     textAlign: 'center',
@@ -174,7 +174,7 @@ const styles = {
   label: {
     display: 'block',
     marginBottom: '12px',
-    color: '#555',
+    color: '#fff',
     fontWeight: '600',
   },
   doubleInputRow: {
@@ -191,6 +191,7 @@ const styles = {
     border: '1.5px solid #a5d6a7',
     fontSize: '16px',
     outline: 'none',
+    backgroundColor: '#fff',
   },
   textarea: {
     width: '100%',
@@ -220,7 +221,7 @@ const styles = {
     transition: 'background-color 0.3s ease',
   },
   saveButton: {
-    backgroundColor: '#2e7d32',
+    backgroundColor: '#01694D',
     color: 'white',
     border: 'none',
     borderRadius: '6px',

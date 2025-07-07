@@ -21,7 +21,7 @@ const AdminProfile = () => {
           <h2 className="admin-profile-title">Admin Profile</h2>
           <div className="admin-profile-image">
             <img
-              src={ user?.profileImageData ? `data:${user?.profileImageType};base64,${user?.profileImageData}` : require('../../assets/profile_picture.webp')} // Fallback to default image if user has no profile image
+              src={ user?.imageData ? `data:${user?.imageType};base64,${user?.imageData}` : require('../../assets/profile_picture.webp')} // Fallback to default image if user has no profile image
               alt="Profile"
             />
           </div>

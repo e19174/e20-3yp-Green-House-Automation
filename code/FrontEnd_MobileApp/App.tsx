@@ -1,22 +1,22 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { initializeNotifications } from './app/Components/Notifiation Handler/NotificationHandler'; // Adjust path as needed
+// import { initializeNotifications } from './app/Components/Notifiation Handler/NotificationHandler'; // Adjust path as needed
 
 export default function App() {
-  useEffect(() => {
-    let unsubscribe: () => void;
+  // useEffect(() => {
+  //   let unsubscribe: () => void;
 
-    (async () => {
-      unsubscribe = await initializeNotifications();
-    })();
+  //   (async () => {
+  //     unsubscribe = await initializeNotifications();
+  //   })();
 
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
-  }, []);
+  //   return () => {
+  //     if (unsubscribe) {
+  //       unsubscribe();
+  //     }
+  //   };
+  // }, []);
 
   return (
     <View style={styles.container}>

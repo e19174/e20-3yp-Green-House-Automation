@@ -3,12 +3,15 @@ import AddUser from './AddUser'; // Adjust path if needed
 import UpdateUser from './UpdateUser'; // Import your UpdateUser component
 import './users.css';
 import { Axios } from '../../AxiosBuilder';
+import DeletePlant from '../plants/DeletePlant';
 
 const Users = ({ activeTab }) => {
   const [users, setUsers] = useState([]);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [isUpdateUserModalOpen, setIsUpdateUserModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isDeletePlantModalOpen, setIsDeletePlantModalOpen] = useState(false);
+
 
   const handleAddUserClick = () => {
     setIsAddUserModalOpen(true);
@@ -104,7 +107,10 @@ const Users = ({ activeTab }) => {
                 <td>{new Date(user?.createdAt).toLocaleDateString()}</td>
                 <td>
                   <button className="edit-btn" onClick={() => handleEditClick(user)}>Edit</button>
-                  <button className="delete-btn" onClick={() => handleDeleteClick(user?.id)}>Delete</button>
+                  <button className="delete-btn" onClick={() => {
+                    setSelectedUser(user);
+                    setIsDeletePlantModalOpen(true);
+                  }}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -125,6 +131,13 @@ const Users = ({ activeTab }) => {
         user={selectedUser} // Pass user data to UpdateUser
         setUser={setSelectedUser}
       />
+
+      <DeletePlant
+        isOpen={isDeletePlantModalOpen}
+          onClose={() => setIsDeletePlantModalOpen(false)}
+          onDelete={handleDeleteClick}
+          plant={selectedUser}
+        />
     </div>
   );
 };

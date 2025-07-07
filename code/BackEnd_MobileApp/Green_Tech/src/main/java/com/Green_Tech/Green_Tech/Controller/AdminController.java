@@ -3,6 +3,7 @@ package com.Green_Tech.Green_Tech.Controller;
 import com.Green_Tech.Green_Tech.CustomException.DeviceNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.PlantNotFoundException;
 import com.Green_Tech.Green_Tech.CustomException.UserNotFoundException;
+import com.Green_Tech.Green_Tech.DTO.AdminDTO;
 import com.Green_Tech.Green_Tech.DTO.PlantDTO;
 import com.Green_Tech.Green_Tech.Entity.Admin;
 import com.Green_Tech.Green_Tech.Entity.Device;
@@ -39,11 +40,10 @@ public class AdminController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Admin> updateAdmin(@ModelAttribute Map<String, Object> adminData,
-                                             @RequestHeader("Authorization") String auth,
-                                             @RequestParam(value = "image", required = false) MultipartFile image)
+    public ResponseEntity<Admin> updateAdmin(@ModelAttribute AdminDTO adminData,
+                                             @RequestHeader("Authorization") String auth)
             throws UserNotFoundException, IOException {
-        return ResponseEntity.ok(adminService.updateAdmin(adminData, auth, image));
+        return ResponseEntity.ok(adminService.updateAdmin(adminData, auth));
     }
 
     @GetMapping("/adminData")

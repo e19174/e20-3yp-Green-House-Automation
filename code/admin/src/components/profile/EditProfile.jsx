@@ -23,10 +23,10 @@ const EditProfile = ({ onSave }) => {
     }
 
     try {
-      const response = await Axios.put("/update/", form, {
+      const response = await Axios.put("/update", form, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("token")}`,
-          // 'Content-Type': "multipart/form-data"
+          'Content-Type': "multipart/form-data"
         }
       });
       console.log(response.data);

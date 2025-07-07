@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Axios } from '../../AxiosBuilder';
 
-const UpdatePlant = ({ isOpen, onClose, onSave, plant, setPlant }) => {
+const UpdatePlant = ({ isOpen, onClose, plant, setPlant, setPlants }) => {
+  const [image, setImage] = useState(null);
   if (!isOpen || !plant) return null;
 
   const handleChange = (e) => {
@@ -10,6 +12,7 @@ const UpdatePlant = ({ isOpen, onClose, onSave, plant, setPlant }) => {
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
+    setImage(file);
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -22,6 +25,36 @@ const UpdatePlant = ({ isOpen, onClose, onSave, plant, setPlant }) => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+    const handleUpdatePlant = async () => {
+      const form = new FormData();
+
+      Object.keys(plant).forEach(key => {
+        form.append(key, plant[key]);
+      });
+
+      if (image) {
+        if(image.size > 1 * 1024 * 1024) {
+          alert('Image size exceeds 2MB limit. Please upload a smaller image.');
+          return;
+        }
+        form.append('image', image);
+      }
+      try {
+        const response = await Axios.put(`/updatePlant/${plant.id}`, form, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem("token")}`,
+          }
+        });
+        setPlants(response.data);
+        alert("Plant updated successfully");
+      } catch (error) {
+        console.error(error);
+        alert('Failed to update plant');
+      }
+      onClose();
   };
 
   return (
@@ -55,27 +88,27 @@ const UpdatePlant = ({ isOpen, onClose, onSave, plant, setPlant }) => {
         <label style={styles.label}>Temperature 🌡️:
           <div style={styles.doubleInputRow}>
             <label htmlFor="temperatureLow">Low: </label>
-            <input name="temperatureLow" type="number" value={plant.temperatureLow || 0} onChange={handleChange} style={styles.input} />
+            <input name="temperatureLow" type="number" value={plant.temperatureLow} onChange={handleChange} style={styles.input} />
             <label htmlFor="temperatureHigh">High: </label>
-            <input name="temperatureHigh" type="number" value={plant.temperatureHigh || 0} onChange={handleChange} style={styles.input} />
+            <input name="temperatureHigh" type="number" value={plant.temperatureHigh} onChange={handleChange} style={styles.input} />
           </div>
         </label>
 
         <label style={styles.label}>Humidity 💧:
           <div style={styles.doubleInputRow}>
             <label htmlFor="humidityLow">Low: </label>
-            <input name="humidityLow" type="number" value={plant.humidityLow || 0} onChange={handleChange} style={styles.input} />
+            <input name="humidityLow" type="number" value={plant.humidityLow} onChange={handleChange} style={styles.input} />
             <label htmlFor="humidityHigh">High: </label>
-            <input name="humidityHigh" type="number" value={plant.humidityHigh || 0} onChange={handleChange} style={styles.input} />
+            <input name="humidityHigh" type="number" value={plant.humidityHigh} onChange={handleChange} style={styles.input} />
           </div>
         </label>
 
         <label style={styles.label}>Moisture 🌿:
           <div style={styles.doubleInputRow}>
             <label htmlFor="moistureLow">Low: </label>
-            <input name="moistureLow" type="number" value={plant.moistureLow || 0} onChange={handleChange} style={styles.input} />
+            <input name="moistureLow" type="number" value={plant.moistureLow} onChange={handleChange} style={styles.input} />
             <label htmlFor="moistureHigh">High: </label>
-            <input name="moistureHigh" type="number" value={plant.moistureHigh || 0} onChange={handleChange} style={styles.input} />
+            <input name="moistureHigh" type="number" value={plant.moistureHigh} onChange={handleChange} style={styles.input} />
           </div>
         </label>
 
@@ -125,7 +158,11 @@ const UpdatePlant = ({ isOpen, onClose, onSave, plant, setPlant }) => {
         {plant.imageData && (
           <div style={{ textAlign: 'center', marginTop: '10px' }}>
             <img
-              src={plant.imageData}
+              src={
+                plant.imageData.startsWith('data:')
+                  ? plant.imageData
+                  : `data:${plant.imageType};base64,${plant.imageData}`
+              }
               alt="Preview"
               style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '6px' }}
             />
@@ -133,8 +170,8 @@ const UpdatePlant = ({ isOpen, onClose, onSave, plant, setPlant }) => {
         )}
 
         <div style={styles.buttonRow}>
-          <button onClick={onSave} style={styles.saveButton}>Save</button>
           <button onClick={onClose} style={styles.cancelButton}>Cancel</button>
+          <button onClick={handleUpdatePlant} style={styles.saveButton}>Save</button>
         </div>
       </div>
     </>
@@ -153,18 +190,19 @@ const styles = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    backgroundColor: '#fff',
     padding: '30px 40px',
     borderRadius: '12px',
     boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
     zIndex: 1000,
-    width: '400px',
-    maxHeight: '90vh',
+    width: '500px',
+    maxHeight: '80vh',
     overflowY: 'auto',
+    background: 'linear-gradient(to bottom right, #014d36, #012A1C)',
+    
   },
   title: {
     marginBottom: '20px',
-    color: '#2e7d32',
+    color: '#fff',
     fontWeight: '700',
     fontSize: '24px',
     textAlign: 'center',
@@ -172,7 +210,7 @@ const styles = {
   label: {
     display: 'block',
     marginBottom: '12px',
-    color: '#555',
+    color: '#fff',
     fontWeight: '600',
   },
     doubleInputRow: {
@@ -187,6 +225,7 @@ const styles = {
     marginTop: '6px',
     borderRadius: '6px',
     border: '1.5px solid #a5d6a7',
+    backgroundColor: '#fff',
     fontSize: '16px',
     outline: 'none',
   },
@@ -217,7 +256,7 @@ const styles = {
     marginRight: '10px',
   },
   saveButton: {
-    backgroundColor: '#2e7d32',
+    backgroundColor: '#01694D',
     color: 'white',
     border: 'none',
     borderRadius: '6px',

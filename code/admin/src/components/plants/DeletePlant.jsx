@@ -1,4 +1,3 @@
-import React from 'react';
 
 const DeletePlant = ({ isOpen, onClose, onDelete, plant }) => {
   if (!isOpen || !plant) return null;
@@ -59,7 +58,7 @@ const styles = {
   },
   buttonRow: {
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     gap: '4px'
   },
   cancelButton: {

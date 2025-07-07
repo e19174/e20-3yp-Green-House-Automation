@@ -34,21 +34,6 @@ const Plants = ({ activeTab }) => {
     setIsDetailModalOpen(false);
     };
 
-  // const handleSavePlant = async (plantDetails) => {
-  //   try {
-  //     const response = await Axios.post('/addPlant', plantDetails, {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //           'Content-Type': 'multipart/form-data'
-  //         }
-  //     });
-  //     setPlants(response.data);
-  //   } catch (error) {
-  //     console.log(error);
-  //     alert('Failed to add plant');
-  //   }
-  // };
-
   const handleEditClick = (plant) => {
     setSelectedPlant(plant);
     setIsUpdatePlantModalOpen(true);
@@ -58,19 +43,6 @@ const Plants = ({ activeTab }) => {
     setIsUpdatePlantModalOpen(false);
     setSelectedPlant(null);
   };
-
-  const handleUpdatePlant = async () => {
-    try {
-      const response = await Axios.put(`/updatePlant/${selectedPlant.id}`, selectedPlant);
-      setPlants(response.data);
-    } catch (error) {
-      console.error(error);
-      alert('Failed to update plant');
-    }
-    setIsUpdatePlantModalOpen(false);
-    setSelectedPlant(null);
-  };
-  
 
   const handleDeleteClick = (plant) => {
     if (plant) {
@@ -142,9 +114,9 @@ const Plants = ({ activeTab }) => {
       <UpdatePlant
         isOpen={isUpdatePlantModalOpen}
         onClose={handleCloseUpdatePlantModal}
-        onSave={handleUpdatePlant}
         plant={selectedPlant}
         setPlant={setSelectedPlant}
+        setPlants={setPlants}
       />
 
       <DeletePlant
@@ -158,7 +130,7 @@ const Plants = ({ activeTab }) => {
             <div className="plant-detail-modal">
               <div className="modal-content">
                 <h3>{selectedPlant.name}</h3>
-                <img src={`data:${selectedPlant.imageType};base64,${selectedPlant.imageData}`} alt={selectedPlant.name} style={{ width: '100px' }} />
+                <img src={`data:${selectedPlant.imageType};base64,${selectedPlant.imageData}`} alt={selectedPlant.name}/>
                 <p>{selectedPlant.description}</p>
                 <ul>
                   <li>Temperature🌡️: {selectedPlant.temperatureLow} - {selectedPlant.temperatureHigh}</li>

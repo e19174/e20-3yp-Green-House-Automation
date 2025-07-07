@@ -46,6 +46,12 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
           Users
         </div>
         <div
+          className={`sidebar-item ${activeTab === 'plants' ? 'active' : ''}`}
+          onClick={() => handleTabClick('plants')}
+        >
+          Plants
+        </div>
+        <div
           className={`sidebar-item ${activeTab === 'profile' ? 'active' : ''}`}
           onClick={() => handleTabClick('profile')}
         >
@@ -56,12 +62,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
           onClick={() => handleTabClick('setting')}
         >
           Settings
-        </div>
-        <div
-          className={`sidebar-item ${activeTab === 'plants' ? 'active' : ''}`}
-          onClick={() => handleTabClick('plants')}
-        >
-          Plants
         </div>
 
       </div>
